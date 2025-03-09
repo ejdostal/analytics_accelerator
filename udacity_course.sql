@@ -1,4 +1,4 @@
--- select occured_at, account_id and channel columns from web_events table, limited to first 15 rows. -- 
+-- select 3 columns from web_events table, limited to first 15 rows. -- 
 
 SELECT occurred_at,
   account_id
