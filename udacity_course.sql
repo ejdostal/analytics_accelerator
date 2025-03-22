@@ -26,6 +26,7 @@ If you environment allows it, it will also allow you to run multiple queries at 
 
 -- Queries from Udacity course --
 
+-- SELECT & FROM -- 
 SELECT * 
 FROM orders  
   -- shows every row in the orders table, showing all available columns --
@@ -34,6 +35,9 @@ SELECT id, account_id, occurred_at
 FROM orders;
   -- shows data from just these 3 columns in the orders table. --
 
+
+
+-- LIMIT & ORDER BY -- 
 SELECT *
 FROM orders
 LIMIT 10; 
