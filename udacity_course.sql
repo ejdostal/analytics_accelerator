@@ -66,4 +66,8 @@ ORDER BY total_amt_usd
 LIMIT 20;
   -- returns these 3 columns for the 20 smallest orders in terms of sales (total_amt_usd). --
 
+SELECT account_id, total_amt_usd
+FROM orders
+ORDER BY account_id, total_amount_usd DESC;
+  -- returns these 2 columns, account_ids sorted from smallest to largest, and all orders associated with each account sorted by total_amt_usd from largest to smallest.--
 
