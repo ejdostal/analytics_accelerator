@@ -1,13 +1,21 @@
 /* 
 
 Clauses, Commands / Statements:
+
 - SELECT: choose columns (See all columns with *)
+
 - FROM: choose tables
-- ORDER BY: sorts your results using the data in any column
+
+- ORDER BY: sorts results by the data in any column
   - Useful when you want to sort orders by date, for example
-  - When you use ORDER BY in a SQL query, your output will be sorted that way only temporarily. The next query you run will encounter the unsorted data again. 
-  - It's important to keep in mind that this is different than using common spreadsheet software, where sorting the spreadsheet by column actually alters the data in that sheet until you undo or change that sorting. This highlights the meaning and function of a SQL "query".
-  - DESC can be added after the column in your ORDER BY statement to sort in descending order. (The default is to sort in ascending order: A to Z, lowest to highest, or earliest to latest.)
+  - The default is to sort in Ascending order: A to Z, lowest to highest, or earliest to latest. 
+  - DESC can be added after the column in your ORDER BY statement instead. 
+  - ORDER BY SQL queries only sort data temporarily, unlike sorting a spreadsheet by a column in Excel or Google Sheets (which alters the data).
+  - You can also use ORDER BY over multiple columns to achieve results. The sorting with happen in the order that you specify the columns.
+    --> Ex. ORDER BY account_id, total_amount_usd DESC; <--
+    This orders results by account id (from smallest to largest), then records within each account are displayed by largest total_amount_usd to smallest. 
+   
+
 - LIMIT: see just the first few rows of the table.
   - Useful when you want to see just the first few rows of a table. This can be much faster for loading than if we load the entire dataset. 
   - The LIMIT command is always the very last part of a query.
@@ -69,5 +77,4 @@ LIMIT 20;
 SELECT account_id, total_amt_usd
 FROM orders
 ORDER BY account_id, total_amount_usd DESC;
-  -- returns these 2 columns, account_ids sorted from smallest to largest, and all orders associated with each account sorted by total_amt_usd from largest to smallest.--
-
+ -- orders results by account id (from smallest to largest). Within each account, sorts orders from largest total_amt_usd to smallest. --
