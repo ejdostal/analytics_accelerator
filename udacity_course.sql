@@ -4,6 +4,9 @@ Clauses, Commands / Statements:
 
 - FROM: choose tables
 
+- WHERE: filters results based on a set of specific criteris
+    - Useful when you want to generate a list of all orders made by a specific customer, for example
+
 - ORDER BY: sorts results by the data in any column
   - Useful when you want to sort orders by date, for example
   - The default is to sort in Ascending order: A to Z, lowest to highest, or earliest to latest. 
@@ -89,3 +92,22 @@ ORDER BY total DESC, account_id;
   -- orders results largest total dollar amount (total_amt_usd or total) to smallest. If there are any orders with the exact same sales value, those will be sorted by account_id from smallest to largest. --
   /* In the queries above, the orders will appear from greatest to least regardless of which account ID they were from. Then they are sorted by account ID next. 
   The secondary sorting by account ID will be difficult to see here, since only if there were two orders with equal total dollar amounts would there need to be any sorting by account ID.) */
+
+--- WHERE ---
+
+SELECT *
+FROM orders
+WHERE gloss_amt_usd >= 1000
+LIMIT 5; 
+-- shows the first 5 rows from the orders table that have a dollar amount of 1000 or greater for gloss_amt_usd. --
+
+SELECT *
+FROM orders
+WHERE gloss_amt_use < 500
+LIMIT 10;
+-- shows the first 10 rows from the orders table that have a dollar amount less than 500 for gloss_amt_usd. --
+
+
+
+
+
