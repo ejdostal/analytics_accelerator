@@ -32,7 +32,6 @@ If you environment allows it, it will also allow you to run multiple queries at 
 
 
 -- Queries from Udacity course --
-
 -- SELECT & FROM -- 
 SELECT * 
 FROM orders  
@@ -93,8 +92,8 @@ ORDER BY total DESC, account_id;
   /* In the queries above, the orders will appear from greatest to least regardless of which account ID they were from. Then they are sorted by account ID next. 
   The secondary sorting by account ID will be difficult to see here, since only if there were two orders with equal total dollar amounts would there need to be any sorting by account ID.) */
 
---- WHERE ---
 
+--- WHERE ---
 SELECT *
 FROM orders
 WHERE gloss_amt_usd >= 1000
