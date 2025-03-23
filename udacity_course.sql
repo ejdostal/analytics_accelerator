@@ -4,7 +4,7 @@ Clauses, Commands / Statements:
 
 - FROM: choose tables
 
-- WHERE: filters results based on a set of specific criteris
+- WHERE: filters results based on a set of specific criteria; display subsets of tables based on conditions that must be met
     - Useful when you want to generate a list of all orders made by a specific customer, for example
 
 - ORDER BY: sorts results by the data in any column
