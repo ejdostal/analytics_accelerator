@@ -34,6 +34,7 @@ If you environment allows it, it will also allow you to run multiple queries at 
 
 -- Queries from Udacity course --
 
+
 -- SELECT & FROM -- 
 SELECT * 
 FROM orders  
@@ -73,6 +74,8 @@ FROM orders
 ORDER BY total_amt_usd
 LIMIT 20;
   -- returns these 3 columns for the 20 smallest orders in terms of sales (total_amt_usd). --
+
+-- ORDER BY (multiple columns at once) -- 
 
 SELECT account_id, total_amt_usd
 FROM orders
