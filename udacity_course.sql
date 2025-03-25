@@ -6,6 +6,8 @@ Clauses, Commands / Statements:
 
 - WHERE: filters results based on a set of specific criteria; display subsets of tables based on conditions that must be met
     - Useful when you want to generate a list of all orders made by a specific customer, for example
+    - Commonly when we are using WHERE with non-numeric data fields, we use the LIKE, NOT, or IN operators.
+    - SQL requires double quotes around text values.
 
 - ORDER BY: sorts results by the data in any column
   - Useful when you want to sort orders by date, for example
@@ -106,7 +108,14 @@ WHERE gloss_amt_use < 500
 LIMIT 10;
 -- shows the first 10 rows from the orders table that have a dollar amount less than 500 for gloss_amt_usd. --
 
+SELECT name, website, primary_poc
+FROM accounts
+WHERE name = 'Exxon Mobil';
+-- filters down to just these 3 columns where records are named "Exon Mobil." 
 
-
+SELECT id, (standard_amt_usd/total_amt_usd)*100 AS std_percent, total_amt_usd
+FROM orders
+LIMIT 10; 
+-- shows the id and the total_amt_usd columns, and temporarily creates a derived column named std_percent, cropped to just the first 10 rows of data in the table. --
 
 
