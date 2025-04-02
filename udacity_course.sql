@@ -22,6 +22,8 @@ Clauses, Commands / Statements:
   - Useful when you want to see just the first few rows of a table. This can be much faster for loading than if we load the entire dataset. 
   - The LIMIT command is always the very last part of a query.
 
+Derived columns - A new column created by manipulating existing columns in the database. 
+    - Give the column an alias by adding AS to the end of the line that produces the derived column.
 
 Best Practice:
 - Write SQL COMMANDS in all uppercase letters, keep everything else in your query lowercase.
@@ -116,6 +118,16 @@ WHERE name = 'Exxon Mobil';
 SELECT id, (standard_amt_usd/total_amt_usd)*100 AS std_percent, total_amt_usd
 FROM orders
 LIMIT 10; 
--- shows the id and the total_amt_usd columns, and temporarily creates a derived column named std_percent, cropped to just the first 10 rows of data in the table. --
+-- returns the id column, total_amt_usd column, temporarily creates a std_percent column, derived from original columns - and limits to the first 10 rows of data. --
+-- std_percent column finds the standard paper percent for the order by dividing the standard paper dollar amount by the total order amount.  --
 
 
+
+
+SELECT id, account_id, (standard_amt_usd / standard_qty) AS standard_unit_price
+FROM orders
+LIMIT 10;
+
+SELECT id, account_id, poster_amt_usd / (standard_amt_usd + gloss_amt_usd + poster_amt_usd)*100 AS poster_percent_revenue
+FROM orders
+LIMIT 10;
