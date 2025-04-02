@@ -118,16 +118,15 @@ WHERE name = 'Exxon Mobil';
 SELECT id, (standard_amt_usd/total_amt_usd)*100 AS std_percent, total_amt_usd
 FROM orders
 LIMIT 10; 
--- returns the id column, total_amt_usd column, temporarily creates a std_percent column, derived from original columns - and limits to the first 10 rows of data. --
+-- returns the id column, total_amt_usd column, and temporarily creates a std_percent column (derived from 2 original columns), limits to the first 10 rows of data. --
 -- std_percent column finds the standard paper percent for the order by dividing the standard paper dollar amount by the total order amount.  --
 
-
-
-
-SELECT id, account_id, (standard_amt_usd / standard_qty) AS standard_unit_price
+SELECT id, account_id, standard_amt_usd / standard_qty AS standard_unit_price
 FROM orders
 LIMIT 10;
+-- shows id, account_id columns, and derived column calculating the unit price for standard paper in the order, limits to the first 10 rows. --
 
-SELECT id, (account_id, poster_amt_usd / (standard_amt_usd + gloss_amt_usd + poster_amt_usd))*100 AS poster_percent
+SELECT id, account_id, (poster_amt_usd / (standard_amt_usd + gloss_amt_usd + poster_amt_usd))*100 AS poster_percent_rev
 FROM orders
 LIMIT 10;
+-- shows id, account_id columns, and derived column calculating the percentage of revenue that comes from poster paper for each order. --
