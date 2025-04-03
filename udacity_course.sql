@@ -1,16 +1,28 @@
 /* 
 
 Clauses, Commands / Statements:
-- SELECT: chooses the columns to show (See all columns with *)
+SELECT: chooses the columns to show (See all columns with *)
 
-- FROM: choose the tables you're pulling data from
+FROM: choose the tables you're pulling data from
 
-- WHERE: filters your results based on a set criteria; a "subset" of the table
+WHERE: filters your results based on a set criteria; a "subset" of the table
 - When using WHERE with non-numeric data fields, LIKE, NOT, or IN operators are often used.
-- SQL requires single quotes around text values.
+- SQL requires single quotes around text values. 
 
-    - LIKE: you use like within the WHERE clause
-    - requires the use of wildcards (ex. %)
+    LIKE: you use LIKE within the WHERE clause
+    - requires the use of wildcards (ex. % represents any number of characters)
+    - useful in any case where you have a lot of similar, but slightly different, values in a column.
+    - uppercase and lowercase letters are not the same in a string (ex. Searching for 'T' is not the same as searching for 't'.)
+
+    IN: you use IN within the WHERE clause
+    - allows you to check conditions for multiple column values within the same query 
+    - can use IN with both numeric and text columns
+    - you could also use OR operator to perform these tasks, but the IN operator is cleaner
+    - In most SQL environments, you can use single or double quotation marks around text values - although you may NEED to use double quotation marks if the text itself contains an apostrophe. --
+
+    NOT: you can use NOT with LIKE and IN operators in the WHERE clause
+    - By specifying NOT LIKE or NOT IN, we can grab all of the rows that do not meet a particular criteria.
+    - NOT provides the inverse results for IN, LIKE and similar operators.
 
 - ORDER BY: sorts results by the data in any column
   - Useful when you want to sort orders by date, for example
@@ -137,4 +149,52 @@ LIMIT 10;
 SELECT *
 FROM demo.web_events_full
 WHERE referrer_url LIKE '%google%';
--- captures all web traffic from google, regardless of the rest of the url.
+-- captures all refer urls with same domain (google),by finding all urls that contain 'google', but with any number of characters before or after it (represented by the % signs). --
+
+SELECT * 
+FROM accounts
+WHERE name LIKE 'C%';
+-- shows all records for companies whose name starts with "C" --
+
+SELECT *
+FROM accounts
+WHERE name LIKE '%one%';
+-- shows all records for companies whose name contains the string "one" somewhere in the name --
+
+SELECT *
+FROM accounts
+WHERE name LIKE '%s';
+-- shows all records for companies whose name ends in "s". --
+
+SELECT *
+FROM demo.orders
+WHERE account_id IN (1001, 1021);
+-- returns all records just for account ids 1001 and 1002. These records will appear all jumbled together because there's not ORDER BY clause here. --
+
+SELECT name, primary_poc, sales_rep_id
+FROM accounts
+WHERE name IN ('Walmart','Target', 'Nordstrom');
+-- returns these 3 columns for all accounts named "Walmart", "Target", and "Nordstrom". --
+
+SELECT *
+FROM web_events
+WHERE channel IN ('organic', 'adwords');
+-- returns records for all web events in which individuals were contacted via "organic" and "adwords" channels. --
+
+SELECT sales_rep_id,name
+FROM demo.accounts
+ORDER BY sales_rep_id;
+-- shows the sales rep id and name columns for all sales accounts, order in ascending order by sales rep id (least to greatest). --
+
+SELECT sales_rep_id,name
+FROM demo.accounts
+WHERE sales_rep_id IN (321500, 321570)
+ORDER BY sales_rep_id;
+-- filters down to just the sales accounts associated with sales rep ids 321500 and 321570. --
+
+SELECT sales_rep_id,name
+FROM demo.accounts
+WHERE sales_rep_id NOT IN (321500, 321570)
+ORDER BY sales_rep_id;
+-- returns the inverse or all accounts NOT included in the previous query; filters down to all sales accounts NOT associated with those sales rep ids. --
+
