@@ -1,13 +1,16 @@
 /* 
+
 Clauses, Commands / Statements:
-- SELECT: choose columns (See all columns with *)
+- SELECT: chooses the columns to show (See all columns with *)
 
-- FROM: choose tables
+- FROM: choose the tables you're pulling data from
 
-- WHERE: filters results based on a set of specific criteria; display subsets of tables based on conditions that must be met
-    - Useful when you want to generate a list of all orders made by a specific customer, for example
-    - Commonly when we are using WHERE with non-numeric data fields, we use the LIKE, NOT, or IN operators.
-    - SQL requires double quotes around text values.
+- WHERE: filters your results based on a set criteria; a "subset" of the table
+- When using WHERE with non-numeric data fields, LIKE, NOT, or IN operators are often used.
+- SQL requires single quotes around text values.
+
+    - LIKE: you use like within the WHERE clause
+    - requires the use of wildcards (ex. %)
 
 - ORDER BY: sorts results by the data in any column
   - Useful when you want to sort orders by date, for example
@@ -39,41 +42,41 @@ If you environment allows it, it will also allow you to run multiple queries at 
 -- SELECT & FROM -- 
 SELECT * 
 FROM orders  
-  -- shows every row in the orders table, showing all available columns --
+-- shows every row in the orders table, showing all available columns --
 
 SELECT id, account_id, occurred_at
 FROM orders;
-  -- shows data from just these 3 columns in the orders table. --
+-- shows data from just these 3 columns in the orders table. --
 
 
 -- LIMIT & ORDER BY -- 
 SELECT *
 FROM orders
 LIMIT 10; 
-  -- shows all columns in the orders table, but only the first 10 rows of data. -- 
+-- shows all columns in the orders table, but only the first 10 rows of data. -- 
 
 SELECT occurred_at, account_id, channel
 FROM web_events
 LIMIT 15;
-  -- shows only these 3 columns from the web_events table, limited to only the first 15 rows of data. -- 
+-- shows only these 3 columns from the web_events table, limited to only the first 15 rows of data. -- 
 
 SELECT id, occurred_at, total_amt_usd
 FROM orders
 ORDER BY occurred_at
 LIMIT 10;
-  -- returns the these 3 columns for the 10 earliest orders in the orders table (sorts the data from lowest to highest based on the occurred_at column, then limits to only the first 10 rows of data.) --
+-- returns the these 3 columns for the 10 earliest orders in the orders table (sorts the data from lowest to highest based on the occurred_at column, then limits to only the first 10 rows of data.) --
 
 SELECT id, account_id, total_amt_usd
 FROM orders
 ORDER BY total_amt_usd DESC
 LIMIT 5;
-  -- returns these 3 columns for the 5 largest orders in terms of sales (total_amt_usd). --
+ -- returns these 3 columns for the 5 largest orders in terms of sales (total_amt_usd). --
 
 SELECT id, account_id, total_amt_usd
 FROM orders
 ORDER BY total_amt_usd
 LIMIT 20;
-  -- returns these 3 columns for the 20 smallest orders in terms of sales (total_amt_usd). --
+-- returns these 3 columns for the 20 smallest orders in terms of sales (total_amt_usd). --
 
 SELECT account_id, total_amt_usd
 FROM orders
@@ -82,8 +85,8 @@ ORDER BY account_id, total_amt_usd DESC;
 SELECT id, account_id, total
 FROM orders
 ORDER BY account_id, total DESC; 
-   -- orders results by account id (from smallest to largest). Within each account, sorts orders from largest total dollar amount (total_amt_usd or total) to smallest --
-   -- In the queries above, all of the orders for each account ID are grouped together, and then within each of those groupings, the orders appear from the greatest order amount to the least. --
+-- orders results by account id (from smallest to largest). Within each account, sorts orders from largest total dollar amount (total_amt_usd or total) to smallest --
+-- In the queries above, all of the orders for each account ID are grouped together, and then within each of those groupings, the orders appear from the greatest order amount to the least. --
 
 SELECT account_id, total_amt_usd
 FROM orders
@@ -92,9 +95,9 @@ ORDER BY total_amount_usd DESC, account_id;
 SELECT id, account_id, total
 FROM orders
 ORDER BY total DESC, account_id;
-  -- orders results largest total dollar amount (total_amt_usd or total) to smallest. If there are any orders with the exact same sales value, those will be sorted by account_id from smallest to largest. --
-  /* In the queries above, the orders will appear from greatest to least regardless of which account ID they were from. Then they are sorted by account ID next. 
-  The secondary sorting by account ID will be difficult to see here, since only if there were two orders with equal total dollar amounts would there need to be any sorting by account ID.) */
+-- orders results largest total dollar amount (total_amt_usd or total) to smallest. If there are any orders with the exact same sales value, those will be sorted by account_id from smallest to largest. --
+/* In the queries above, the orders will appear from greatest to least regardless of which account ID they were from. Then they are sorted by account ID next. 
+The secondary sorting by account ID will be difficult to see here, since only if there were two orders with equal total dollar amounts would there need to be any sorting by account ID.) */
 
 
 --- WHERE ---
@@ -130,3 +133,8 @@ SELECT id, account_id, (poster_amt_usd / (standard_amt_usd + gloss_amt_usd + pos
 FROM orders
 LIMIT 10;
 -- shows id, account_id columns, and derived column calculating the percentage of revenue that comes from poster paper for each order. --
+
+SELECT *
+FROM demo.web_events_full
+WHERE referrer_url LIKE '%google%';
+-- captures all web traffic from google, regardless of the rest of the url.
