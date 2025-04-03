@@ -1,6 +1,5 @@
-/* 
-
-Clauses, Commands / Statements:
+/* Clauses, Commands / Statements:
+----------------------------------
 SELECT: chooses the columns to show (See all columns with *)
 
 FROM: choose the tables you're pulling data from
@@ -9,29 +8,40 @@ WHERE: filters your results based on a set criteria; a "subset" of the table
 - When using WHERE with non-numeric data fields, LIKE, NOT, or IN operators are often used.
 - SQL requires single quotes around text values. 
 
-    LIKE: you use LIKE within the WHERE clause
+    LIKE: use LIKE within the WHERE clause.
     - requires the use of wildcards (ex. % represents any number of characters)
     - useful in any case where you have a lot of similar, but slightly different, values in a column.
     - uppercase and lowercase letters are not the same in a string (ex. Searching for 'T' is not the same as searching for 't'.)
 
-    IN: you use IN within the WHERE clause
+    IN: use IN within the WHERE clause.
     - allows you to check conditions for multiple column values within the same query 
     - can use IN with both numeric and text columns
     - you could also use OR operator to perform these tasks, but the IN operator is cleaner
     - In most SQL environments, you can use single or double quotation marks around text values - although you may NEED to use double quotation marks if the text itself contains an apostrophe. --
 
-    NOT: you can use NOT with LIKE and IN operators in the WHERE clause
+    NOT: use NOT with LIKE, IN and similar operators within the WHERE clause.
     - By specifying NOT LIKE or NOT IN, we can grab all of the rows that do not meet a particular criteria.
-    - NOT provides the inverse results for IN, LIKE and similar operators.
+    - NOT provides the inverse results for IN.
 
-- ORDER BY: sorts results by the data in any column
-  - Useful when you want to sort orders by date, for example
-  - The default is to sort in Ascending order: A to Z, lowest to highest, or earliest to latest. 
-  - DESC can be added after the column in your ORDER BY statement to flip the sort. 
-  - SQL queries only sort data temporarily, unlike sorting a spreadsheet by a column in Excel or Google Sheets which permanently alters the data until you change or undo it.
-  - You can also use ORDER BY over multiple columns to achieve results. The sorting with happen in the order that you specify the columns.
-    --> Ex. ORDER BY account_id, total_amount_usd DESC; <--
-    This orders results by account id (from smallest to largest), then records within each account are ordered from largest total_amount_usd to smallest. 
+    AND: use AND within the WHERE clause.
+    - used to consider more than one column at a time; you may link as many statements as you would like to consider at the same time.
+    - Each time you link a new statement with an AND, you need to state the column of interest independently, even when referring to the same column.
+    - AND works with arithmetic operators (+, *, -, /).
+    - LIKE, IN, and NOT operators can be linked using the AND operator. 
+
+    BETWEEN:
+    - When using the same column for different parts of an AND statement, BETWEEN is often a cleaner statement to use.
+        AND: WHERE column >= 6 AND column <=10
+        BETWEEN - cleaner: WHERE column BETWEEN 6 AND 10
+
+ORDER BY: sorts results by the data in any column
+- useful when you want to sort orders by date, for example
+- the default is to sort in Ascending order: A to Z, lowest to highest, or earliest to latest. 
+- DESC can be added after the column in your ORDER BY statement to flip the sort. 
+- SQL queries only sort data temporarily, unlike sorting a spreadsheet by a column in Excel or Google Sheets which permanently alters the data until you change or undo it.
+- you can also use ORDER BY over multiple columns to achieve results. The sorting with happen in the order that you specify the columns.
+ Ex. ORDER BY account_id, total_amount_usd DESC; 
+This orders results by account id (from smallest to largest), then records within each account are ordered from largest total_amount_usd to smallest. 
 
 - LIMIT: limits results to the first few rows in the table.
   - Useful when you want to see just the first few rows of a table. This can be much faster for loading than if we load the entire dataset. 
@@ -197,4 +207,15 @@ FROM demo.accounts
 WHERE sales_rep_id NOT IN (321500, 321570)
 ORDER BY sales_rep_id;
 -- returns the inverse or all accounts NOT included in the previous query; filters down to all sales accounts NOT associated with those sales rep ids. --
+
+SELECT *
+FROM demo.orders
+WHERE occurred_at >= '2016-04-01' AND occurred_at <= '2016-10-01'
+ORDER BY occurred_at DESC
+-- filters down to only purchases made by customers between April and October 2016 (April 1st to October 1st). --
+-- reorders results from most recent to oldest purchase dates; helps to confirm that orders after October 1st were actually excluded. --
+-- Notice how the column needs to be stated independently each time, even when operating on the same column name.
+
+
+
 
