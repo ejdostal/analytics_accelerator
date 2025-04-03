@@ -1,5 +1,5 @@
 /* Clauses, Commands / Statements:
-----------------------------------
+
 SELECT: chooses the columns to show (See all columns with *)
 
 FROM: choose the tables you're pulling data from
@@ -35,10 +35,8 @@ WHERE: filters your results based on a set criteria; a "subset" of the table
     BETWEEN (cleaner): WHERE column BETWEEN 6 AND 10
     - BETWEEN is inclusive, which means that the end points of BETWEEN statements are included in final results.
     - BETWEEN assumes the time is at 00:00:00 (i.e. midnight) for dates.
-        - For that reason, you'll want to set the last point one day later than the actual date. 
-        - (ex. to find all dates in 2016, you'd set it as date BETWEEN '2016-01-01' AND '2017-01-01'; 
-        Finds all dates between midnight on Jan 1st 2016 and midnight on Jan 1st 2017 (which is basically only one minute into 2017).
-
+    - For that reason, you'll want to set the last endpoint one day later than the actual date. 
+    - Ex. To find all dates in 2016, you'd set it as date BETWEEN '2016-01-01' AND '2017-01-01' - finding all dates between midnight on Jan 1st 2016 and midnight on Jan 1st 2017.
 
 ORDER BY: sorts results by the data in any column
 - useful when you want to sort orders by date, for example
@@ -46,15 +44,20 @@ ORDER BY: sorts results by the data in any column
 - DESC can be added after the column in your ORDER BY statement to flip the sort. 
 - SQL queries only sort data temporarily, unlike sorting a spreadsheet by a column in Excel or Google Sheets which permanently alters the data until you change or undo it.
 - you can also use ORDER BY over multiple columns to achieve results. The sorting with happen in the order that you specify the columns.
- Ex. ORDER BY account_id, total_amount_usd DESC; 
-This orders results by account id (from smallest to largest), then records within each account are ordered from largest total_amount_usd to smallest. 
+- Ex. ORDER BY account_id, total_amount_usd DESC; 
+- This orders results by account id (from smallest to largest), then records within each account are ordered from largest total_amount_usd to smallest. 
 
-- LIMIT: limits results to the first few rows in the table.
-  - Useful when you want to see just the first few rows of a table. This can be much faster for loading than if we load the entire dataset. 
-  - The LIMIT command is always the very last part of a query.
+LIMIT: limits results to the first few rows in the table.
+- useful when you want to see just the first few rows of a table. This can be much faster for loading than if we load the entire dataset. 
+- the LIMIT command is always the very last part of a query.
+
+
+*****
 
 Derived columns - A new column created by manipulating existing columns in the database. 
-    - Give the column an alias by adding AS to the end of the line that produces the derived column.
+- Give the column an alias by adding AS to the end of the line that produces the derived column.
+
+*****
 
 Best Practice:
 - Write SQL COMMANDS in all uppercase letters, keep everything else in your query lowercase.
@@ -64,13 +67,13 @@ Best Practice:
 - Put a semicolon at the end of each statement. Depending on your SQL environment, your query may need a semicolon at the end to execute.
 If you environment allows it, it will also allow you to run multiple queries at once
 
+*/
 
 
-Queries from Udacity course */
---------------------------- 
-
+-- Queries from Udacity course --
+*****
+    
 -- SELECT and FROM (1.11) --
-
 SELECT * 
 FROM orders  
 -- shows every row in the orders table, showing all available columns --
@@ -81,7 +84,6 @@ FROM orders;
 
 
 -- LIMIT and ORDER BY (1.15) --
-
 SELECT *
 FROM orders
 LIMIT 10; 
@@ -134,7 +136,6 @@ The secondary sorting by account ID will be difficult to see here, since only if
 
 
 --- WHERE (1.24) ---
-
 SELECT *
 FROM orders
 WHERE gloss_amt_usd >= 1000
@@ -155,7 +156,6 @@ WHERE name = 'Exxon Mobil';
 
 
 -- Arithmetic Operators (1.30) --
-
 SELECT id, (standard_amt_usd/total_amt_usd)*100 AS std_percent, total_amt_usd
 FROM orders
 LIMIT 10; 
@@ -174,7 +174,6 @@ LIMIT 10;
 
 
 -- LIKE (1.34) --
-
 SELECT *
 FROM demo.web_events_full
 WHERE referrer_url LIKE '%google%';
@@ -197,7 +196,6 @@ WHERE name LIKE '%s';
 
 
 -- IN (1.37) --
-
 SELECT *
 FROM demo.orders
 WHERE account_id IN (1001, 1021);
@@ -227,7 +225,6 @@ ORDER BY sales_rep_id;
 
 
 -- NOT (1.40) --
-
 SELECT sales_rep_id,name
 FROM demo.accounts
 WHERE sales_rep_id NOT IN (321500, 321570)
@@ -245,7 +242,6 @@ ORDER BY occurred_at DESC
 
     
 -- AND and BETWEEN (1.43) --  
-    
 SELECT *
 FROM orders
 WHERE standard_qty > 1000 AND poster_qty = 0 AND gloss_qty = 0;
