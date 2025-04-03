@@ -30,9 +30,15 @@ WHERE: filters your results based on a set criteria; a "subset" of the table
     - LIKE, IN, and NOT operators can be linked using the AND operator. 
 
     BETWEEN:
-    - When using the same column for different parts of an AND statement, BETWEEN is often a cleaner statement to use.
-        AND: WHERE column >= 6 AND column <=10
-        BETWEEN - cleaner: WHERE column BETWEEN 6 AND 10
+    - When using the same column for different parts of an AND statement, BETWEEN is often a cleaner replacement.
+    AND: WHERE column >= 6 AND column <=10
+    BETWEEN (cleaner): WHERE column BETWEEN 6 AND 10
+    - BETWEEN is inclusive, which means that the end points of BETWEEN statements are included in final results.
+    - BETWEEN assumes the time is at 00:00:00 (i.e. midnight) for dates.
+        - For that reason, you'll want to set the last point one day later than the actual date. 
+        - (ex. to find all dates in 2016, you'd set it as date BETWEEN '2016-01-01' AND '2017-01-01'; 
+        Finds all dates between midnight on Jan 1st 2016 and midnight on Jan 1st 2017 (which is basically only one minute into 2017).
+
 
 ORDER BY: sorts results by the data in any column
 - useful when you want to sort orders by date, for example
@@ -57,11 +63,14 @@ Best Practice:
   - In other environments, you might see this as square brackets instead (Ex: FROM [Table Name]). 
 - Put a semicolon at the end of each statement. Depending on your SQL environment, your query may need a semicolon at the end to execute.
 If you environment allows it, it will also allow you to run multiple queries at once
-*/ 
 
 
--- Queries from Udacity course --
--- SELECT & FROM -- 
+
+Queries from Udacity course */
+--------------------------- 
+
+-- SELECT and FROM (1.11) --
+
 SELECT * 
 FROM orders  
 -- shows every row in the orders table, showing all available columns --
@@ -71,7 +80,8 @@ FROM orders;
 -- shows data from just these 3 columns in the orders table. --
 
 
--- LIMIT & ORDER BY -- 
+-- LIMIT and ORDER BY (1.15) --
+
 SELECT *
 FROM orders
 LIMIT 10; 
@@ -122,7 +132,9 @@ ORDER BY total DESC, account_id;
 The secondary sorting by account ID will be difficult to see here, since only if there were two orders with equal total dollar amounts would there need to be any sorting by account ID.) */
 
 
---- WHERE ---
+
+--- WHERE (1.24) ---
+
 SELECT *
 FROM orders
 WHERE gloss_amt_usd >= 1000
@@ -140,6 +152,10 @@ FROM accounts
 WHERE name = 'Exxon Mobil';
 -- filters down to just these 3 columns where records are named "Exon Mobil." 
 
+
+
+-- Arithmetic Operators (1.30) --
+
 SELECT id, (standard_amt_usd/total_amt_usd)*100 AS std_percent, total_amt_usd
 FROM orders
 LIMIT 10; 
@@ -155,6 +171,9 @@ SELECT id, account_id, (poster_amt_usd / (standard_amt_usd + gloss_amt_usd + pos
 FROM orders
 LIMIT 10;
 -- shows id, account_id columns, and derived column calculating the percentage of revenue that comes from poster paper for each order. --
+
+
+-- LIKE (1.34) --
 
 SELECT *
 FROM demo.web_events_full
@@ -175,6 +194,9 @@ SELECT *
 FROM accounts
 WHERE name LIKE '%s';
 -- shows all records for companies whose name ends in "s". --
+
+
+-- IN (1.37) --
 
 SELECT *
 FROM demo.orders
@@ -202,6 +224,10 @@ WHERE sales_rep_id IN (321500, 321570)
 ORDER BY sales_rep_id;
 -- filters down to just the sales accounts associated with sales rep ids 321500 and 321570. --
 
+
+
+-- NOT (1.40) --
+
 SELECT sales_rep_id,name
 FROM demo.accounts
 WHERE sales_rep_id NOT IN (321500, 321570)
@@ -216,6 +242,34 @@ ORDER BY occurred_at DESC
 -- reorders results from most recent to oldest purchase dates; helps to confirm that orders after October 1st were actually excluded. --
 -- Notice how the column needs to be stated independently each time, even when operating on the same column name.
 
+
+    
+-- AND and BETWEEN (1.43) --  
+    
+SELECT *
+FROM orders
+WHERE standard_qty > 1000 AND poster_qty = 0 AND gloss_qty = 0;
+-- returns all orders where the standard quantity is over 1000, the poster quantity is 0, and the gloss quantity is 0. --
+
+SELECT name
+FROM accounts
+WHERE name NOT LIKE 'C%' AND name NOT LIKE '%s';
+-- returns all company names that do not begin with a "C" or end in an "s".
+
+SELECT occurred_at, gloss_qty
+FROM orders 
+WHERE gloss_qty BETWEEN 24 and 29;
+-- returns the order date and gloss quantity columns for all columns where the gloss quantity is between 24 and 29. --
+-- BETWEEN is inclusive so gloss quantities of 24 and 29 would be included in the results. --
+
+SELECT *
+FROM web_events
+WHERE channel IN ('organic', 'adwords')
+AND occurred_at BETWEEN '2016-01-01' AND '2017-01-01'
+ORDER BY occurred_at DESC;
+-- returns all records for individuals who contacted via organic or adwords channels and started their accounts at some point in 2016, sorted from newest to oldest customers. --
+-- BETWEEN '2016-01-01' AND '2017-01-01' is finding all dates between midnight on Jan 1st 2016, and midnight on Jan 1st 2017 
+-- midnight on Jan 1st 2017 is basically only one minute into 2017; which is why we set the right-side endpoint of the period at '2017-01-01.' --
 
 
 
