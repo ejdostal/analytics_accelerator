@@ -394,6 +394,10 @@ JOIN accounts a
 o.account_id = a.id;
 -- Alias names of "o" and "a" are given for the orders and accounts tables in the FROM and JOIN clauses. The table names can then be replaced with their aliases throughout the rest of the query. (in SELECT and ON, in this case) --
 
+
+-- JOIN Quizzes -- 
+
+-- 1 --
 SELECT accounts.primary_poc,
 web_events.occurred_at,
 web_events.channel,
@@ -412,7 +416,7 @@ WHERE a.name = 'Walmart';
 -- The only difference is the tables aren't given aliases in the first query, whereas the second query does give the tables aliases.
 -- The web_events table is joined with the accounts table on account id to gather all selected columns for the output. --
 
-
+-- 2 --
 SELECT region.name AS region,
 sales_reps.name AS sales_rep,
 accounts.name AS account
@@ -433,18 +437,34 @@ ORDER BY a.name;
 -- Both queries show the region name from the region table, the sales representative name from the sales_reps table, and the account name from the accounts table. --
     -- region and sales_reps are joined based on region id, meanwhile sales_reps and accounts are joined based on sales representative id. --
     -- The results are sorted from A-Z based by account name.
--- The only difference is the tables aren't given aliases in the first query, whereas the second query does give the tables aliases. 
 -- Both queries give the columns aliases for a more readable resulting table, but use different methods to achieve the same result.
+-- The only difference is the tables aren't given aliases in the first query, whereas the second query does give the tables aliases. 
 
 
 
-SELECT region.name,
-accounts.name,
+-- 3 --
+SELECT region.name AS region, 
+accounts.name AS account,
 orders.total_amt_usd/(orders.total + 0.01) AS unit_price
 FROM region
-JOIN sales_rep
-ON region.id = sales_reps.region_id
+JOIN sales_reps
+ON region.id = sales_reps.region_id   
 JOIN accounts
-ON sales_reps.region_id = accounts.sales_rep_id
+ON sales_reps.id = accounts.sales_rep_id
 JOIN orders
-ON accounts.id = orders.account_id;
+ON accounts.id = orders.account_id ;
+
+SELECT r.name region, a.name account, 
+           o.total_amt_usd/(o.total + 0.01) unit_price
+FROM region r
+JOIN sales_reps s
+ON s.region_id = r.id
+JOIN accounts a
+ON a.sales_rep_id = s.id
+JOIN orders o
+ON o.account_id = a.id;
+-- Both queries output the region name from the region table, account name from the accounts table, and calculate the order unit_price from the orders table. --
+    -- "0.01" is added to the total column in the unit_price calculation to avoid division by zero - a few accounts had totals of 0. --
+    -- region and sales_reps tables are joined on region id, sales_reps and accounts tables are joined on sales representative id, and accounts and orders tables or joined on account id. -- 
+-- Both queries give the columns aliases for a more readable resulting table, but use different methods to achieve the same result.
+-- The only difference is the tables aren't given aliases in the first query, whereas the second query does give the tables aliases. --
