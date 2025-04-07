@@ -61,6 +61,16 @@ LIMIT: limits results to the first few rows in the table.
 - the LIMIT command is always the very last part of a query.
 
 
+JOIN: allows us to pull data from more than one table at a time. Joining tables allows you access to each of the tables in the SELECT statement through the table name, and the columns will always follow a . after the table name.
+- SELECT indicates which column(s) of data you'd like to see in the output. 
+    - "TableA." gives us all the columns that table in the output.
+    - "TableA.ColumnNameC" gives us that specific column from that table in the output.
+- The FROM clause indicates the first table from which we're pulling data, and the JOIN indicates the second table. Nonetheless, the result is the same if you were to switch the tables in the FROM and JOIN.
+- The ON clause is used to specify the JOIN condition, by specifying the column on which you'd like to merge the two tables together. Which side of the = sign a column is listed doesn't matter.
+
+
+
+
 *****
 
 Derived columns - A new column created by manipulating existing columns in the database. 
@@ -310,6 +320,13 @@ WHERE (name LIKE 'C%' OR name LIKE 'W%')
 
 
 -- JOIN (2.3) --
+SELECT orders.*,
+    accounts.*
+FROM accounts
+JOIN orders
+ON accounts.id = orders.account_id;
+-- joins the orders table with the accounts table and pulls all data from both tables.
+
 SELECT accounts.name, orders.occurred_at
 FROM orders
 JOIN accounts
@@ -320,20 +337,14 @@ SELECT *
 FROM orders
 JOIN accounts
 ON orders.account_id = accounts.id;
--- The accounts table is joined with the orders table on account id, then returns all columns from both the accounts table and orders table. --
+-- The accounts table is joined with the orders table on account id, then returns all columns from BOTH the accounts table and orders table. --
 
-SELECT orders.*,
+SELECT orders.*
 FROM orders
 JOIN accounts
 ON orders.account_id = accounts.id
--- The accounts table is joined with the orders table on account id, then returns all the information from the orders table, and nothing from the accounts table. --
-
-SELECT orders.*, accounts.*
-FROM accounts
-JOIN orders
-ON accounts.id = orders.account_id;
--- joins orders table on the accounts table and pulls all data from 
-
+-- The orders table is joined with the accounts table on account id, then then pulls all the information ONLY from the orders table. --
+-- This query only pulls data from the orders table because SELECT only references columns from the orders table. --
 
 SELECT orders.standard_qty,
 orders.gloss_qty,
@@ -343,3 +354,7 @@ accounts.primary_poc
 FROM orders
 JOIN accounts
 ON orders.account_id = accounts.id;
+
+
+
+
