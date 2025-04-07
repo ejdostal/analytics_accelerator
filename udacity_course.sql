@@ -64,7 +64,7 @@ LIMIT: limits results to the first few rows in the table.
 JOIN: allows us to pull data from more than one table at a time. Joining tables allows you access to each of the tables in the SELECT statement through the table name, and the columns will always follow a . after the table name.
 - SELECT indicates which column(s) of data you'd like to see in the output. 
     - "TableA." gives us all the columns that table in the output.
-    - "TableA.ColumnNameC" gives us that specific column from that table in the output.
+    - "TableA.ColumnNameC" gives us that specific column from that table in the output. We need to specify the table every column comes from in the SELECT statement.
 - The FROM clause indicates the first table from which we're pulling data, and the JOIN indicates the second table. Nonetheless, the result is the same if you were to switch the tables in the FROM and JOIN.
 - The ON clause is used to specify the JOIN condition, by specifying the column on which you'd like to merge the two tables together. Which side of the = sign a column is listed doesn't matter.
 
@@ -354,6 +354,7 @@ accounts.primary_poc
 FROM orders
 JOIN accounts
 ON orders.account_id = accounts.id;
+-- Joins the orders table and accounts table on account id; them pulls these 2 columns from the orders table and these 2 columns from the accounts table. --
 
 
 
