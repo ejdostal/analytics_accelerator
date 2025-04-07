@@ -47,6 +47,7 @@ WHERE: filters your results based on a set criteria; a "subset" of the table
     - When combining multiple of these operations, you frequently might need to use parentheses to assure that the logic you want to perform is being executed correctly.
 
 
+
 ORDER BY: sorts results by the data in any column
 - useful when you want to sort orders by date, for example
 - the default is to sort in Ascending order: A to Z, lowest to highest, or earliest to latest. 
@@ -65,10 +66,13 @@ JOIN: allows us to pull data from more than one table at a time. Joining tables 
 - SELECT indicates which column(s) of data you'd like to see in the output. 
     - "TableA." gives us all the columns that table in the output.
     - "TableA.ColumnNameC" gives us that specific column from that table in the output. We need to specify the table every column comes from in the SELECT statement.
-- The FROM clause indicates the first table from which we're pulling data, and the JOIN indicates the second table. Nonetheless, the result is the same if you were to switch the tables in the FROM and JOIN.
+- The FROM clause indicates the first table from which we're pulling data, and the JOIN indicates the second table. The result is still the same if you were to switch the tables in the FROM and JOIN.
 - The ON clause is used to specify the JOIN condition, by specifying the column on which you'd like to merge the two tables together. Which side of the = sign a column is listed doesn't matter.
-
-
+    - A Primary Key (PK) exists in every table. It is a column that has a unique value for every row. It is common for the primary key to be the first column in our tables in most databases.
+    - A Foreign Key (FK) is a column in one table that is a primary key in a different table. Each foreign key is linked to the primary key of another table. (the primary-foreign key link that connects the 2 tables)
+    - The crow's foot in an ERD shows that the FK can actually appear in many rows in the table its touching. 
+    - The single line in an ERD shows that the PK can only appear in one row in the table its touching.
+    - Foreign keys can appear many times in a single table, whereas Primary keys can only appear once. This is always the case for a primary-foreign key relationship.
 
 
 *****
