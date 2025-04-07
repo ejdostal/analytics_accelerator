@@ -82,11 +82,9 @@ JOIN: allows us to pull data from more than one table at a time.
     
     - Aliases - When we JOIN tables together, each table is often given an alias. Frequently it's just the first letter of the table name. You can add aliases in the FROM or JOIN clauses by typing the table name, a space, and then the letter. 
     - While aliasing tables is the most common use case, selected columns can also be aliased give the resulting table more readable column names.
+    - We can simply write our alias directly after the column name (in the SELECT) or table name (in the FROM or JOIN) by writing the alias directly following the column or table we would like to alias. 
+    - This will allow you to create clear column names even if calculations are used to create the column, and you can be more efficient with your code by aliasing table names.
 
-/* Ex:
-Select t1.column1 aliasname, t2.column2 aliasname2
-FROM tablename AS t1
-JOIN tablename2 AS t2 /* 
 
 *****
 
@@ -396,4 +394,41 @@ JOIN accounts a
 o.account_id = a.id;
 -- Alias names of "o" and "a" are given for the orders and accounts tables in the FROM and JOIN clauses. The table names can then be replaced with their aliases throughout the rest of the query. (in SELECT and ON, in this case) --
 
+SELECT accounts.primary_poc,
+web_events.occurred_at,
+web_events.channel,
+accounts.name
+FROM web_events
+JOIN accounts
+ON web_events.account_id = accounts.id
+WHERE accounts.name = 'Walmart';
 
+SELECT a.primary_poc, w.occurred_at, w.channel, a.name
+FROM web_events w
+JOIN accounts a
+ON w.account_id = a.id
+WHERE a.name = 'Walmart';
+-- Both of these queries show the primary point of contact, time of web event, channel of web event, and the account name (in this case, all Walmart) for all web_events where the account name is "Walmart."
+-- The only difference is the tables aren't given aliases in the first query, whereas the second query does.
+-- The web_events table is joined with the accounts table on account id to gather all selected columns for the output. --
+
+
+SELECT region.name,
+sales_reps.name,
+accounts.name
+FROM region
+JOIN sales_reps
+ON region.id = sales_reps.region_id
+ON sales_reps.id = accounts.sales_rep_id
+ORDER BY accounts.name;
+
+SELECT region.name,
+accounts.name,
+orders.total_amt_usd/(orders.total + 0.01) AS unit_price
+FROM region
+JOIN sales_rep
+ON region.id = sales_reps.region_id
+JOIN accounts
+ON sales_reps.region_id = accounts.sales_rep_id
+JOIN orders
+ON accounts.id = orders.account_id;
