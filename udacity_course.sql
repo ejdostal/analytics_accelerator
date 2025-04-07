@@ -62,27 +62,26 @@ LIMIT: limits results to the first few rows in the table.
 - the LIMIT command is always the very last part of a query.
 
 
-JOIN: allows us to pull data from more than one table at a time. Joining tables allows you access to each of the tables in the SELECT statement through the table name, and the columns will always follow a . after the table name.
-- SELECT indicates which column(s) of data you'd like to see in the output. 
-    - "TableA." gives us all the columns that table in the output.
-    - "TableA.ColumnNameC" gives us that specific column from that table in the output. We need to specify the table every column comes from in the SELECT statement.
-- The FROM clause indicates the first table from which we're pulling data, and the JOIN indicates the second table. The result is still the same if you were to switch the tables in the FROM and JOIN.
-- The ON clause is used to specify the JOIN condition, by specifying the column on which you'd like to merge the two tables together. Which side of the = sign a column is listed doesn't matter.
-    - A Primary Key (PK) exists in every table. It is a column that has a unique value for every row. It is common for the primary key to be the first column in our tables in most databases.
-    - Primary key - has a unique value for every row in that column. There is one in every table. There is one and only of these columns in every table. They are a column in a table.
-    - The primary key is a single column that must exist in each table of a database. Again, these rules are true for most major databases, but some databases may not enforce these rules.
-- A Foreign Key (FK) is a column in one table that is a primary key in a different table. Each foreign key is linked to the primary key of another table. (the primary-foreign key link that connects the 2 tables)
-    - Foreign key - the link to the primary key that exists in another table. They are always linked to a primary key. If every forieng key is associated with a crow foot notation, this suggests it can appear multiple times in the column of a table.
-    - Foreign keys are always associated with a primary key, and they are associated with the crow-foot notation above to show they can appear multiple times in a particular table.
-- The crow's foot in an ERD shows that the FK can actually appear in many rows in the table its touching. 
-    - The single line in an ERD shows that the PK can only appear in one row in the table its touching.
-    - Foreign keys can appear many times in a single table, whereas Primary keys can only appear once. This is always the case for a primary-foreign key relationship.
-- The two tables you'd like to join are listed in the FROM and the JOIN clauses.
-- In the ON, we will always have the PK equal to the FK.
-- The way we join any two table is by linking the PK and the FK, generally in the ON statement.
-- Aliases - Aliases are often given to table names when tables are joined together. Frequently an alias is just the first letter of the table name. You can add aliases in the FROM or JOIN clauses by typing the table name, a space, and then the letter. 
-- Optionally, you could also use a space, then the AS statement, then a space, then a letter to create an alias for tables - like you would when creating a new column name for a derived column. Both ways would produce the same resulting alias for both tables and derived columns. -- 
-- While aliasing tables is the most common use case, it can also be used to alias the columns selected to have the resulting table reflect a more readable name.
+JOIN: allows us to pull data from more than one table at a time. 
+- Joining tables gives you access to each of the tables in the SELECT statement through the table name, a ".", and the column name you want to pull from that table.
+
+    - SELECT indicates which column(s) of data you'd like to see in the output. 
+        - "TableA." gives us all the columns that table in the output.
+        - "TableA.ColumnNameC" gives us that specific column from that table in the output. We need to specify the table every column comes from in the SELECT statement.
+
+    - The FROM clause indicates the first table from which we're pulling data, and the JOIN indicates the second table. To join two tables, list them in the FROM and JOIN clauses.
+    - The result is still the same if you were to switch the tables in the FROM and JOIN.
+
+    - The ON clause is used to specify the JOIN condition, by specifying the column on which you'd like to merge the two tables together. 
+    - Which side of the = sign a column is listed doesn't matter.
+    - Joining tables involves linking their PKs and FKS, usually in the ON clause.
+
+    - A Primary Key (PK) exists in every table and is a unique column for each row. It’s often the first column in tables. The single line in an ERD indicates that a PK can only appear in one row in the table it touches.
+    - A Foreign Key (FK) is a column in one table that’s a primary key in another. Each FK links to a primary key in another table. The crow’s foot in an ERD indicates that a FK can appear in multiple rows in the table it touches.
+        - Foreign keys can appear multiple times in a single table, while primary keys can only appear once.
+    
+    - Aliases - When we JOIN tables together, each table is often given an alias. Frequently it's just the first letter of the table name. You can add aliases in the FROM or JOIN clauses by typing the table name, a space, and then the letter. 
+    - While aliasing tables is the most common use case, selected columns can also be aliased give the resulting table more readable column names.
 
 /* Ex:
 Select t1.column1 aliasname, t2.column2 aliasname2
