@@ -381,6 +381,7 @@ orders.total
 FROM accounts
 ON web_events.account_id = accounts.id
 ON accounts.id = orders.accounts_id;
--- 
+-- Joins 3 tables, again using the same logic. This time pulling only the channel column from the web_events table, the name column from the accounts table, and the total column from the orders table. --
+
 
 
