@@ -409,18 +409,34 @@ JOIN accounts a
 ON w.account_id = a.id
 WHERE a.name = 'Walmart';
 -- Both of these queries show the primary point of contact, time of web event, channel of web event, and the account name (in this case, all Walmart) for all web_events where the account name is "Walmart."
--- The only difference is the tables aren't given aliases in the first query, whereas the second query does.
+-- The only difference is the tables aren't given aliases in the first query, whereas the second query does give the tables aliases.
 -- The web_events table is joined with the accounts table on account id to gather all selected columns for the output. --
 
 
-SELECT region.name,
-sales_reps.name,
-accounts.name
+SELECT region.name AS region,
+sales_reps.name AS sales_rep,
+accounts.name AS account
 FROM region
 JOIN sales_reps
 ON region.id = sales_reps.region_id
+JOIN accounts
 ON sales_reps.id = accounts.sales_rep_id
 ORDER BY accounts.name;
+
+SELECT r.name region, s.name rep, a.name account
+FROM sales_reps s
+JOIN region r
+ON s.region_id = r.id
+JOIN accounts a
+ON a.sales_rep_id = s.id
+ORDER BY a.name;
+-- Both queries show the region name from the region table, the sales representative name from the sales_reps table, and the account name from the accounts table. --
+    -- region and sales_reps are joined based on region id, meanwhile sales_reps and accounts are joined based on sales representative id. --
+    -- The results are sorted from A-Z based by account name.
+-- The only difference is the tables aren't given aliases in the first query, whereas the second query does give the tables aliases. 
+-- Both queries give the columns aliases for a more readable resulting table, but use different methods to achieve the same result.
+
+
 
 SELECT region.name,
 accounts.name,
