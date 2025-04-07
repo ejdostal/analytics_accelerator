@@ -80,7 +80,14 @@ JOIN: allows us to pull data from more than one table at a time. Joining tables 
 - The two tables you'd like to join are listed in the FROM and the JOIN clauses.
 - In the ON, we will always have the PK equal to the FK.
 - The way we join any two table is by linking the PK and the FK, generally in the ON statement.
+- Aliases - Aliases are often given to table names when tables are joined together. Frequently an alias is just the first letter of the table name. You can add aliases in the FROM or JOIN clauses by typing the table name, a space, and then the letter. 
+- Optionally, you could also use a space, then the AS statement, then a space, then a letter to create an alias for tables - like you would when creating a new column name for a derived column. Both ways would produce the same resulting alias for both tables and derived columns. -- 
+- While aliasing tables is the most common use case, it can also be used to alias the columns selected to have the resulting table reflect a more readable name.
 
+/* Ex:
+Select t1.column1 aliasname, t2.column2 aliasname2
+FROM tablename AS t1
+JOIN tablename2 AS t2 /* 
 
 *****
 
@@ -383,5 +390,9 @@ ON web_events.account_id = accounts.id
 ON accounts.id = orders.accounts_id;
 -- Joins 3 tables, again using the same logic. This time pulling only the channel column from the web_events table, the name column from the accounts table, and the total column from the orders table. --
 
-
-
+SELECT o.*,
+a.*
+FROM orders o
+JOIN accounts a
+o.account_id = a.id;
+-- Alias names of "o" and "a" are given for the orders and accounts tables in the FROM and JOIN clauses. The table names can then be replaced their aliases throughout the rest of the query (ex. SELECT and ON, in this case). --
