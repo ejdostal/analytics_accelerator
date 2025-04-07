@@ -309,4 +309,37 @@ WHERE (name LIKE 'C%' OR name LIKE 'W%')
 
 
 
+-- JOIN (2.3) --
+SELECT accounts.name, orders.occurred_at
+FROM orders
+JOIN accounts
+ON orders.account_id = accounts.id;
+-- The accounts table is joined with the orders table on account id, then returns only the account name from the accounts table and the dates in which that account placed orders from the orders table. --
 
+SELECT *
+FROM orders
+JOIN accounts
+ON orders.account_id = accounts.id;
+-- The accounts table is joined with the orders table on account id, then returns all columns from both the accounts table and orders table. --
+
+SELECT orders.*,
+FROM orders
+JOIN accounts
+ON orders.account_id = accounts.id
+-- The accounts table is joined with the orders table on account id, then returns all the information from the orders table, and nothing from the accounts table. --
+
+SELECT orders.*, accounts.*
+FROM accounts
+JOIN orders
+ON accounts.id = orders.account_id;
+-- joins orders table on the accounts table and pulls all data from 
+
+
+SELECT orders.standard_qty,
+orders.gloss_qty,
+orders.poster_qty,
+accounts.website,
+accounts.primary_poc
+FROM orders
+JOIN accounts
+ON orders.account_id = accounts.id;
