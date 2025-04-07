@@ -69,10 +69,17 @@ JOIN: allows us to pull data from more than one table at a time. Joining tables 
 - The FROM clause indicates the first table from which we're pulling data, and the JOIN indicates the second table. The result is still the same if you were to switch the tables in the FROM and JOIN.
 - The ON clause is used to specify the JOIN condition, by specifying the column on which you'd like to merge the two tables together. Which side of the = sign a column is listed doesn't matter.
     - A Primary Key (PK) exists in every table. It is a column that has a unique value for every row. It is common for the primary key to be the first column in our tables in most databases.
-    - A Foreign Key (FK) is a column in one table that is a primary key in a different table. Each foreign key is linked to the primary key of another table. (the primary-foreign key link that connects the 2 tables)
-    - The crow's foot in an ERD shows that the FK can actually appear in many rows in the table its touching. 
+    - Primary key - has a unique value for every row in that column. There is one in every table. There is one and only of these columns in every table. They are a column in a table.
+    - The primary key is a single column that must exist in each table of a database. Again, these rules are true for most major databases, but some databases may not enforce these rules.
+- A Foreign Key (FK) is a column in one table that is a primary key in a different table. Each foreign key is linked to the primary key of another table. (the primary-foreign key link that connects the 2 tables)
+    - Foreign key - the link to the primary key that exists in another table. They are always linked to a primary key. If every forieng key is associated with a crow foot notation, this suggests it can appear multiple times in the column of a table.
+    - Foreign keys are always associated with a primary key, and they are associated with the crow-foot notation above to show they can appear multiple times in a particular table.
+- The crow's foot in an ERD shows that the FK can actually appear in many rows in the table its touching. 
     - The single line in an ERD shows that the PK can only appear in one row in the table its touching.
     - Foreign keys can appear many times in a single table, whereas Primary keys can only appear once. This is always the case for a primary-foreign key relationship.
+- The two tables you'd like to join are listed in the FROM and the JOIN clauses.
+- In the ON, we will always have the PK equal to the FK.
+- The way we join any two table is by linking the PK and the FK, generally in the ON statement.
 
 
 *****
@@ -360,6 +367,20 @@ JOIN accounts
 ON orders.account_id = accounts.id;
 -- Joins the orders table and accounts table on account id; them pulls these 2 columns from the orders table and these 2 columns from the accounts table. --
 
+SELECT *
+FROM web_events
+JOIN accounts
+ON web_events.account_id = accounts.id
+ON accounts.id = orders.accounts_id;
+-- Joins 3 tables using the same logic, pulling all data from all 3 joined tables. --
+-- For efficiency reasons, we probably don't want to do this unless we actually need the information from all of the tables. --
 
+SELECT web_events.channel,
+accounts.name,
+orders.total
+FROM accounts
+ON web_events.account_id = accounts.id
+ON accounts.id = orders.accounts_id;
+-- 
 
 
