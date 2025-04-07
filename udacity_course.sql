@@ -394,4 +394,6 @@ a.*
 FROM orders o
 JOIN accounts a
 o.account_id = a.id;
--- Alias names of "o" and "a" are given for the orders and accounts tables in the FROM and JOIN clauses. The table names can then be replaced their aliases throughout the rest of the query (ex. SELECT and ON, in this case). --
+-- Alias names of "o" and "a" are given for the orders and accounts tables in the FROM and JOIN clauses. The table names can then be replaced with their aliases throughout the rest of the query. (in SELECT and ON, in this case) --
+
+
