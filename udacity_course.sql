@@ -554,27 +554,125 @@ AND accounts.sales_rep_id = 321500
 -- (OUTER JOIN) Quiz: Last Check (2.19) --
 
 -- 1 --
-SELECT r.name region_name, s.name sales_rep_name, a.name account_name
+SELECT r.name region, s.name rep, a.name account
 FROM region r
 JOIN sales_reps s
 ON r.id = s.region_id
 AND r.name = 'Midwest'
 JOIN accounts a
 ON s.id = a.sales_rep_id
-ORDER BY account_name;
+ORDER BY a.name;
 -- Returns 3 columns - the region name, sales representative name, and the account name.
--- First, gathers only rows from the region table where the name is "Midwest."
--- Then joins THAT subset of rows from the reigon table with information in the sales_reps table - only the rows where region_id matches between both the subset from the region table and the sales_reps table.
--- Then, on THIS new subset of rows, information from the accounts table is joined - only the rows where sales representative id matches between both the subset of the sales_reps table and the accounts table.
+-- First, gathers only rows from the region table where the name is "Midwest" and joins THOSE rows with information in the sales_reps table where the region id matches those in the "Midwest" subset. 
+-- Then new information from the accounts table is joined to this second subset wherever sales representative id matches with the accounts table. 
+-- Results are ordered from A-Z by account name.
+
+SELECT r.name region, s.name rep, a.name account
+FROM region r
+JOIN sales_reps s
+ON r.id = s.region_id
+AND r.name = 'Midwest'
+JOIN accounts a
+ON s.id = a.sales_rep_id
+ORDER BY a.name;
+-- You could also write the query #1 like this. It returns the same results. --
+-- This was the answer in 2.20 Solutions: Last Check. --
+
 
 -- 2 --
-SELECT r.name region_name, s.name sales_rep_name, a.name accounts_name
+SELECT r.name region, s.name rep, a.name account
 FROM region r
 JOIN sales_reps s
 ON r.id = s.region_id AND r.name = 'Midwest' AND s.name LIKE 'S%'
 JOIN accounts a
-ON s.id = a.sales_rep_id;
--- Returns the same 3 columns
--- Gathers only rows from the region table where region name is "Midwest" and only rows from the sales_reps table where the sales representative name begins with an "S". Then combines these rows - only where region id matches between both subsets.
--- THEN THAT new subset of rows is joined with information in the accounts table - only where the sales representative id matches between the combined subset from the sales_reps table and the accounts table. 
+ON s.id = a.sales_rep_id
+ORDER BY a.name;
+-- Returns the same 3 columns.
+-- First, gathers only rows from the region table where region name is "Midwest" in a subset table
+-- Also gathers only rows from the sales_reps table where the sales rep name begins with an "S" into a second subset table.
+-- Then the "Midwest" subset table is joined with the "rep names that begin with an 'S'" subset table wherever region id matches between the two subsets - this creates a third subset. 
+-- The "Midwest + rep names that begin with an 'S'" third subset is then joined with the accounts table wherever sales representative id matches between the third subset and the accounts table.
+-- Results are ordered from A-Z by account name.
+
+SELECT r.name region, s.name rep, a.name account
+FROM region r
+JOIN sales_reps s
+ON r.id = s.region_id AND r.name = 'Midwest' AND s.name LIKE 'S%'
+JOIN accounts a
+ON s.id = a.sales_rep_id
+ORDER BY a.name;
+-- You could also write the query #2 like this. It returns the same results. --
+-- This was the answer in 2.20 Solutions: Last Check. --
+
+
+-- 3 -- 
+SELECT r.name region, s.name rep, a.name account
+FROM sales_reps s
+JOIN region r
+ON s.region_id = r.id
+WHERE s.name LIKE '% K%' AND r.name = 'Midwest'
+JOIN accounts a
+ON s.id = s.sales_rep_id
+ORDER BY a.name;
+-- didn't work --
+
+SELECT r.name region, s.name rep, a.name account
+FROM region r
+JOIN sales_reps s
+ON r.id = region_id
+AND s.name LIKE '% K%' AND r.name = 'Midwest'
+JOIN accounts a
+ON s.id = a.sales_rep_id
+ORDER BY a.name;
+-- worked --
+
+-- 4 --
+SELECT r.name region, a.name account,
+o.total_amt_usd/(o.total + 0.01) unit_price
+FROM region r
+JOIN sales_reps s
+ON r.id = s.region_id
+JOIN accounts a
+ON s.id = a.sales_rep_id
+JOIN orders o
+ON a.id = o.account_id
+WHERE o.standard_qty > 100 ;
+
+-- 5 --
+SELECT r.name region, a.name account, 
+o.total_amt_usd / (o.total + 0.01) unit_price
+FROM region r
+JOIN sales_reps s
+ON r.id = s.region_id
+JOIN accounts a
+ON s.id = a.sales_rep_id
+JOIN orders o
+ON a.id = o.account_id
+WHERE standard_qty > 100 
+AND poster_qty > 50
+ORDER BY unit_price;
+
+-- 6 --
+SELECT r.name region, a.name account, 
+o.total_amt_usd / (o.total + 0.01) unit_price
+FROM region r
+JOIN sales_reps s
+ON r.id = s.region_id
+JOIN accounts a
+ON s.id = a.sales_rep_id
+JOIN orders o
+ON a.id = o.account_id
+WHERE standard_qty > 100 
+AND poster_qty > 50
+ORDER BY unit_price DESC;
+
+-- 7 -- 
+SELECT o.occurred_at occurred_at, a.name account,
+o.total, o.total_amt_usd
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+AND o.occurred_at BETWEEN '2015-01-01' AND '2016-01-01';
+
+
 
