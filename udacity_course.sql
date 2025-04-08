@@ -86,22 +86,26 @@ JOIN: allows us to pull data from more than one table at a time.
     - one-to-one and one-to-many relationships are common when working with PKs and FKs.
     - however, traditional databases do not allow for many-to-many relationships, as these break the schema down pretty quickly.
 
-    - INNER JOIN - returns only rows that appear in both tables; only rows where the id that appears in the first table also matches the id in the second column.
+    - INNER JOIN (or JOIN is exactly the same command) - returns only rows that appear in both tables; only rows where the id that appears in the first table also matches the id in the second column.
     - ex. simply attaching account names to each order; excluding accounts without orders placed yet is probably fine
-    - so far we've been working with inner joins
+    - so far we've been working with inner joins; we have pulled rows only if they exist as a match across two tables.
     
-    - OUTER JOIN - used to also include data (rows) that only exist in one table but not the other
+    - OUTER JOIN - used to also include data (rows) that only exist in one table but not the other; allow us to pull rows that might only exist in one of the two tables.  This will introduce a new data type called NULL
     - ex. goal is to count up all the accounts in the region along with their quantities of paper purchased; probably want to include the accounts without any orders 
     - Outer joins (Left Join, Right Join, and Full Outer Join) still provide all of the resulting rows on an inner join - but you may also gain some additional rows.
     - The results of an Outer Join will always have at least as many rows as an inner join (if they have the same logic in the ON clause).
     - The table in the FROM statement is the Left table; the one in the Join statement is the Right table.
         
-        LEFT JOIN -  returns all rows matching with the Right table. It also returns any additional rows in the Left table that did not match. 
+        LEFT JOIN (or LEFT OUTER JOIN is the exact same command) -  returns all rows matching with the Right table. It also returns any additional rows in the Left table that did not match. 
 
-        RIGHT JOIN - returns all rows matching with the Left table. It also returns any additional rows from the Right table that did not match. 
+        RIGHT JOIN (or RIGHT OUTER JOIN is the exact same command) - returns all rows matching with the Left table. It also returns any additional rows from the Right table that did not match. 
         - The rows in the Right table that don't match the rows in the Left table will be included at the bottom of the results. They don't match with rows in the Left table, so any columns from the Left table will contain no data for these rows.
+        - You can consider any cell without data as NULL.
         - Left and Right Joins are effectively interchangeable so you'll rarely see a Right Join "in the wild". (if you switch the tables in the FROM and JOIN clauses in a Left Join, you'll effectively still get the same results of a right join. 
 
+        OUTER JOIN (or FULL OUTER JOIN is the exact same command) - this returns the inner join result set, as any unmatched rows from either of the two tables being joined.
+        - Again, this returns rows that do not match one another from the two tables. 
+        - The use cases for a full outer join are very rare.
 
 ------------------------------------
 
@@ -489,5 +493,25 @@ JOIN accounts a
 ON orders.account_id = accounts.id
 -- This an example of an inner join (what you've done so far). --
 -- This pulls the account id and account name from the accounts table and the total from the orders table - but only the rows where the account id in the orders table matches the account id in the accounts table. --
+
+SELECT c.countryid, c.countryName, s.stateName
+FROM Country c
+JOIN State s
+ON c.countryid = s.countryid;
+-- an inner join; returns country id and country name from the Country table and state name from the State table - only for where the country id in the Country table matches the country id in the State table. --
+
+SELECT c.countryid, c.countryName, s.stateName
+FROM Country c
+LEFT JOIN State s
+ON c.countryid = s.countryid;
+-- a left join, also returns country id and country name from the Country table and state name from the State table - includes all the rows where the country id matches in both tables. ALSO returns additional rows from the Country table where country id didn't match a country id in the State table. --
+
+
+
+
+
+
+
+
 
 
