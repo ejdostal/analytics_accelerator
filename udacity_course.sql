@@ -107,6 +107,8 @@ JOIN: allows us to pull data from more than one table at a time.
         - Again, this returns rows that do not match one another from the two tables. 
         - The use cases for a full outer join are very rare.
 
+
+        
 ------------------------------------
 
 Derived columns - A new column created by manipulating existing columns in the database. 
@@ -505,8 +507,15 @@ FROM Country c
 LEFT JOIN State s
 ON c.countryid = s.countryid;
 -- a left join, also returns country id and country name from the Country table and state name from the State table - includes all the rows where the country id matches in both tables. ALSO returns additional rows from the Country table where country id didn't match a country id in the State table. --
+-- We are essentially JOINing the matching PK-FK links from the two tables, as we did before, but we are also pulling all the additional rows from the Country table even if they don't have a match in the State table. 
+-- Therefore, we're obtaining all the rows of the INNER JOIN, but we also get additional rows from the table in the FROM.
 
-
+SELECT c.countryid, c.countryName, s.stateName
+FROM State s
+LEFT JOIN Country c
+ON c.countryid = s.countryid;
+-- FINAL LEFT JOIN Note - If we were to flip the tables, we would actually obtain the same exact result as the (inner) JOIN statement directly above.
+-- This is because if State is on the LEFT table, all of the rows exist in the RIGHT table again.
 
 
 
