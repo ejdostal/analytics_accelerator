@@ -664,6 +664,7 @@ WHERE standard_qty > 100
 AND poster_qty > 50
 ORDER BY unit_price;
 -- Same as query #4, but the final subset was are even further so as to show only orders where standard order quanity is greater than $100 AND poster order quantity is greater than $50. 
+-- Results are sorted from least to greatest unit price. 
 -- My solution AND the solution in 2.20 Solutions: Last Check. --
 
 -- 6 --
@@ -679,14 +680,27 @@ ON a.id = o.account_id
 WHERE standard_qty > 100 
 AND poster_qty > 50
 ORDER BY unit_price DESC;
+-- Same as query #5, but results are sorted from greatest to least unit price instead. 
+-- My solution AND the solution in 2.20 Solutions: Last Check. 
 
--- 7 -- 
+
+-- 7 --
+SELECT DISTINCT a.name, w.channel
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+WHERE a.id = 1001;
+-- Returns all the different channesl used by account id 1001. 
+-- SELECT DISTINCT is used to narrow down the results to only the unique values.
+-- My solution AND (basically) the solution in 2.20 Solutions: Last Check.
+
+-- 8 -- 
 SELECT o.occurred_at occurred_at, a.name account,
 o.total, o.total_amt_usd
 FROM orders o
 JOIN accounts a
 ON o.account_id = a.id
 AND o.occurred_at BETWEEN '2015-01-01' AND '2016-01-01';
-
-
+-- Finds all orders that occurred in 2015, showing the occurred_at, account name, order total, and total order amount in USD columns.
+-- My solution AND (basically) the solution in 2.20 Solutions: Last Check. 
 
