@@ -601,7 +601,7 @@ ON r.id = s.region_id AND r.name = 'Midwest' AND s.name LIKE 'S%'
 JOIN accounts a
 ON s.id = a.sales_rep_id
 ORDER BY a.name;
--- You could also write the query #2 like this. It returns the same results. --
+-- You could also write query #2 like this. It returns the same results. --
 -- This was the answer in 2.20 Solutions: Last Check. --
 
 
@@ -610,11 +610,16 @@ SELECT r.name region, s.name rep, a.name account
 FROM sales_reps s
 JOIN region r
 ON s.region_id = r.id
-WHERE s.name LIKE '% K%' AND r.name = 'Midwest'
 JOIN accounts a
-ON s.id = s.sales_rep_id
+ON a.sales_rep_id = s.id
+WHERE r.name = 'Midwest' AND s.name LIKE '% K%'
 ORDER BY a.name;
--- didn't work --
+-- This was the answer in 2.20 Solutions: Last Check. --
+-- These 3 columns are returned from the region, sales_reps and accounts tables.
+-- Rows in the sales_reps table is joined with rows in the region table wherever region id matches. This creates a subset.
+-- Then this subset is joined with information in the accounts table wherever sales representative id matches between the two. This creates a second subset.
+-- Then this second subset is filtered down to only show rows with a region name of "Midwest" and where the sales representative last name starts with a "K." This creates a third subset.
+-- Then this third (and final) subset is displayed from A-Z by account name.
 
 SELECT r.name region, s.name rep, a.name account
 FROM region r
@@ -624,7 +629,8 @@ AND s.name LIKE '% K%' AND r.name = 'Midwest'
 JOIN accounts a
 ON s.id = a.sales_rep_id
 ORDER BY a.name;
--- worked --
+-- You could also write query #3 like this. It returns the same results. --
+-- This was my solution to 2.19 Quiz: Last Check. 
 
 -- 4 --
 SELECT r.name region, a.name account,
@@ -637,6 +643,12 @@ ON s.id = a.sales_rep_id
 JOIN orders o
 ON a.id = o.account_id
 WHERE o.standard_qty > 100 ;
+-- Returns region name, account name and unit price of paper for all orders where standard paper order quantity exceeded $100.
+-- Joins region table with sales_reps table wherever region id matches.
+-- This subset of rows is then joined with the accounts table wherever sales representative id matches it. 
+-- The remaining rows from THAT join is then combined with information from the orders table wherever account id matches it.
+-- Then THOSE results are filtered to only show orders where the standard paper order quantity was greater than 100.
+-- My solution AND the solution in 2.20 Solutions: Last Check. --
 
 -- 5 --
 SELECT r.name region, a.name account, 
@@ -651,6 +663,8 @@ ON a.id = o.account_id
 WHERE standard_qty > 100 
 AND poster_qty > 50
 ORDER BY unit_price;
+-- Same as query #4, but the final subset was are even further so as to show only orders where standard order quanity is greater than $100 AND poster order quantity is greater than $50. 
+-- My solution AND the solution in 2.20 Solutions: Last Check. --
 
 -- 6 --
 SELECT r.name region, a.name account, 
