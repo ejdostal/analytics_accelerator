@@ -82,6 +82,8 @@ JOIN: allows us to pull data from more than one table at a time.
     - While aliasing tables is the most common use case, selected columns can also be aliased to give the resulting table more readable column names.
     - We can simply write our alias directly after the column name (in the SELECT) or table name (in the FROM or JOIN) by writing the alias directly following the column or table we would like to alias. 
     - This will allow you to create clear column names even if calculations are used to create the column, and you can be more efficient with your code by aliasing table names.
+    - If you have two or more columns in your SELECT that have the same name after the table name such as accounts.name and sales_reps.name you will NEED to alias them. 
+    - Otherwise it will only show one of the columns. You can alias them like accounts.name AS AcountName, sales_rep.name AS SalesRepName.
 
     - one-to-one and one-to-many relationships are common when working with PKs and FKs.
     - however, traditional databases do not allow for many-to-many relationships, as these break the schema down pretty quickly.
@@ -549,6 +551,21 @@ AND accounts.sales_rep_id = 321500
 -- This only works of LEFT JOIN - moving this filter to the ON clause of an (inner) will simply the same result as keeping it in the WHERE clause.
 
 
+-- (OUTER JOIN) Quiz: Last Check (2.19) --
+
+-- 1 --
+SELECT r.name region_name, s.name sales_rep_name, a.name account_name
+FROM region r
+JOIN sales_reps s
+ON r.id = s.region_id
+AND r.name = 'Midwest'
+JOIN accounts a
+ON s.id = a.sales_rep_id
+ORDER BY account_name;
+-- Returns 3 columns - the region name, sales representative name, and the account name.
+-- First, gathers only rows from the region table where the name is "Midwest."
+-- THEN joins THOSE rows with information in the sales_reps table, only where region_id matches between both the region table and the sales_reps table.
+-- Then, with THOSE results, information from the accounts table is joined, only rows sales representative id matches between both the sales_reps table and the accounts table.
 
 
 
