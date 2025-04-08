@@ -564,8 +564,17 @@ ON s.id = a.sales_rep_id
 ORDER BY account_name;
 -- Returns 3 columns - the region name, sales representative name, and the account name.
 -- First, gathers only rows from the region table where the name is "Midwest."
--- THEN joins THOSE rows with information in the sales_reps table, only where region_id matches between both the region table and the sales_reps table.
--- Then, with THOSE results, information from the accounts table is joined, only rows sales representative id matches between both the sales_reps table and the accounts table.
+-- Then joins THAT subset of rows from the reigon table with information in the sales_reps table - only the rows where region_id matches between both the subset from the region table and the sales_reps table.
+-- Then, on THIS new subset of rows, information from the accounts table is joined - only the rows where sales representative id matches between both the subset of the sales_reps table and the accounts table.
 
-
+-- 2 --
+SELECT r.name region_name, s.name sales_rep_name, a.name accounts_name
+FROM region r
+JOIN sales_reps s
+ON r.id = s.region_id AND r.name = 'Midwest' AND s.name LIKE 'S%'
+JOIN accounts a
+ON s.id = a.sales_rep_id;
+-- Returns the same 3 columns
+-- Gathers only rows from the region table where region name is "Midwest" and only rows from the sales_reps table where the sales representative name begins with an "S". Then combines these rows - only where region id matches between both subsets.
+-- THEN THAT new subset of rows is joined with information in the accounts table - only where the sales representative id matches between the combined subset from the sales_reps table and the accounts table. 
 
