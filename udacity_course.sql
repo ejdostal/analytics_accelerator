@@ -107,6 +107,10 @@ JOIN: allows us to pull data from more than one table at a time.
         - Again, this returns rows that do not match one another from the two tables. 
         - The use cases for a full outer join are very rare.
 
+- In order to get the exact results you're after, you need to be careful about exactly how you filter the data. As with joins, there are multiple options.
+- Logic in the ON clause reduces the rows BEFORE combining the tables.
+- Logic in the WHERE clause occurs AFTER the join occurs 
+
 
         
 ------------------------------------
@@ -514,11 +518,31 @@ SELECT c.countryid, c.countryName, s.stateName
 FROM State s
 LEFT JOIN Country c
 ON c.countryid = s.countryid;
--- FINAL LEFT JOIN Note - If we were to flip the tables, we would actually obtain the same exact result as the (inner) JOIN statement directly above.
--- This is because if State is on the LEFT table, all of the rows exist in the RIGHT table again.
+-- FINAL LEFT JOIN Note - If we were to flip the tables, we would actually obtain the same exact result as the (inner) JOIN statement directly above. This is because if State is on the LEFT table, all of the rows exist in the RIGHT table again.
 
+SELECT orders.*,
+accounts.*
+FROM orders
+LEFT JOIN accounts
+ON orders.account_id = accounts.id
+WHERE accounts.sales_rep_id = 321500
+-- Shows only rows where column ids match between both orders and accounts tables, in addition to all other rows existing in the orders table, where the sales representative id is 321500. 
+    -- Retrieves all columns from BOTH the orders table and the accounts table.
+    -- Returns all rows where the account has matches in both the orders table and the accounts table - as well as any additional rows in the orders table where account id did not match a column id in the accounts table.
+    -- Then filters those results down to just the rows in that subset containing a sales representative id of 32100.
+    -- The logic in the ON clause reduces the rows BEFORE combining the tables - so the orders and accounts tables are combined FIRST here.
+    -- The logic in the WHERE clause occurs AFTER the Join occurs - so the subset of rows from the Left Join is further filtered down to just show rows where sales_rep_id is 321500. 
 
-
+SELECT orders.*,
+accounts.*
+FROM orders
+LEFT JOIN accounts
+ON orders.account_id = accounts.id
+AND accounts.sales_rep_id = 321500
+--
+-- This effectively pre-filters the Right table to include only rows with sales rep id 321500 BEFORE the join is executed.
+-- In other words, it's like a WHERE clause that applies BEFORE the join, rather than after. 
+-- This is like joining orders to a different table - one that only includes a subset of the rows in the original accounts table - 
 
 
 
