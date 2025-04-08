@@ -68,7 +68,7 @@ JOIN: allows us to pull data from more than one table at a time.
         - "TableA.ColumnNameC" gives us that specific column from that table in the output. We need to specify the table every column comes from in the SELECT statement.
 
     - The FROM clause indicates the first table from which we're pulling data, and the JOIN indicates the second table. To join two tables, list them in the FROM and JOIN clauses.
-    - The result is still the same if you were to switch the tables in the FROM and JOIN.
+    - The result is still the same if you were to switch the tables in the FROM and JOIN for (inner) JOIN.
 
     - The ON clause is used to specify the JOIN condition, by specifying the column on which you'd like to merge the two tables together. 
     - Which side of the = sign a column is listed doesn't matter.
@@ -79,22 +79,22 @@ JOIN: allows us to pull data from more than one table at a time.
         - Foreign keys can appear multiple times in a single table, while primary keys can only appear once.
     
     - Aliases - When we JOIN tables together, each table is often given an alias. Frequently it's just the first letter of the table name. You can add aliases in the FROM or JOIN clauses by typing the table name, a space, and then the letter. 
-    - While aliasing tables is the most common use case, selected columns can also be aliased give the resulting table more readable column names.
+    - While aliasing tables is the most common use case, selected columns can also be aliased to give the resulting table more readable column names.
     - We can simply write our alias directly after the column name (in the SELECT) or table name (in the FROM or JOIN) by writing the alias directly following the column or table we would like to alias. 
     - This will allow you to create clear column names even if calculations are used to create the column, and you can be more efficient with your code by aliasing table names.
 
     - one-to-one and one-to-many relationships are common when working with PKs and FKs.
     - however, traditional databases do not allow for many-to-many relationships, as these break the schema down pretty quickly.
 
-    - INNER JOIN (or JOIN is exactly the same command) - returns only rows that appear in both tables; only rows where the id that appears in the first table also matches the id in the second column.
-    - ex. simply attaching account names to each order; excluding accounts without orders placed yet is probably fine
+    - INNER JOIN (or JOIN is exactly the same command) - returns ONLY the rows that appear in both tables (only rows where the id that appears in the first table also matches the id in the second column).
+    - ex. use when you're simply attaching account names to each order; excluding accounts without orders placed yet is probably fine
     - so far we've been working with inner joins; we have pulled rows only if they exist as a match across two tables.
     
-    - OUTER JOIN - used to also include data (rows) that only exist in one table but not the other; allow us to pull rows that might only exist in one of the two tables.  This will introduce a new data type called NULL
+    - OUTER JOIN - also include data (rows) that only exist in one table but not the other; allow us to pull rows that might only exist in one of the two tables.  This will introduce a new data type called NULL
     - ex. goal is to count up all the accounts in the region along with their quantities of paper purchased; probably want to include the accounts without any orders 
     - Outer joins (Left Join, Right Join, and Full Outer Join) still provide all of the resulting rows on an inner join - but you may also gain some additional rows.
-    - The results of an Outer Join will always have at least as many rows as an inner join (if they have the same logic in the ON clause).
-    - The table in the FROM statement is the Left table; the one in the Join statement is the Right table.
+    - The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
+    - The table in the FROM statement is the Left table; the one in the JOIN statement is the Right table.
         
         LEFT JOIN (or LEFT OUTER JOIN is the exact same command) -  returns all rows matching with the Right table. It also returns any additional rows in the Left table that did not match. 
 
@@ -108,8 +108,10 @@ JOIN: allows us to pull data from more than one table at a time.
         - The use cases for a full outer join are very rare.
 
 - In order to get the exact results you're after, you need to be careful about exactly how you filter the data. As with joins, there are multiple options.
-- Logic in the ON clause reduces the rows BEFORE combining the tables.
-- Logic in the WHERE clause occurs AFTER the join occurs 
+- For LEFT JOIN, logic in the ON clause reduces the rows BEFORE combining the tables.
+- For LEFT JOIN, logic in the WHERE clause occurs AFTER the join occurs. Use logic in the ON clause with LEFT JOIN to prefilter data BEFORE the join occurs. 
+- This only works for LEFT JOIN - it will not work of (inner) JOIN.
+- Because (inner) JOIN only returns the rows for which the two tables match, moving this filter to the ON clause of an (inner) JOIN will simply produce the same result as keeping it in the WHERE clause.
 
 
         
@@ -539,10 +541,12 @@ FROM orders
 LEFT JOIN accounts
 ON orders.account_id = accounts.id
 AND accounts.sales_rep_id = 321500
---
--- This effectively pre-filters the Right table to include only rows with sales rep id 321500 BEFORE the join is executed.
--- In other words, it's like a WHERE clause that applies BEFORE the join, rather than after. 
--- This is like joining orders to a different table - one that only includes a subset of the rows in the original accounts table - 
+-- Pre-filters orders table down to ONLY the rows where sales representative id is 32100 by moving this filter to the ON clause.
+    -- This effectively pre-filters the Right table to include only rows with sales rep id 321500 BEFORE the join is executed.
+    -- In other words, it's like a WHERE clause that applies BEFORE the join, rather than after. 
+-- You can think of this like joining orders with a different table - on that includes only a subset of rows from the original accounts table.
+-- Includes all rows in the orders table, plus any data in this new prefiltered table that match the account id in the orders table. 
+-- This only works of LEFT JOIN - moving this filter to the ON clause of an (inner) will simply the same result as keeping it in the WHERE clause.
 
 
 
