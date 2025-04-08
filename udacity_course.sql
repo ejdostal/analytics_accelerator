@@ -83,12 +83,12 @@ JOIN: allows us to pull data from more than one table at a time.
     - We can simply write our alias directly after the column name (in the SELECT) or table name (in the FROM or JOIN) by writing the alias directly following the column or table we would like to alias. 
     - This will allow you to create clear column names even if calculations are used to create the column, and you can be more efficient with your code by aliasing table names.
 
-*****
+------------------------------------
 
 Derived columns - A new column created by manipulating existing columns in the database. 
 - Give the column an alias by adding AS to the end of the line that produces the derived column.
 
-*****
+------------------------------------
 
 Best Practice:
 - Write SQL COMMANDS in all uppercase letters, keep everything else in your query lowercase.
@@ -96,14 +96,14 @@ Best Practice:
   - In Postgres, if you have spaces in column or table names, you need to refer to these columns/tables with double quotes around them (Ex: FROM "Table Name" as opposed to FROM table_name). 
   - In other environments, you might see this as square brackets instead (Ex: FROM [Table Name]). 
 - Put a semicolon at the end of each statement. Depending on your SQL environment, your query may need a semicolon at the end to execute.
-If you environment allows it, it will also allow you to run multiple queries at once
+If you environment allows it, it will also allow you to run multiple queries at once. */
 
-*/
 
-*****
+
+
 -- Queries from Udacity course --
-    
-*****  
+
+------------------------------------
 -- SELECT and FROM (1.11) --
 SELECT * 
 FROM orders  
@@ -113,7 +113,7 @@ SELECT id, account_id, occurred_at
 FROM orders;
 -- shows data from just these 3 columns in the orders table. --
 
-*****  
+------------------------------------
 -- LIMIT and ORDER BY (1.15) --
 SELECT *
 FROM orders
@@ -164,7 +164,7 @@ ORDER BY total DESC, account_id;
 /* In the queries above, the orders will appear from greatest to least regardless of which account ID they were from. Then they are sorted by account ID next. 
 The secondary sorting by account ID will be difficult to see here, since only if there were two orders with equal total dollar amounts would there need to be any sorting by account ID.) */
 
-***** 
+------------------------------------
 --- WHERE (1.24) ---
 SELECT *
 FROM orders
@@ -183,7 +183,7 @@ FROM accounts
 WHERE name = 'Exxon Mobil';
 -- filters down to just these 3 columns where records are named "Exon Mobil." 
 
-*****
+------------------------------------
 -- Arithmetic Operators (1.30) --
 SELECT id, (standard_amt_usd/total_amt_usd)*100 AS std_percent, total_amt_usd
 FROM orders
@@ -201,7 +201,7 @@ FROM orders
 LIMIT 10;
 -- shows id, account_id columns, and derived column calculating the percentage of revenue that comes from poster paper for each order. --
 
-***** 
+------------------------------------
 -- LIKE (1.34) --
 SELECT *
 FROM demo.web_events_full
@@ -223,7 +223,7 @@ FROM accounts
 WHERE name LIKE '%s';
 -- shows all records for companies whose name ends in "s". --
 
-*****
+------------------------------------
 -- IN (1.37) --
 SELECT *
 FROM demo.orders
@@ -251,7 +251,7 @@ WHERE sales_rep_id IN (321500, 321570)
 ORDER BY sales_rep_id;
 -- filters down to just the sales accounts associated with sales rep ids 321500 and 321570. --
 
-***** 
+------------------------------------
 -- NOT (1.40) --
 SELECT sales_rep_id,name
 FROM demo.accounts
@@ -267,7 +267,7 @@ ORDER BY occurred_at DESC
 -- reorders results from most recent to oldest purchase dates; helps to confirm that orders after October 1st were actually excluded. --
 -- Notice how the column needs to be stated independently each time, even when operating on the same column name.
 
-*****   
+------------------------------------  
 -- AND and BETWEEN (1.43) --  
 SELECT *
 FROM orders
@@ -294,7 +294,7 @@ ORDER BY occurred_at DESC;
 -- BETWEEN '2016-01-01' AND '2017-01-01' is finding all dates between midnight on Jan 1st 2016, and midnight on Jan 1st 2017 
 -- midnight on Jan 1st 2017 is basically only one minute into 2017; which is why we set the right-side endpoint of the period at '2017-01-01.' --
 
-*****
+------------------------------------
 -- OR (1.46) --
 SELECT account_id, occurred_at, standard_qty, gloss_qty, poster_qty
 FROM demo.orders
@@ -325,7 +325,7 @@ WHERE (name LIKE 'C%' OR name LIKE 'W%')
     AND primary_poc NOT LIKE '%eana%');
 -- shows records where the company name starts with either "C" or "W" and the primary point of contact contains the string "ana" or "Ana", but does not contain the string "eana". --
 
-*****
+------------------------------------
 -- JOIN (2.3) --
 SELECT orders.*,
     accounts.*
@@ -386,7 +386,7 @@ JOIN accounts a
 o.account_id = a.id;
 -- Alias names of "o" and "a" are given for the orders and accounts tables in the FROM and JOIN clauses. The table names can then be replaced with their aliases throughout the rest of the query. (in SELECT and ON, in this case) --
 
-*****
+------------------------------------
 -- JOIN Questions Part 1 (2.11) -- 
     
 -- 1 --
@@ -459,3 +459,4 @@ ON o.account_id = a.id;
 -- Both queries give the columns aliases for a more readable resulting table, but use different methods to achieve the same result.
 -- The only difference is the tables aren't given aliases in the first query, whereas the second query does give the tables aliases. --
 
+------------------------------------
