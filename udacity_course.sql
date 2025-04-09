@@ -485,20 +485,8 @@ ON a.sales_rep_id = s.id
 ORDER BY a.name;
 -- Shows the region for each sales representative, along with their associated accounts. Sorts results alphabetically (A-Z) on account name. --
 
--- 3 --
-SELECT region.name AS region, 
-accounts.name AS account,
-orders.total_amt_usd/(orders.total + 0.01) AS unit_price
-FROM region
-JOIN sales_reps
-ON region.id = sales_reps.region_id   
-JOIN accounts
-ON sales_reps.id = accounts.sales_rep_id
-JOIN orders
-ON accounts.id = orders.account_id ;
-
 SELECT r.name region, a.name account, 
-           o.total_amt_usd/(o.total + 0.01) unit_price
+o.total_amt_usd/(o.total + 0.01) unit_price
 FROM region r
 JOIN sales_reps s
 ON s.region_id = r.id
@@ -506,11 +494,8 @@ JOIN accounts a
 ON a.sales_rep_id = s.id
 JOIN orders o
 ON o.account_id = a.id;
--- Both queries output the region name from the region table, account name from the accounts table, and calculate the order unit_price from the orders table. --
-    -- "0.01" is added to the total column in the unit_price calculation to avoid division by zero - a few accounts had totals of 0. --
-    -- region and sales_reps tables are joined on region id, sales_reps and accounts tables are joined on sales representative id, and accounts and orders tables or joined on account id. -- 
--- Both queries give the columns aliases for a more readable resulting table, but use different methods to achieve the same result.
--- The only difference is the tables aren't given aliases in the first query, whereas the second query does give the tables aliases. --
+-- Provides the region for every order, as well as the account name and the unit price they paid (total amount in USD / by the total) for the order.  
+-- "0.01" is added to the total column in the unit_price calculation to avoid division by zero (A few accounts have 0 for total). --
 
 
 -- OUTER JOINS (2.13) --
