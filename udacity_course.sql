@@ -421,17 +421,17 @@ ON accounts.id = orders.account_id;
 -- Pulls all the data from the accounts table and all the data from the orders table. --
 -- Notice that we need to specify every table a column comes from in the SELECT statement. --
 
-    SELECT orders.*, accounts.*
-    FROM orders
-    JOIN accounts
-    ON accounts.id = orders.account_id;
-    -- This result is the same as if you switched the tables in the FROM and JOIN. 
+SELECT orders.*, accounts.*
+FROM orders
+JOIN accounts
+ON accounts.id = orders.account_id;
+-- This result is the same as if you switched the tables in the FROM and JOIN. 
     
-    SELECT orders.*, accounts.*
-    FROM accounts
-    JOIN orders
-    ON orders.account_id = accounts.id;
-    -- Additionally, which side of the = a column is listed doesn't matter.
+SELECT orders.*, accounts.*
+FROM accounts
+JOIN orders
+ON orders.account_id = accounts.id;
+-- Additionally, which side of the = a column is listed doesn't matter.
 
 SELECT orders.standard_qty, orders.gloss_qty,orders.poster_qty,
 accounts.website, accounts.primary_poc
@@ -457,8 +457,8 @@ ON accounts.id = orders.account_id;
 -- Again, joins all three tables together, but only returns the channel column from the web_events table, the account name column from accounts table, and the order total column from orders table. --
 -- We could continue this same process to link all of the tables if we wanted! But for efficiency reasons, we probably dont't want to do this unless we actually need information from all of the tables. :-) --
 
--- Aliases --  
 
+-- Aliases (2.10) --  
 SELECT o.*,
 a.*
 FROM orders o
@@ -467,39 +467,14 @@ o.account_id = a.id;
 -- Frequently an alias is just the first letter of the table name. lias names of "o" and "a" are given for the orders and accounts tables in the FROM and JOIN clauses. --
 
 
-
-
-
-
--- (INNER) JOIN Questions Part 1 (2.11) --     
--- 1 --
-SELECT accounts.primary_poc,
-web_events.occurred_at,
-web_events.channel,
-accounts.name
-FROM web_events
-JOIN accounts
-ON web_events.account_id = accounts.id
-WHERE accounts.name = 'Walmart';
+-- Quiz (2.11) --
 
 SELECT a.primary_poc, w.occurred_at, w.channel, a.name
 FROM web_events w
 JOIN accounts a
 ON w.account_id = a.id
 WHERE a.name = 'Walmart';
--- JOIN stands for inner join. Information in the accounts table is joined with the rows in the web_events table wherever account id matches between both tables; rows without a match between both tables are dropped. Then the subset is filtered down to show only the rows where the account name is "Walmart". --
--- The second query gives the tables aliases. --
-
--- 2 --
-SELECT region.name AS region,
-sales_reps.name AS sales_rep,
-accounts.name AS account
-FROM region
-JOIN sales_reps
-ON region.id = sales_reps.region_id
-JOIN accounts
-ON sales_reps.id = accounts.sales_rep_id
-ORDER BY accounts.name;
+-- Provides all web_events associated with account name of "Walmart"; returning only the primary point of contact, event date, channel, and account name columns. --
 
 SELECT r.name region, s.name rep, a.name account
 FROM sales_reps s
@@ -508,11 +483,7 @@ ON s.region_id = r.id
 JOIN accounts a
 ON a.sales_rep_id = s.id
 ORDER BY a.name;
--- Both queries show the region name from the region table, the sales representative name from the sales_reps table, and the account name from the accounts table. --
-    -- region and sales_reps are joined based on region id, meanwhile sales_reps and accounts are joined based on sales representative id. --
-    -- The results are sorted from A-Z based by account name.
--- Both queries give the columns aliases for a more readable resulting table, but use different methods to achieve the same result.
--- The only difference is the tables aren't given aliases in the first query, whereas the second query does give the tables aliases. 
+-- Shows the region for each sales representative, along with their associated accounts. Sorts results alphabetically (A-Z) on account name. --
 
 -- 3 --
 SELECT region.name AS region, 
