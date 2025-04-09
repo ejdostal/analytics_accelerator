@@ -378,10 +378,10 @@ SELECT orders.*,
 FROM accounts
 JOIN orders
 ON accounts.id = orders.account_id;
--- Rows in the orders table are combined with rows in the accounts table wherever the account id in orders matches account id in ; Rows without a match are dropped. --
-    -- This is an example of a many-to-one relationship; there can be many orders for one account. So the resulting table might show the same account id multiple times to represent multiple orders made on that account. -- 
-    -- account id is the primary key in the accounts table, and the foreign key in orders table. --
--- All columns from the orders table and all columns from the accounts table are returned; 
+-- JOIN denotes an INNER join. -- 
+-- Here rows in the orders table are added to rows in the accounts table wherever the account id matches; Rows without a match between tables are dropped. --
+    
+-- All columns from the orders table and all columns from the accounts table are returned; --
 -- Notice how the accounts table is in the FROM clause and the orders table is in the JOIN clause here, which is different from the queries below. --
 
 SELECT orders.*
