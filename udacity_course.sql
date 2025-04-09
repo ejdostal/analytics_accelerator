@@ -60,7 +60,9 @@ LIMIT: limits results to the first few rows in the table.
 - useful when you want to see just the first few rows of a table. This can be much faster for loading than if we load the entire dataset. 
 - the LIMIT command is always the very last part of a query.
 
-JOIN: the whole purpose of JOIN statements is to allow us to pull data from more than one table at a time. 
+
+--- JOIN Statements -- 
+The whole purpose of JOIN statements is to allow us to pull data from more than one table at a time. 
 - Joining tables gives you access to each of the tables in the SELECT statement through the table name, a ".", and the column name you want to pull from that table.
 
     - SELECT: indicates which column(s) of data you'd like to see in the output. 
@@ -78,7 +80,6 @@ JOIN: the whole purpose of JOIN statements is to allow us to pull data from more
         - A foreign key (FK) is a column in one table that is a primary key in another table. 
             - Each FK links to a primary key in another table.
 
-
 Aliases: Give table names aliases when performing joins. (This can save you a lot of typing)
     - The alias for a table is created in the FROM or JOIN clauses; use the alias to replace the table name throughout the rest of the query. 
     - You can alias tables and columns using AS or not using it.
@@ -86,50 +87,34 @@ Aliases: Give table names aliases when performing joins. (This can save you a lo
     - As with column names, the best practice is for aliases to be all lowercase letters, and to use underscores instead of spaces. 
     - If you have two or more columns in your SELECT that have the same name after the table name (ex. accounts.name, sales_reps.name) you will NEED to alias them; otherwise it will only show ONE of the columns. 
         
+-- Join Types --
+JOIN: (INNER JOIN) Only returns rows that appear in both tables; pulls rows only if they exist as a match across two tables. 
 
-
-- A Foreign Key (FK) is a column in one table that’s a primary key in a different table.
-
-        -  The crow’s foot in an ERD indicates that a FK can appear in multiple rows in the table it touches.
-        - Foreign keys can appear multiple times in a single table, while primary keys can only appear once.
-        - foreign keys - are the primary key appearing in another table, which allows the rows to be non-unique.
+-- Motivation to use other Joins --
+    - If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
+    - Each of these new JOIN statements pulls all the same rows as an INNER JOIN, but they also potentially pull some additional rows.
+    - If there is not matching information in the JOINed table, then you will have columns with empty cells; any cells without data are considered NULL. 
+    - The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
+    - The table in the FROM statement is the Left table; the one in the JOIN statement is the Right table.
+    
+LEFT JOIN: (LEFT OUTER JOIN) Includes all the results that match with Right table, just like an Inner JOIN, as well as any results in the Left table that did not match. 
+    
+RIGHT JOIN: (RIGHT OUTER JOIN) Includes all the results that match with Left table, just like an Inner JOIN, as well as any results in the Left table that did not match. 
+    - A LEFT JOIN and RIGHT JOIN do the same thing if we change the tables that are in the FROM and JOIN statements.
+    - The rows in the Right table that don't match the rows in the Left table will be included at the bottom of the results. They don't match with rows in the Left table, so any columns from the Left table will contain no data for these rows.
+       
+OUTER JOIN: (FULL OUTER JOIN) This will return the inner join result set, as well as any unmatched rows from either of the two tables being joined.
+    - Again, this returns rows that do not match one another from the two tables. 
+    - The use cases for a full outer join are very rare.
    
-    - one-to-one and one-to-many relationships are common when working with PKs and FKs.
-    - Traditional databases do not allow for many-to-many relationships (these break the schema down pretty quickly).
-
-
-
-
-
- The three JOIN statements you are most likely to use are:
+ 
+The three JOIN statements you are most likely to use are:
     - JOIN - an INNER JOIN that only pulls data that exists in both tables.
-    - LEFT JOIN - pulls all the data that exists in both tables, as well as all of the rows from the table in the FROM even if they do not exist in the JOIN statement.
+    - LEFT JOIN - pulls all the data tht exists in both tables, as well as all of the rows from the table in the FROM even if they do not exist in the JOIN statement.
     - RIGHT JOIN - pulls all the data that exists in both tables, as well as all of the rows from the table in the JOIN even if they do not exist in the FROM statement.
 
     - There are other a few other advanced JOINS that are used in very specific use cases: UNION and UNION ALL, CROSS JOIN, and the tricky SELF JOIN. It's useful to be aware that they exist, as they are useful in special cases.
     
-
-    - INNER JOIN (or JOIN is exactly the same command) - returns ONLY the rows that appear in both tables (only rows where the id that appears in the first table also matches the id in the second column).
-    - ex. use when you're simply attaching account names to each order; excluding accounts without orders placed yet is probably fine
-    - so far we've been working with inner joins; we have pulled rows only if they exist as a match across two tables.
-  
-
-    - OUTER JOIN - also include data (rows) that only exist in one table but not the other; allow us to pull rows that might only exist in one of the two tables.  This will introduce a new data type called NULL
-    - ex. goal is to count up all the accounts in the region along with their quantities of paper purchased; probably want to include the accounts without any orders 
-    - Outer joins (Left Join, Right Join, and Full Outer Join) still provide all of the resulting rows on an inner join - but you may also gain some additional rows.
-    - The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
-    - The table in the FROM statement is the Left table; the one in the JOIN statement is the Right table.
-        
-        LEFT JOIN (or LEFT OUTER JOIN is the exact same command) -  returns all rows matching with the Right table. It also returns any additional rows in the Left table that did not match. 
-
-        RIGHT JOIN (or RIGHT OUTER JOIN is the exact same command) - returns all rows matching with the Left table. It also returns any additional rows from the Right table that did not match. 
-        - The rows in the Right table that don't match the rows in the Left table will be included at the bottom of the results. They don't match with rows in the Left table, so any columns from the Left table will contain no data for these rows.
-        - You can consider any cell without data as NULL.
-        - Left and Right Joins are effectively interchangeable so you'll rarely see a Right Join "in the wild". (if you switch the tables in the FROM and JOIN clauses in a Left Join, you'll effectively still get the same results of a right join. 
-
-        OUTER JOIN (or FULL OUTER JOIN is the exact same command) - this returns the inner join result set, as any unmatched rows from either of the two tables being joined.
-        - Again, this returns rows that do not match one another from the two tables. 
-        - The use cases for a full outer join are very rare.
 
 - In order to get the exact results you're after, you need to be careful about exactly how you filter the data. As with joins, there are multiple options.
 - For LEFT JOIN, logic in the ON clause reduces the rows BEFORE combining the tables.
