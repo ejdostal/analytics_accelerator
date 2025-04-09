@@ -75,8 +75,10 @@ JOIN: allows us to pull data from more than one table at a time.
     - Joining tables involves linking their PKs and FKS, usually in the ON clause.
 
     - A Primary Key (PK) exists in every table and is a unique column for each row. It’s often the first column in tables. The single line in an ERD indicates that a PK can only appear in one row in the table it touches.
+        - primary keys - are unique for every row in a table. These are generally the first column in our database (like you saw with the id column for every table in the Parch & Posey database).
     - A Foreign Key (FK) is a column in one table that’s a primary key in another. Each FK links to a primary key in another table. The crow’s foot in an ERD indicates that a FK can appear in multiple rows in the table it touches.
         - Foreign keys can appear multiple times in a single table, while primary keys can only appear once.
+        - foreign keys - are the primary key appearing in another table, which allows the rows to be non-unique.
     
     - Aliases - When we JOIN tables together, each table is often given an alias. Frequently it's just the first letter of the table name. You can add aliases in the FROM or JOIN clauses by typing the table name, a space, and then the letter. 
     - While aliasing tables is the most common use case, selected columns can also be aliased to give the resulting table more readable column names.
@@ -88,10 +90,18 @@ JOIN: allows us to pull data from more than one table at a time.
     - one-to-one and one-to-many relationships are common when working with PKs and FKs.
     - however, traditional databases do not allow for many-to-many relationships, as these break the schema down pretty quickly.
 
+
+ The three JOIN statements you are most likely to use are:
+    - JOIN - an INNER JOIN that only pulls data that exists in both tables.
+    - LEFT JOIN - pulls all the data that exists in both tables, as well as all of the rows from the table in the FROM even if they do not exist in the JOIN statement.
+    - RIGHT JOIN - pulls all the data that exists in both tables, as well as all of the rows from the table in the JOIN even if they do not exist in the FROM statement.
+
+
     - INNER JOIN (or JOIN is exactly the same command) - returns ONLY the rows that appear in both tables (only rows where the id that appears in the first table also matches the id in the second column).
     - ex. use when you're simply attaching account names to each order; excluding accounts without orders placed yet is probably fine
     - so far we've been working with inner joins; we have pulled rows only if they exist as a match across two tables.
-    
+  
+
     - OUTER JOIN - also include data (rows) that only exist in one table but not the other; allow us to pull rows that might only exist in one of the two tables.  This will introduce a new data type called NULL
     - ex. goal is to count up all the accounts in the region along with their quantities of paper purchased; probably want to include the accounts without any orders 
     - Outer joins (Left Join, Right Join, and Full Outer Join) still provide all of the resulting rows on an inner join - but you may also gain some additional rows.
