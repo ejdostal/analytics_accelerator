@@ -71,12 +71,17 @@ JOIN: the whole purpose of JOIN statements is to allow us to pull data from more
         - To join two tables, list them in the FROM and JOIN clauses.
         - For (inner) JOIN, the result is still the same if you were to switch the tables in the FROM and JOIN.
 
-    - ON: specifies the column on which you'd like to merge the two tables together; Joining tables involves linking their PKs and FKS, usually here in the ON clause.
-        - Which side of the = sign a column is listed doesn't matter.
+    - ON: specifies the column on which you'd like to merge the two tables together; in the ON, we ALWAYS have the primary key (PK) equal to the foreign key (FK);  Primary-foreign key relationships are typically one-to-many, respectively.
+        - A primary key (PK) exists in every table and is a unique column for each row; primary keys are unique for every row in a table. 
+            - It is common for the primary key (PK) to be the first column in our tables in most databases. 
+       
+        - A foreign key (FK) is a column in one table that is a primary key in another table. 
+            - Each FK links to a primary key in another table.
+        
+     
+- A Foreign Key (FK) is a column in one table that’s a primary key in a different table.
 
-    - A Primary Key (PK) exists in every table and is a unique column for each row. It’s often the first column in tables. The single line in an ERD indicates that a PK can only appear in one row in the table it touches.
-        - primary keys - are unique for every row in a table. These are generally the first column in our database (like you saw with the id column for every table in the Parch & Posey database).
-    - A Foreign Key (FK) is a column in one table that’s a primary key in another. Each FK links to a primary key in another table. The crow’s foot in an ERD indicates that a FK can appear in multiple rows in the table it touches.
+        -  The crow’s foot in an ERD indicates that a FK can appear in multiple rows in the table it touches.
         - Foreign keys can appear multiple times in a single table, while primary keys can only appear once.
         - foreign keys - are the primary key appearing in another table, which allows the rows to be non-unique.
    
@@ -372,7 +377,6 @@ WHERE (name LIKE 'C%' OR name LIKE 'W%')
 
 ------------------------------------
 -- JOIN (2.3) --
-
 SELECT orders.*,
     accounts.*
 FROM accounts
@@ -422,7 +426,6 @@ ON accounts.id = orders.account_id;
     ON orders.account_id = accounts.id;
     -- Additionally, which side of the = a column is listed doesn't matter.
 
-
 SELECT orders.standard_qty, orders.gloss_qty,orders.poster_qty,
 accounts.website, accounts.primary_poc
 FROM orders
@@ -430,6 +433,7 @@ JOIN accounts
 ON orders.account_id = accounts.id;
 -- Pulls standard order quantity, glossy order quantity, and poster order quantity from the orders table and pulls website and primary point of contact from the accounts table. --
 
+-------------------
 
 SELECT *
 FROM web_events
