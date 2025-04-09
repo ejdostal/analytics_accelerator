@@ -378,31 +378,42 @@ SELECT orders.*,
 FROM accounts
 JOIN orders
 ON accounts.id = orders.account_id;
--- Rows in the orders table are combined with rows in the accounts table wherever the account id matches both tables; Rows without a match are dropped. --
--- This is an example of a many-to-one relationship; there can be many orders for one account. So the resulting table might show the same account id multiple times to represent multiple orders made on that account. -- 
--- account id is the primary key in the accounts table, and the foreign key in orders table. --
+-- Rows in the orders table are combined with rows in the accounts table wherever the account id in orders matches account id in ; Rows without a match are dropped. --
+    -- This is an example of a many-to-one relationship; there can be many orders for one account. So the resulting table might show the same account id multiple times to represent multiple orders made on that account. -- 
+    -- account id is the primary key in the accounts table, and the foreign key in orders table. --
 -- All columns from the orders table and all columns from the accounts table are returned; 
--- The same results are generated as the 4th query below, but with the accounts table columnns (FROM) listed first and the orders table columns listed second (JOIN). --
+-- Notice how the accounts table is in the FROM clause and the orders table is in the JOIN clause here, which is different from the queries below. --
 
 SELECT orders.*
 FROM orders
 JOIN accounts
-ON orders.account_id = accounts.id
--- The same inner join is happening here as directly above - but only the columns from the orders table are shown in the final output; Shows information from only the orders table. --  
+ON orders.account_id = accounts.id;
+-- The SAME inner join is happening here as in the query above, but only information from the orders table is showing in the results. 
+    -- Notice how the orders table is now in the FROM clause and the accounts table is not in the JOIN clause in this query (they got reversed from the query above). 
+    -- For inner JOINs, the results will still be the same when you switch the tables in the FROM and JOIN clauses. 
   
 SELECT accounts.name, orders.occurred_at
 FROM orders
 JOIN accounts
 ON orders.account_id = accounts.id;
--- The same inner join is happening here as in the 2 queries above - but only account name (from the accounts table) and the order occurrance time (from the orders table) are displayed in the final output. -- 
+-- The same inner join is happening here as in BOTH of the 2 queries above.; however, only the account name from the accounts table and the order occurrance time from the orders table are displayed in the final results. -- 
 
 SELECT *
 FROM orders
 JOIN accounts
 ON orders.account_id = accounts.id;
--- The same inner join is happening here as in the 3 queries above - but all columns from both the orders and the accounts table are shown. --
--- This would return the same rows as the 1st query, but change the order the columns are listed in; orders table columns (FROM) would be listed first; accounts table columns (JOIN) second. --
+-- The exact same results are generated in this query as in the 1st query --
 
+SELECT *
+FROM accounts
+JOIN orders
+ON accounts.id = orders.account_id
+-- The exact same results are generated in this query as in the query above, however, the order of the columns upon output might differ --
+    -- When you explicitly specify columns in your SELECT statement, the order of those columns will follow the order you defined in the query;
+    -- However When the SELECT property doesn't specifically identify the order you want the columns listed in, the columns are defined in the table schema, not by the SQL query itself.
+
+---- )))))
+    
 SELECT orders.standard_qty,
 orders.gloss_qty,
 orders.poster_qty,
