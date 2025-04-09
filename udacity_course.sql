@@ -378,51 +378,58 @@ SELECT orders.*,
 FROM accounts
 JOIN orders
 ON accounts.id = orders.account_id;
--- JOIN denotes an INNER join. -- 
--- Here rows in the orders table are added to rows in the accounts table wherever the account id matches; Rows without a match between tables are dropped. --
+-- A JOIN clause means an INNER join; Here account names are added to each order. --
     
--- All columns from the orders table and all columns from the accounts table are returned; --
--- Notice how the accounts table is in the FROM clause and the orders table is in the JOIN clause here, which is different from the queries below. --
-
 SELECT orders.*
 FROM orders
 JOIN accounts
 ON orders.account_id = accounts.id;
--- The SAME inner join is happening here as in the query above, but only information from the orders table is showing in the results. 
-    -- Notice how the orders table is now in the FROM clause and the accounts table is not in the JOIN clause in this query (they got reversed from the query above). 
-    -- For inner JOINs, the results will still be the same when you switch the tables in the FROM and JOIN clauses. 
-  
+    -- The SELECT clause tells us which columns to display in the output (all columns in the orders table). --
+    -- The FROM clause tells us the first table from which we're pulling data (orders). --
+    -- The JOIN clause gives us the second table (accounts). --
+    -- The ON clause specifies the column on which you'd like to merge the two tables together (where "account_id" in the orders table matches "id" in the accounts table). --
+-- Pulls all the information from ONLY the orders table. --
+    -- Above, we are only pulling data from the orders table since in the SELECT statement we only reference columns from the orders table. --
+
 SELECT accounts.name, orders.occurred_at
 FROM orders
 JOIN accounts
 ON orders.account_id = accounts.id;
--- The same inner join is happening here as in BOTH of the 2 queries above.; however, only the account name from the accounts table and the order occurrance time from the orders table are displayed in the final results. -- 
+-- Pulls the account name and the dates in which that account placed an order, but none of the other columns. --
 
 SELECT *
 FROM orders
 JOIN accounts
 ON orders.account_id = accounts.id;
--- The exact same results are generated in this query as in the 1st query --
+-- Pulls all the columns from BOTH the accounts and orders table. --
 
-SELECT *
+SELECT orders.*, accounts.*
 FROM accounts
 JOIN orders
-ON accounts.id = orders.account_id
--- The exact same results are generated in this query as in the query above, however, the order of the columns upon output might differ --
-    -- When you explicitly specify columns in your SELECT statement, the order of those columns will follow the order you defined in the query;
-    -- However When the SELECT property doesn't specifically identify the order you want the columns listed in, the columns are defined in the table schema, not by the SQL query itself.
+ON accounts.id = orders.account_id;
+-- Pulls all the data from the accounts table and all the data from the orders table. --
+-- Notice that we need to specify every table a column comes from in the SELECT statement. --
 
----- )))))
+    SELECT orders.*, accounts.*
+    FROM orders
+    JOIN accounts
+    ON accounts.id = orders.account_id;
+    -- This result is the same as if you switched the tables in the FROM and JOIN. 
     
-SELECT orders.standard_qty,
-orders.gloss_qty,
-orders.poster_qty,
-accounts.website,
-accounts.primary_poc
+    SELECT orders.*, accounts.*
+    FROM accounts
+    JOIN orders
+    ON orders.account_id = accounts.id;
+    -- Additionally, which side of the = a column is listed doesn't matter.
+
+
+SELECT orders.standard_qty, orders.gloss_qty,orders.poster_qty,
+accounts.website, accounts.primary_poc
 FROM orders
 JOIN accounts
 ON orders.account_id = accounts.id;
--- Joins the orders table and accounts table on account id; them pulls these 2 columns from the orders table and these 2 columns from the accounts table. --
+-- Pulls standard order quantity, glossy order quantity, and poster order quantity from the orders table and pulls website and primary point of contact from the accounts table. --
+
 
 SELECT *
 FROM web_events
