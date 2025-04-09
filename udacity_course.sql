@@ -68,7 +68,7 @@ JOIN: allows us to pull data from more than one table at a time.
         - "TableA.ColumnNameC" gives us that specific column from that table in the output. We need to specify the table every column comes from in the SELECT statement.
 
     - The FROM clause indicates the first table from which we're pulling data, and the JOIN indicates the second table. To join two tables, list them in the FROM and JOIN clauses.
-    - The result is still the same if you were to switch the tables in the FROM and JOIN for (inner) JOIN.
+    - For (inner) JOIN, the result is still the same if you were to switch the tables in the FROM and JOIN.
 
     - The ON clause is used to specify the JOIN condition, by specifying the column on which you'd like to merge the two tables together. 
     - Which side of the = sign a column is listed doesn't matter.
@@ -81,17 +81,13 @@ JOIN: allows us to pull data from more than one table at a time.
         - foreign keys - are the primary key appearing in another table, which allows the rows to be non-unique.
    
     - one-to-one and one-to-many relationships are common when working with PKs and FKs.
-    - however, traditional databases do not allow for many-to-many relationships, as these break the schema down pretty quickly.
+    - Traditional databases do not allow for many-to-many relationships (these break the schema down pretty quickly).
 
-    - Aliases - When we JOIN tables together, each table is often given an alias. Frequently it's just the first letter of the table name. You can add aliases in the FROM or JOIN clauses by typing the table name, a space, and then the letter. 
-    - While aliasing tables is the most common use case, selected columns can also be aliased to give the resulting table more readable column names.
-    - We can simply write our alias directly after the column name (in the SELECT) or table name (in the FROM or JOIN) by writing the alias directly following the column or table we would like to alias. 
-    - This will allow you to create clear column names even if calculations are used to create the column, and you can be more efficient with your code by aliasing table names.
-    - If you have two or more columns in your SELECT that have the same name after the table name such as accounts.name and sales_reps.name you will NEED to alias them. 
-    - Otherwise it will only show one of the columns. You can alias them like accounts.name AS AcountName, sales_rep.name AS SalesRepName.
-
-    - You learned that you can alias tables and columns using AS or not using it. 
+    - You can alias tables and columns using AS or not using it. 
     - This allows you to be more efficient in the number of characters you need to write, while at the same time you can assure that your column headings are informative of the data in your table.
+        - If you have two or more columns in your SELECT that have the same name after the table name such as accounts.name and sales_reps.name you will NEED to alias them. 
+        - Otherwise it will only show one of the columns. You can alias them like accounts.name AS AcountName, sales_rep.name AS SalesRepName.
+
 
  The three JOIN statements you are most likely to use are:
     - JOIN - an INNER JOIN that only pulls data that exists in both tables.
