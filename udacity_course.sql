@@ -79,7 +79,10 @@ JOIN: allows us to pull data from more than one table at a time.
     - A Foreign Key (FK) is a column in one table that’s a primary key in another. Each FK links to a primary key in another table. The crow’s foot in an ERD indicates that a FK can appear in multiple rows in the table it touches.
         - Foreign keys can appear multiple times in a single table, while primary keys can only appear once.
         - foreign keys - are the primary key appearing in another table, which allows the rows to be non-unique.
-    
+   
+    - one-to-one and one-to-many relationships are common when working with PKs and FKs.
+    - however, traditional databases do not allow for many-to-many relationships, as these break the schema down pretty quickly.
+
     - Aliases - When we JOIN tables together, each table is often given an alias. Frequently it's just the first letter of the table name. You can add aliases in the FROM or JOIN clauses by typing the table name, a space, and then the letter. 
     - While aliasing tables is the most common use case, selected columns can also be aliased to give the resulting table more readable column names.
     - We can simply write our alias directly after the column name (in the SELECT) or table name (in the FROM or JOIN) by writing the alias directly following the column or table we would like to alias. 
@@ -87,15 +90,16 @@ JOIN: allows us to pull data from more than one table at a time.
     - If you have two or more columns in your SELECT that have the same name after the table name such as accounts.name and sales_reps.name you will NEED to alias them. 
     - Otherwise it will only show one of the columns. You can alias them like accounts.name AS AcountName, sales_rep.name AS SalesRepName.
 
-    - one-to-one and one-to-many relationships are common when working with PKs and FKs.
-    - however, traditional databases do not allow for many-to-many relationships, as these break the schema down pretty quickly.
-
+    - You learned that you can alias tables and columns using AS or not using it. 
+    - This allows you to be more efficient in the number of characters you need to write, while at the same time you can assure that your column headings are informative of the data in your table.
 
  The three JOIN statements you are most likely to use are:
     - JOIN - an INNER JOIN that only pulls data that exists in both tables.
     - LEFT JOIN - pulls all the data that exists in both tables, as well as all of the rows from the table in the FROM even if they do not exist in the JOIN statement.
     - RIGHT JOIN - pulls all the data that exists in both tables, as well as all of the rows from the table in the JOIN even if they do not exist in the FROM statement.
 
+    - There are other a few other advanced JOINS that are used in very specific use cases: UNION and UNION ALL, CROSS JOIN, and the tricky SELF JOIN. It's useful to be aware that they exist, as they are useful in special cases.
+    
 
     - INNER JOIN (or JOIN is exactly the same command) - returns ONLY the rows that appear in both tables (only rows where the id that appears in the first table also matches the id in the second column).
     - ex. use when you're simply attaching account names to each order; excluding accounts without orders placed yet is probably fine
