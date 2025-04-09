@@ -77,8 +77,17 @@ JOIN: the whole purpose of JOIN statements is to allow us to pull data from more
        
         - A foreign key (FK) is a column in one table that is a primary key in another table. 
             - Each FK links to a primary key in another table.
+
+
+Aliases: Give table names aliases when performing joins. (This can save you a lot of typing)
+    - The alias for a table is created in the FROM or JOIN clauses; use the alias to replace the table name throughout the rest of the query. 
+    - You can alias tables and columns using AS or not using it.
+    - Frequently an alias is just the first letter of the table name
+    - As with column names, the best practice is for aliases to be all lowercase letters, and to use underscores instead of spaces. 
+    - If you have two or more columns in your SELECT that have the same name after the table name (ex. accounts.name, sales_reps.name) you will NEED to alias them; otherwise it will only show ONE of the columns. 
         
-     
+
+
 - A Foreign Key (FK) is a column in one table that’s a primary key in a different table.
 
         -  The crow’s foot in an ERD indicates that a FK can appear in multiple rows in the table it touches.
@@ -88,10 +97,8 @@ JOIN: the whole purpose of JOIN statements is to allow us to pull data from more
     - one-to-one and one-to-many relationships are common when working with PKs and FKs.
     - Traditional databases do not allow for many-to-many relationships (these break the schema down pretty quickly).
 
-    - You can alias tables and columns using AS or not using it. 
-    - This allows you to be more efficient in the number of characters you need to write, while at the same time you can assure that your column headings are informative of the data in your table.
-        - If you have two or more columns in your SELECT that have the same name after the table name such as accounts.name and sales_reps.name you will NEED to alias them. 
-        - Otherwise it will only show one of the columns. You can alias them like accounts.name AS AcountName, sales_rep.name AS SalesRepName.
+
+
 
 
  The three JOIN statements you are most likely to use are:
@@ -433,30 +440,35 @@ JOIN accounts
 ON orders.account_id = accounts.id;
 -- Pulls standard order quantity, glossy order quantity, and poster order quantity from the orders table and pulls website and primary point of contact from the accounts table. --
 
--------------------
-
 SELECT *
 FROM web_events
 JOIN accounts
 ON web_events.account_id = accounts.id
-ON accounts.id = orders.accounts_id;
--- Joins 3 tables using the same logic, pulling all data from all 3 joined tables. --
--- For efficiency reasons, we probably don't want to do this unless we actually need the information from all of the tables. --
+JOIN orders
+ON accounts.id = orders.account_id;
+-- Joins all three of these tables together(the web_events table, accounts table, and the orders table) using the same logic as above; the code pulls all of the data from all of the joined tables. --
 
-SELECT web_events.channel,
-accounts.name,
-orders.total
-FROM accounts
+SELECT web_events.channel, accounts.name, orders.total
+FROM web_events
+JOIN accounts
 ON web_events.account_id = accounts.id
-ON accounts.id = orders.accounts_id;
--- Joins 3 tables, again using the same logic. This time pulling only the channel column from the web_events table, the name column from the accounts table, and the total column from the orders table. --
+JOIN orders
+ON accounts.id = orders.account_id;
+-- Again, joins all three tables together, but only returns the channel column from the web_events table, the account name column from accounts table, and the order total column from orders table. --
+-- We could continue this same process to link all of the tables if we wanted! But for efficiency reasons, we probably dont't want to do this unless we actually need information from all of the tables. :-) --
+
+-- Aliases --  
 
 SELECT o.*,
 a.*
 FROM orders o
 JOIN accounts a
 o.account_id = a.id;
--- Alias names of "o" and "a" are given for the orders and accounts tables in the FROM and JOIN clauses. The table names can then be replaced with their aliases throughout the rest of the query. (in SELECT and ON, in this case) --
+-- Frequently an alias is just the first letter of the table name. lias names of "o" and "a" are given for the orders and accounts tables in the FROM and JOIN clauses. --
+
+
+
+
 
 
 -- (INNER) JOIN Questions Part 1 (2.11) --     
