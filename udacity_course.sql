@@ -60,19 +60,19 @@ LIMIT: limits results to the first few rows in the table.
 - useful when you want to see just the first few rows of a table. This can be much faster for loading than if we load the entire dataset. 
 - the LIMIT command is always the very last part of a query.
 
-JOIN: allows us to pull data from more than one table at a time. 
+JOIN: the whole purpose of JOIN statements is to allow us to pull data from more than one table at a time. 
 - Joining tables gives you access to each of the tables in the SELECT statement through the table name, a ".", and the column name you want to pull from that table.
 
-    - SELECT indicates which column(s) of data you'd like to see in the output. 
+    - SELECT: indicates which column(s) of data you'd like to see in the output. 
         - "TableA." gives us all the columns that table in the output.
         - "TableA.ColumnNameC" gives us that specific column from that table in the output. We need to specify the table every column comes from in the SELECT statement.
 
-    - The FROM clause indicates the first table from which we're pulling data, and the JOIN indicates the second table. To join two tables, list them in the FROM and JOIN clauses.
-    - For (inner) JOIN, the result is still the same if you were to switch the tables in the FROM and JOIN.
+    - FROM: indicates the first table from which we're pulling data; JOIN: indicates the second table. 
+        - To join two tables, list them in the FROM and JOIN clauses.
+        - For (inner) JOIN, the result is still the same if you were to switch the tables in the FROM and JOIN.
 
-    - The ON clause is used to specify the JOIN condition, by specifying the column on which you'd like to merge the two tables together. 
-    - Which side of the = sign a column is listed doesn't matter.
-    - Joining tables involves linking their PKs and FKS, usually in the ON clause.
+    - ON: specifies the column on which you'd like to merge the two tables together; Joining tables involves linking their PKs and FKS, usually here in the ON clause.
+        - Which side of the = sign a column is listed doesn't matter.
 
     - A Primary Key (PK) exists in every table and is a unique column for each row. It’s often the first column in tables. The single line in an ERD indicates that a PK can only appear in one row in the table it touches.
         - primary keys - are unique for every row in a table. These are generally the first column in our database (like you saw with the id column for every table in the Parch & Posey database).
@@ -369,33 +369,39 @@ WHERE (name LIKE 'C%' OR name LIKE 'W%')
     AND primary_poc NOT LIKE '%eana%');
 -- shows records where the company name starts with either "C" or "W" and the primary point of contact contains the string "ana" or "Ana", but does not contain the string "eana". --
 
+
 ------------------------------------
--- (INNER) JOIN (2.3) --
+-- JOIN (2.3) --
+
 SELECT orders.*,
     accounts.*
 FROM accounts
 JOIN orders
 ON accounts.id = orders.account_id;
--- joins the orders table with the accounts table and pulls all data from both tables.
-
-SELECT accounts.name, orders.occurred_at
-FROM orders
-JOIN accounts
-ON orders.account_id = accounts.id;
--- The accounts table is joined with the orders table on account id, then returns only the account name from the accounts table and the dates in which that account placed orders from the orders table. --
-
-SELECT *
-FROM orders
-JOIN accounts
-ON orders.account_id = accounts.id;
--- The accounts table is joined with the orders table on account id, then returns all columns from BOTH the accounts table and orders table. --
+-- Rows in the orders table are combined with rows in the accounts table wherever the account id matches both tables; Rows without a match are dropped. --
+-- This is an example of a many-to-one relationship; there can be many orders for one account. So the resulting table might show the same account id multiple times to represent multiple orders made on that account. -- 
+-- account id is the primary key in the accounts table, and the foreign key in orders table. --
+-- All columns from the orders table and all columns from the accounts table are returned; 
+-- The same results are generated as the 4th query below, but with the accounts table columnns (FROM) listed first and the orders table columns listed second (JOIN). --
 
 SELECT orders.*
 FROM orders
 JOIN accounts
 ON orders.account_id = accounts.id
--- The orders table is joined with the accounts table on account id, then then pulls all the information ONLY from the orders table. --
--- This query only pulls data from the orders table because SELECT only references columns from the orders table. --
+-- The same inner join is happening here as directly above - but only the columns from the orders table are shown in the final output; Shows information from only the orders table. --  
+  
+SELECT accounts.name, orders.occurred_at
+FROM orders
+JOIN accounts
+ON orders.account_id = accounts.id;
+-- The same inner join is happening here as in the 2 queries above - but only account name (from the accounts table) and the order occurrance time (from the orders table) are displayed in the final output. -- 
+
+SELECT *
+FROM orders
+JOIN accounts
+ON orders.account_id = accounts.id;
+-- The same inner join is happening here as in the 3 queries above - but all columns from both the orders and the accounts table are shown. --
+-- This would return the same rows as the 1st query, but change the order the columns are listed in; orders table columns (FROM) would be listed first; accounts table columns (JOIN) second. --
 
 SELECT orders.standard_qty,
 orders.gloss_qty,
@@ -430,9 +436,8 @@ JOIN accounts a
 o.account_id = a.id;
 -- Alias names of "o" and "a" are given for the orders and accounts tables in the FROM and JOIN clauses. The table names can then be replaced with their aliases throughout the rest of the query. (in SELECT and ON, in this case) --
 
-------------------------------------
--- (INNER) JOIN Questions Part 1 (2.11) -- 
-    
+
+-- (INNER) JOIN Questions Part 1 (2.11) --     
 -- 1 --
 SELECT accounts.primary_poc,
 web_events.occurred_at,
@@ -448,9 +453,8 @@ FROM web_events w
 JOIN accounts a
 ON w.account_id = a.id
 WHERE a.name = 'Walmart';
--- Both of these queries show the primary point of contact, time of web event, channel of web event, and the account name (in this case, all Walmart) for all web_events where the account name is "Walmart."
--- The only difference is the tables aren't given aliases in the first query, whereas the second query does give the tables aliases.
--- The web_events table is joined with the accounts table on account id to gather all selected columns for the output. --
+-- JOIN stands for inner join. Information in the accounts table is joined with the rows in the web_events table wherever account id matches between both tables; rows without a match between both tables are dropped. Then the subset is filtered down to show only the rows where the account name is "Walmart". --
+-- The second query gives the tables aliases. --
 
 -- 2 --
 SELECT region.name AS region,
@@ -503,10 +507,8 @@ ON o.account_id = a.id;
 -- Both queries give the columns aliases for a more readable resulting table, but use different methods to achieve the same result.
 -- The only difference is the tables aren't given aliases in the first query, whereas the second query does give the tables aliases. --
 
-------------------------------------
 
 -- OUTER JOINS (2.13) --
-
 SELECT a.id, a.name, o.total
 FROM orders o
 JOIN accounts a
@@ -534,6 +536,7 @@ LEFT JOIN Country c
 ON c.countryid = s.countryid;
 -- FINAL LEFT JOIN Note - If we were to flip the tables, we would actually obtain the same exact result as the (inner) JOIN statement directly above. This is because if State is on the LEFT table, all of the rows exist in the RIGHT table again.
 
+-- JOINS and Filtering (2.18) --
 SELECT orders.*,
 accounts.*
 FROM orders
@@ -562,7 +565,6 @@ AND accounts.sales_rep_id = 321500
 
 
 -- (OUTER JOIN) Quiz: Last Check (2.19) --
-
 -- 1 --
 SELECT r.name region, s.name rep, a.name account
 FROM region r
@@ -714,3 +716,4 @@ AND o.occurred_at BETWEEN '2015-01-01' AND '2016-01-01';
 -- Finds all orders that occurred in 2015, showing the occurred_at, account name, order total, and total order amount in USD columns.
 -- My solution AND (basically) the solution in 2.20 Solutions: Last Check. 
 
+------------------------------------
