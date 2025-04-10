@@ -120,16 +120,13 @@ With LEFT JOIN, you can prefilter data BEFORE the join occurs by using logic in 
 
 However, with (inner) JOIN, which clause the filter is in does NOT matter. 
     - Moving this filter to the ON clause of an (inner) JOIN will produce the same result as keeping it in the WHERE clause.
-    - That's because (inner) JOINs only return the rows for which the two tables match; so results will be the same whether you filter before or after the join occurs. 
-        
-------------------------------------
+    - That's because (inner) JOINs only return the rows for which the two tables match; so results will be the same whether you filter before or after the join occurs.    
 
+-----------
 Derived columns - A new column created by manipulating existing columns in the database. 
-- Give the column an alias by adding AS to the end of the line that produces the derived column.
+-----------
 
-------------------------------------
-
-Best Practice:
+** Best Practice **
 - Write SQL COMMANDS in all uppercase letters, keep everything else in your query lowercase.
 - Avoid using spaces in table names and column names. 
   - In Postgres, if you have spaces in column or table names, you need to refer to these columns/tables with double quotes around them (Ex: FROM "Table Name" as opposed to FROM table_name). 
@@ -137,12 +134,8 @@ Best Practice:
 - Put a semicolon at the end of each statement. Depending on your SQL environment, your query may need a semicolon at the end to execute.
 If you environment allows it, it will also allow you to run multiple queries at once. */
 
-
-
-
 -- Queries from Udacity course --
 
-------------------------------------
 -- SELECT and FROM (1.11) --
 SELECT * 
 FROM orders  
