@@ -78,6 +78,7 @@ LIMIT: limits results to the first few rows in the table.
            
         - A foreign key (FK) is a column in one table that is a primary key in another table. 
         - Each FK links to a primary key in another table.
+        - Foreign keys are what allow rows in a join to be non-unique.
 
 Aliases: Give table names aliases when performing joins. (This can save you a lot of typing)
     - The alias for a table is created in the FROM or JOIN clauses; use the alias to replace the table name throughout the rest of the query. 
@@ -85,9 +86,10 @@ Aliases: Give table names aliases when performing joins. (This can save you a lo
     - Frequently an alias is just the first letter of the table name
     - As with column names, the best practice is for aliases to be all lowercase letters, and to use underscores instead of spaces. 
     - If you have two or more columns in your SELECT that have the same name after the table name (ex. accounts.name, sales_reps.name) you will NEED to alias them; otherwise it will only show ONE of those columns. 
-        
+
+
 ** JOIN Types **
-    JOIN: (INNER JOIN) Only returns rows that appear in both tables; pulls rows only if they exist as a match across two tables. 
+    JOIN: (INNER JOIN) Only returns rows that appear in both tables; pulls rows only if they exist as a match across two tables; an INNER JOIN that only pulls data that exists in both tables.
     
  ** Motivation to use other Joins **
     - If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
@@ -96,16 +98,19 @@ Aliases: Give table names aliases when performing joins. (This can save you a lo
     - The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
     - The table in the FROM statement is the Left table; the one in the JOIN statement is the Right table.
         
-    LEFT JOIN: (LEFT OUTER JOIN) Includes all the results that match with Right table, just like an Inner JOIN, as well as any results in the Left table that did not match. 
+    LEFT JOIN: (LEFT OUTER JOIN) Includes all the results that match with Right table, just like an Inner JOIN, as well as any results in the Left table that did not match; pulls all the data tht exists in both tables, as well as all of the rows from the table in the FROM even if they do not exist in the JOIN statement.
             
-    RIGHT JOIN: (RIGHT OUTER JOIN) Includes all the results that match with Left table, just like an Inner JOIN, as well as any results in the Left table that did not match. 
+    RIGHT JOIN: (RIGHT OUTER JOIN) Includes all the results that match with Left table, just like an Inner JOIN, as well as any results in the Left table that did not match; pulls all the data that exists in both tables, as well as all of the rows from the table in the JOIN even if they do not exist in the FROM statement. 
         - A LEFT JOIN and RIGHT JOIN do the same thing if we change the tables that are in the FROM and JOIN statements.
         - The rows in the Right table that don't match the rows in the Left table will be included at the bottom of the results. They don't match with rows in the Left table, so any columns from the Left table will contain no data for these rows.
                
     OUTER JOIN: (FULL OUTER JOIN) This will return the inner join result set, as well as any unmatched rows from either of the two tables being joined.
         - Again, this returns rows that do not match one another from the two tables. 
         - The use cases for a full outer join are very rare.
-       
+
+- There are other a few other advanced JOINS that are used in very specific use cases: UNION and UNION ALL, CROSS JOIN, and the tricky SELF JOIN. It's useful to be aware that they exist. 
+
+
 ** Filtering JOINS **
 - In order to get the exact results you're after, you need to be careful about exactly how you filter the data.
 
@@ -116,17 +121,6 @@ With LEFT JOIN, you can prefilter data BEFORE the join occurs by using logic in 
 However, with (inner) JOIN, which clause the filter is in does NOT matter. 
     - Moving this filter to the ON clause of an (inner) JOIN will produce the same result as keeping it in the WHERE clause.
     - That's because (inner) JOINs only return the rows for which the two tables match; so results will be the same whether you filter before or after the join occurs. 
-
-
-
-
-The three JOIN statements you are most likely to use are:
-    - JOIN - an INNER JOIN that only pulls data that exists in both tables.
-    - LEFT JOIN - pulls all the data tht exists in both tables, as well as all of the rows from the table in the FROM even if they do not exist in the JOIN statement.
-    - RIGHT JOIN - pulls all the data that exists in both tables, as well as all of the rows from the table in the JOIN even if they do not exist in the FROM statement.
-
-    - There are other a few other advanced JOINS that are used in very specific use cases: UNION and UNION ALL, CROSS JOIN, and the tricky SELF JOIN. It's useful to be aware that they exist, as they are useful in special cases.
-    
         
 ------------------------------------
 
