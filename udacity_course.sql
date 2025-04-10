@@ -87,7 +87,7 @@ Aliases: Give table names aliases when performing joins. (This can save you a lo
     - As with column names, the best practice is for aliases to be all lowercase letters, and to use underscores instead of spaces. 
     - If you have two or more columns in your SELECT that have the same name after the table name (ex. accounts.name, sales_reps.name) you will NEED to alias them; otherwise it will only show ONE of those columns. 
         
--- JOIN Types: --
+** JOIN Types **
 
     JOIN: (INNER JOIN) Only returns rows that appear in both tables; pulls rows only if they exist as a match across two tables. 
     
@@ -514,28 +514,27 @@ ON o.account_id = a.id
 -- RIGHT JOINs and LEFT JOINs are somewhat interchangeable. --
 -- So if you change the query so the accounts table is in the FROM clause and the orders table in the JOIN clause and then run a LEFT JOIN instead, the results will be exactly the same as the RIGHT JOIN we did with the previous query. --
 
-    ---
-
-    
 SELECT c.countryid, c.countryName, s.stateName
 FROM Country c
 JOIN State s
 ON c.countryid = s.countryid;
--- an inner join; returns country id and country name from the Country table and state name from the State table - only for where the country id in the Country table matches the country id in the State table. --
+-- an Inner JOIN; rows will only be joined where country id is shared between both Country and State tables; non-matching rows are dropped. --
 
 SELECT c.countryid, c.countryName, s.stateName
 FROM Country c
 LEFT JOIN State s
 ON c.countryid = s.countryid;
--- a left join, also returns country id and country name from the Country table and state name from the State table - includes all the rows where the country id matches in both tables. ALSO returns additional rows from the Country table where country id didn't match a country id in the State table. --
--- We are essentially JOINing the matching PK-FK links from the two tables, as we did before, but we are also pulling all the additional rows from the Country table even if they don't have a match in the State table. 
--- Therefore, we're obtaining all the rows of the INNER JOIN, but we also get additional rows from the table in the FROM.
+-- a LEFT JOIN; rows where country id is shared between both Country and State tables are joined together and listed in the results first; remaining rows in the Country table (the Left Table) without matches in the State table are still included, but tacked on at the end of the results. --
 
+
+-- 2.17 --
 SELECT c.countryid, c.countryName, s.stateName
 FROM State s
 LEFT JOIN Country c
 ON c.countryid = s.countryid;
--- FINAL LEFT JOIN Note - If we were to flip the tables, we would actually obtain the same exact result as the (inner) JOIN statement directly above. This is because if State is on the LEFT table, all of the rows exist in the RIGHT table again.
+-- Also a LEFT JOIN, but State is now the Left Table and Country is now the Right Table; That means that any rows with unmatched country ids in the State table will now appear at the bottom of the results instead. -- 
+
+
 
 -- JOINS and Filtering (2.18) --
 SELECT orders.*,
