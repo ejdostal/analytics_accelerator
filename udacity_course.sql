@@ -88,7 +88,6 @@ Aliases: Give table names aliases when performing joins. (This can save you a lo
     - If you have two or more columns in your SELECT that have the same name after the table name (ex. accounts.name, sales_reps.name) you will NEED to alias them; otherwise it will only show ONE of those columns. 
         
 ** JOIN Types **
-
     JOIN: (INNER JOIN) Only returns rows that appear in both tables; pulls rows only if they exist as a match across two tables. 
     
     ** Motivation to use other Joins **
@@ -444,16 +443,13 @@ ON accounts.id = orders.account_id;
 -- We could continue this same process to link all of the tables if we wanted! But for efficiency reasons, we probably dont't want to do this unless we actually need information from all of the tables. :-) --
 
 
--- Aliases (2.10) --  
+-- Aliases in JOINS (2.10) --  
 SELECT o.*,
 a.*
 FROM orders o
 JOIN accounts a
 o.account_id = a.id;
 -- Frequently an alias is just the first letter of the table name. lias names of "o" and "a" are given for the orders and accounts tables in the FROM and JOIN clauses. --
-
-
--- Quiz (2.11) --
 
 SELECT a.primary_poc, w.occurred_at, w.channel, a.name
 FROM web_events w
@@ -484,28 +480,29 @@ ON o.account_id = a.id;
 -- "0.01" is added to the total column in the unit_price calculation to avoid division by zero (A few accounts have 0 for total). --
 
 
--- Other JOINS (2.14) --
+-- LEFT JOIN & RIGHT JOIN (2.14) --
 SELECT a.id, a.name, o.total
 FROM orders o
 JOIN accounts a
 ON o.account_id = a.id
--- This is an Inner JOIN; It returns only rows for account ids that appear in both the orders table and the accounts table. --
+-- This is an Inner Join; It returns only rows for account ids that appear in both the orders table and the accounts table. --
 -- So if there are any accounts that haven't placed orders yet (aka they don't appear in the orders table), these accounts WON'T be included in these results. --
 
 SELECT a.id, a.name, o.total
 FROM orders o
 LEFT JOIN accounts a
 ON o.account_id = a.id
--- This will include all the results that match with the Right table (accounts), as well as any results in the left table (orders) that did not match. --  
--- The table in the FROM is considered the Left table, the table in the LEFT JOIN is considered the Right table. --
+-- This will include all the results that match with the Right table (accounts), as well as any results in the Left table that did not match (orders). --  
+-- The table in the FROM is considered the Left table, the table in the JOIN is considered the Right table. --
 
 SELECT a.id, a.name, o.total
 FROM orders o
 RIGHT JOIN accounts a
 ON o.account_id = a.id
--- This will include all accounts that match with the Left table (orders), as well as any rows in the accounts table (the Right table) that don't satisfy the condition. --
--- Rows that don't satisfy the condition of the join are included at the bottom of the results set; any columns from order (the Left table) will contain no data for these rows (Null).  --
--- So accounts that haven't placed any orders (aka they don't appear in the orders table) WILL still be included in these results. --    
+-- This will include all results that match with the Left table (orders), as well as any rows in the Right table that don't match (accounts). --
+-- In this query, accounts that haven't placed any orders (aka they don't appear in the orders table) ARE included in the results. --  
+-- Rows that don't contain matches with orders are returned at the BOTTOM of the results set, with any columns from the orders table containing Null (or no data).  --
+  
 
 SELECT a.id, a.name, o.total
 FROM accounts a
