@@ -501,7 +501,7 @@ RIGHT JOIN accounts a
 ON o.account_id = a.id
 -- This will include all results that match with the Left table (orders), as well as any rows in the Right table that don't match (accounts). --
 -- In this query, accounts that haven't placed any orders (aka they don't appear in the orders table) ARE included in the results. --  
--- Rows that don't contain matches with orders are returned at the BOTTOM of the results set, with any columns from the orders table containing Null (or no data).  --
+-- Rows that don't contain matches are returned at the BOTTOM of the results set, with any columns from the orders table containing Null (or no data).  --
   
 
 SELECT a.id, a.name, o.total
@@ -509,7 +509,7 @@ FROM accounts a
 LEFT JOIN orders o 
 ON o.account_id = a.id
 -- RIGHT JOINs and LEFT JOINs are somewhat interchangeable. --
--- So if you change the query so the accounts table is in the FROM clause and the orders table in the JOIN clause and then run a LEFT JOIN instead, the results will be exactly the same as the RIGHT JOIN we did with the previous query. --
+-- So if you change the query so the accounts table is in the FROM clause and the orders table in the JOIN clause and then run a LEFT JOIN instead, the results will be exactly the same as the Right Join done in the previous query. --
 
 SELECT c.countryid, c.countryName, s.stateName
 FROM Country c
@@ -521,7 +521,7 @@ SELECT c.countryid, c.countryName, s.stateName
 FROM Country c
 LEFT JOIN State s
 ON c.countryid = s.countryid;
--- a LEFT JOIN; rows where country id is shared between both Country and State tables are joined together and listed in the results first; remaining rows in the Country table (the Left Table) without matches in the State table are still included, but tacked on at the end of the results. --
+-- a LEFT JOIN; rows where country id is shared between both Country and State tables are joined together and listed in the results first; remaining rows in the Country table (the Left Table) without matches in the State table are still included, but tacked on to the end of the results. --
 
 
 -- 2.17 --
@@ -529,7 +529,8 @@ SELECT c.countryid, c.countryName, s.stateName
 FROM State s
 LEFT JOIN Country c
 ON c.countryid = s.countryid;
--- Also a LEFT JOIN, but State is now the Left Table and Country is now the Right Table; That means that any rows with unmatched country ids in the State table will now appear at the bottom of the results instead. -- 
+-- Also a LEFT JOIN, but State is now the Left Table and Country is now the Right Table --
+-- In this query, any rows with unmatched country ids in the State table (Left Table) now appear insteadat the bottom of the results. -- 
 
 
 
