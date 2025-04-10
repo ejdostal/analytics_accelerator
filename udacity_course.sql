@@ -61,52 +61,53 @@ LIMIT: limits results to the first few rows in the table.
 - the LIMIT command is always the very last part of a query.
 
 
---- JOIN Statements -- 
-The whole purpose of JOIN statements is to allow us to pull data from more than one table at a time. 
-- Joining tables gives you access to each of the tables in the SELECT statement through the table name, a ".", and the column name you want to pull from that table.
+** JOIN Statements ** 
+    - The whole purpose of JOIN statements is to allow us to pull data from more than one table at a time. 
+    - Joining tables gives you access to each of the tables in the SELECT statement through the table name, a ".", and the column name you want to pull from that table.
 
-    - SELECT: indicates which column(s) of data you'd like to see in the output. 
+    SELECT: indicates which column(s) of data you'd like to see in the output. 
         - "TableA." gives us all the columns that table in the output.
-        - "TableA.ColumnNameC" gives us that specific column from that table in the output. We need to specify the table every column comes from in the SELECT statement.
-
-    - FROM: indicates the first table from which we're pulling data; JOIN: indicates the second table. 
+         - "TableA.ColumnNameC" gives us that specific column from that table in the output. We need to specify the table every column comes from in the SELECT statement.
+    
+    FROM: indicates the first table from which we're pulling data; JOIN: indicates the second table. 
         - To join two tables, list them in the FROM and JOIN clauses.
         - For (inner) JOIN, the result is still the same if you were to switch the tables in the FROM and JOIN.
-
-    - ON: specifies the column on which you'd like to merge the two tables together; in the ON, we ALWAYS have the primary key (PK) equal to the foreign key (FK);  Primary-foreign key relationships are typically one-to-many, respectively.
+    
+    ON: specifies the column on which you'd like to merge the two tables together; in the ON, we ALWAYS have the primary key (PK) equal to the foreign key (FK);  Primary-foreign key relationships are typically one-to-many, respectively.
         - A primary key (PK) exists in every table and is a unique column for each row; primary keys are unique for every row in a table. 
-            - It is common for the primary key (PK) to be the first column in our tables in most databases. 
-       
+        - It is common for the primary key (PK) to be the first column in our tables in most databases. 
+           
         - A foreign key (FK) is a column in one table that is a primary key in another table. 
-            - Each FK links to a primary key in another table.
+        - Each FK links to a primary key in another table.
 
 Aliases: Give table names aliases when performing joins. (This can save you a lot of typing)
     - The alias for a table is created in the FROM or JOIN clauses; use the alias to replace the table name throughout the rest of the query. 
     - You can alias tables and columns using AS or not using it.
     - Frequently an alias is just the first letter of the table name
     - As with column names, the best practice is for aliases to be all lowercase letters, and to use underscores instead of spaces. 
-    - If you have two or more columns in your SELECT that have the same name after the table name (ex. accounts.name, sales_reps.name) you will NEED to alias them; otherwise it will only show ONE of the columns. 
+    - If you have two or more columns in your SELECT that have the same name after the table name (ex. accounts.name, sales_reps.name) you will NEED to alias them; otherwise it will only show ONE of those columns. 
         
--- Join Types --
-JOIN: (INNER JOIN) Only returns rows that appear in both tables; pulls rows only if they exist as a match across two tables. 
+-- JOIN Types: --
 
--- Motivation to use other Joins --
-    - If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
-    - Each of these new JOIN statements pulls all the same rows as an INNER JOIN, but they also potentially pull some additional rows.
-    - If there is not matching information in the JOINed table, then you will have columns with empty cells; any cells without data are considered NULL. 
-    - The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
-    - The table in the FROM statement is the Left table; the one in the JOIN statement is the Right table.
+    JOIN: (INNER JOIN) Only returns rows that appear in both tables; pulls rows only if they exist as a match across two tables. 
     
-LEFT JOIN: (LEFT OUTER JOIN) Includes all the results that match with Right table, just like an Inner JOIN, as well as any results in the Left table that did not match. 
-    
-RIGHT JOIN: (RIGHT OUTER JOIN) Includes all the results that match with Left table, just like an Inner JOIN, as well as any results in the Left table that did not match. 
-    - A LEFT JOIN and RIGHT JOIN do the same thing if we change the tables that are in the FROM and JOIN statements.
-    - The rows in the Right table that don't match the rows in the Left table will be included at the bottom of the results. They don't match with rows in the Left table, so any columns from the Left table will contain no data for these rows.
+    ** Motivation to use other Joins **
+        - If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
+        - Each of these new JOIN statements pulls all the same rows as an INNER JOIN, but they also potentially pull some additional rows.
+        - If there is not matching information in the JOINed table, then you will have columns with empty cells; any cells without data are considered NULL. 
+        - The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
+        - The table in the FROM statement is the Left table; the one in the JOIN statement is the Right table.
+        
+    LEFT JOIN: (LEFT OUTER JOIN) Includes all the results that match with Right table, just like an Inner JOIN, as well as any results in the Left table that did not match. 
+            
+    RIGHT JOIN: (RIGHT OUTER JOIN) Includes all the results that match with Left table, just like an Inner JOIN, as well as any results in the Left table that did not match. 
+        - A LEFT JOIN and RIGHT JOIN do the same thing if we change the tables that are in the FROM and JOIN statements.
+        - The rows in the Right table that don't match the rows in the Left table will be included at the bottom of the results. They don't match with rows in the Left table, so any columns from the Left table will contain no data for these rows.
+               
+    OUTER JOIN: (FULL OUTER JOIN) This will return the inner join result set, as well as any unmatched rows from either of the two tables being joined.
+        - Again, this returns rows that do not match one another from the two tables. 
+        - The use cases for a full outer join are very rare.
        
-OUTER JOIN: (FULL OUTER JOIN) This will return the inner join result set, as well as any unmatched rows from either of the two tables being joined.
-    - Again, this returns rows that do not match one another from the two tables. 
-    - The use cases for a full outer join are very rare.
-   
  
 The three JOIN statements you are most likely to use are:
     - JOIN - an INNER JOIN that only pulls data that exists in both tables.
@@ -483,14 +484,39 @@ ON o.account_id = a.id;
 -- "0.01" is added to the total column in the unit_price calculation to avoid division by zero (A few accounts have 0 for total). --
 
 
--- OUTER JOINS (2.13) --
+-- Other JOINS (2.14) --
 SELECT a.id, a.name, o.total
 FROM orders o
 JOIN accounts a
-ON orders.account_id = accounts.id
--- This an example of an inner join (what you've done so far). --
--- This pulls the account id and account name from the accounts table and the total from the orders table - but only the rows where the account id in the orders table matches the account id in the accounts table. --
+ON o.account_id = a.id
+-- This is an Inner JOIN; It returns only rows for account ids that appear in both the orders table and the accounts table. --
+-- So if there are any accounts that haven't placed orders yet (aka they don't appear in the orders table), these accounts WON'T be included in these results. --
 
+SELECT a.id, a.name, o.total
+FROM orders o
+LEFT JOIN accounts a
+ON o.account_id = a.id
+-- This will include all the results that match with the Right table (accounts), as well as any results in the left table (orders) that did not match. --  
+-- The table in the FROM is considered the Left table, the table in the LEFT JOIN is considered the Right table. --
+
+SELECT a.id, a.name, o.total
+FROM orders o
+RIGHT JOIN accounts a
+ON o.account_id = a.id
+-- This will include all accounts that match with the Left table (orders), as well as any rows in the accounts table (the Right table) that don't satisfy the condition. --
+-- Rows that don't satisfy the condition of the join are included at the bottom of the results set; any columns from order (the Left table) will contain no data for these rows (Null).  --
+-- So accounts that haven't placed any orders (aka they don't appear in the orders table) WILL still be included in these results. --    
+
+SELECT a.id, a.name, o.total
+FROM accounts a
+LEFT JOIN orders o 
+ON o.account_id = a.id
+-- RIGHT JOINs and LEFT JOINs are somewhat interchangeable. --
+-- So if you change the query so the accounts table is in the FROM clause and the orders table in the JOIN clause and then run a LEFT JOIN instead, the results will be exactly the same as the RIGHT JOIN we did with the previous query. --
+
+    ---
+
+    
 SELECT c.countryid, c.countryName, s.stateName
 FROM Country c
 JOIN State s
