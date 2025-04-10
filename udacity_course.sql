@@ -46,7 +46,6 @@ WHERE: filters your results based on a set criteria; a "subset" of the table
     - LIKE, IN, NOT, AND, and BETWEEN logic can be linked using the OR operator. 
     - When combining multiple of these operations, you frequently might need to use parentheses to assure that the logic you want to perform is being executed correctly.
 
-
 ORDER BY: sorts results by the data in any column
 - useful when you want to sort orders by date, for example
 - the default is to sort in Ascending order: A to Z, lowest to highest, or earliest to latest. 
@@ -90,12 +89,12 @@ Aliases: Give table names aliases when performing joins. (This can save you a lo
 ** JOIN Types **
     JOIN: (INNER JOIN) Only returns rows that appear in both tables; pulls rows only if they exist as a match across two tables. 
     
-    ** Motivation to use other Joins **
-        - If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
-        - Each of these new JOIN statements pulls all the same rows as an INNER JOIN, but they also potentially pull some additional rows.
-        - If there is not matching information in the JOINed table, then you will have columns with empty cells; any cells without data are considered NULL. 
-        - The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
-        - The table in the FROM statement is the Left table; the one in the JOIN statement is the Right table.
+ ** Motivation to use other Joins **
+    - If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
+    - Each of these new JOIN statements pulls all the same rows as an INNER JOIN, but they also potentially pull some additional rows.
+    - If there is not matching information in the JOINed table, then you will have columns with empty cells; any cells without data are considered NULL. 
+    - The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
+    - The table in the FROM statement is the Left table; the one in the JOIN statement is the Right table.
         
     LEFT JOIN: (LEFT OUTER JOIN) Includes all the results that match with Right table, just like an Inner JOIN, as well as any results in the Left table that did not match. 
             
@@ -107,7 +106,18 @@ Aliases: Give table names aliases when performing joins. (This can save you a lo
         - Again, this returns rows that do not match one another from the two tables. 
         - The use cases for a full outer join are very rare.
        
- 
+*** Filtering JOINS ***
+- In order to get the exact results you're after, you need to be careful about exactly how you filter the data.
+
+With LEFT JOIN, you can prefilter data BEFORE the join occurs by using logic in the ON clause instead of WHERE:
+    - Use logic in the ON clause with LEFT JOIN to prefilter data BEFORE the join occurs; This is like joining the FROM table with a different table in JOIN - one that only includes a subset of the rows in the original table.
+    - Keep logic in the WHERE clause with LEFT JOIN to filter the result set AFTER the join occurs; When the database executes the query, it executes the join and everything in the ON clause first; This builds a new result set; THEN that result set is filtered using the WHERE clause. 
+
+However, with (inner) JOIN, which clause the filter is in does NOT matter. 
+    - Moving this filter to the ON clause of an (inner) JOIN will produce the same result as keeping it in the WHERE clause.
+    - That's because (inner) JOINs only return the rows for which the two tables match; so results will be the same whether you filter before or after the join occurs. 
+
+
 The three JOIN statements you are most likely to use are:
     - JOIN - an INNER JOIN that only pulls data that exists in both tables.
     - LEFT JOIN - pulls all the data tht exists in both tables, as well as all of the rows from the table in the FROM even if they do not exist in the JOIN statement.
@@ -115,14 +125,6 @@ The three JOIN statements you are most likely to use are:
 
     - There are other a few other advanced JOINS that are used in very specific use cases: UNION and UNION ALL, CROSS JOIN, and the tricky SELF JOIN. It's useful to be aware that they exist, as they are useful in special cases.
     
-
-- In order to get the exact results you're after, you need to be careful about exactly how you filter the data. As with joins, there are multiple options.
-- For LEFT JOIN, logic in the ON clause reduces the rows BEFORE combining the tables.
-- For LEFT JOIN, logic in the WHERE clause occurs AFTER the join occurs. Use logic in the ON clause with LEFT JOIN to prefilter data BEFORE the join occurs. 
-- This only works for LEFT JOIN - it will not work of (inner) JOIN.
-- Because (inner) JOIN only returns the rows for which the two tables match, moving this filter to the ON clause of an (inner) JOIN will simply produce the same result as keeping it in the WHERE clause.
-
-
         
 ------------------------------------
 
