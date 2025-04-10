@@ -126,6 +126,23 @@ However, with (inner) JOIN, which clause the filter is in does NOT matter.
 Derived columns - A new column created by manipulating existing columns in the database. 
 -----------
 
+** Aggregations **
+- These functions operate down columns, not across rows.
+- Nulls are often ignored in aggregation functions.
+    - Nulls - a datatype that specifies where data does not exist.
+    - When identifying NULLs in a WHERE clause, we write IS NULL or IS NOT NULL. (We don't use =, because NULL isn't considered a value in SQL. Rather, it is a property of the data.)
+    - NULLs frequently occur when performing a LEFT or RIGHT JOIN. 
+    - NULLs can also occur from simply missing data in our database.
+
+COUNT: Counts how many rows are in a particular column; you can use COUNT of non-numerical columns.
+SUM: Adds together all the values in a particular column; SUM treats Nulls as zero. 
+MIN / MAX: Return the lowest and highest values in a particular column. 
+Average: Calculates the average of all the values in a particular column.
+
+Use row-level output for early exploratory work, when searching your database to better understand the data.
+Once you get a since of what the data looks like, aggregates become more helpful in answering your questions.
+
+
 ** Best Practice **
 - Write SQL COMMANDS in all uppercase letters, keep everything else in your query lowercase.
 - Avoid using spaces in table names and column names. 
@@ -628,6 +645,76 @@ JOIN accounts a
 ON o.account_id = a.id
 AND o.occurred_at BETWEEN '2015-01-01' AND '2016-01-01';
 -- Finds all the orders that occurred in 2015. --
+
+
+-- NULLS (3.3) --
+SELECT *
+FROM accounts 
+WHERE primary_poc IS NULL;
+-- Finds all the accounts for which there are no values in the primary_poc column. --
+-- If you don't have point of contact, chances are you're not going to be able to keep that customer for much longer. --
+
+SELECT *
+FROM accounts 
+WHERE primary_poc IS NOT NULL;
+-- Finds the inverse of the result set from the previous query; Returns all rows for which there ARE values in the primary_poc column. --
+
+SELECT COUNT(*) AS order_count
+FROM orders
+WHERE occurred_at >= '2016-12-01'
+AND occurred_at >= '2017-01-01';
+-- Counts the titak number of rows in orders table in the month of December 2016. -- 
+    -- The COUNT function is returning a count of all the rows that contain non-null data. --
+    -- The result produced by a COUNT(*) is typically equally to the number of rows in the table, because it's very unusual to have a row that is entirely null. --
+
+SELECT COUNT(*) AS account_count
+FROM accounts;
+-- Finds all the rows in the accounts table. --
+
+SELECT COUNT(id) AS account_count
+FROM accounts;
+-- The difference between the COUNT of the id column and the COUNT of the total number of rows in the table, is the number of Null values there are in the id column. --
+    -- COUNT can help us identify the number of null values in any particular column; Substitute the * in COUNT with a specific column to see how many non-null records there are in that column. --
+    -- If the COUNT  result of a column MATCHES the number of rows in a table, there are no nulls in the column. --
+
+SELECT COUNT(primary_poc) AS account_primary_poc_count
+FROM accounts;
+-- The difference between the COUNT of the primary_poc column and the COUNT of the total number of rows in the table, is the number of Null values there are in the primary_poc column. --
+    -- If the COUNT result of a column is LESS than the number of rows in the table, we know the difference is the number of nulls. --
+    -- COUNT works on any column, including those with non-numerical values. --
+
+SELECT SUM(standard_qty) AS standard,
+SUM(gloss_qty) AS gloss,
+SUM(poster_qty) AS poster
+FROM orders;
+-- Totals up all sales of each paper type and compares them to one another. --
+-- Useful for Inventory planning - how much of each paper type should we produce? --
+-- Works similar to COUNT - just specify column names rather than using *. --
+-- SUM is only for columns that have quantitative data; the SUM function treats Nulls as zero. 
+
+SELECT SUM(poster_qty) AS total_poster_sales
+FROM orders;
+-- Finds the total amount of poster_qty paper ordered in the orders table. --
+
+SELECT SUM(standard_qty) AS total_standard_sales
+FROM orders;
+-- Finds the total amount of standard_qty paper ordered in the orders table. --
+
+SELECT SUM(total_amt_usd) AS total_dollar_sales
+FROM orders;
+-- Finds the total dollar amount of sales using the total_amt_usd in the orders table. --
+
+SELECT standard_amt_usd + gloss_amt_usd AS standard_glossy_total_amt
+FROM orders;
+-- Finds the total dollar amount spent in USD on both standard AND glossy paper for each order in the orders table. --
+
+SELECT SUM(standard_amt_usd)/ SUM(standard_qty) AS standard_price_per_unit
+FROM orders;
+-- Finds the standard paper price per unit across all of the sales made in the orders table. -- 
+-- The price and standard quantity of paper varies from one order to the next.
+-- Summing the standard paper prices and dividing it by the sum of the standard paper quantities, creates a standard paper price per unit ratio across all of the sales made in the orders table. --
+-- Notice, this solution used both an aggregate and our mathematical operators. --
+
 
 
 
