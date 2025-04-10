@@ -106,7 +106,7 @@ Aliases: Give table names aliases when performing joins. (This can save you a lo
         - Again, this returns rows that do not match one another from the two tables. 
         - The use cases for a full outer join are very rare.
        
-*** Filtering JOINS ***
+** Filtering JOINS **
 - In order to get the exact results you're after, you need to be careful about exactly how you filter the data.
 
 With LEFT JOIN, you can prefilter data BEFORE the join occurs by using logic in the ON clause instead of WHERE:
@@ -116,6 +116,8 @@ With LEFT JOIN, you can prefilter data BEFORE the join occurs by using logic in 
 However, with (inner) JOIN, which clause the filter is in does NOT matter. 
     - Moving this filter to the ON clause of an (inner) JOIN will produce the same result as keeping it in the WHERE clause.
     - That's because (inner) JOINs only return the rows for which the two tables match; so results will be the same whether you filter before or after the join occurs. 
+
+
 
 
 The three JOIN statements you are most likely to use are:
@@ -505,7 +507,6 @@ ON o.account_id = a.id
 -- In this query, accounts that haven't placed any orders (aka they don't appear in the orders table) ARE included in the results. --  
 -- Rows that don't contain matches are returned at the BOTTOM of the results set, with any columns from the orders table containing Null (or no data).  --
   
-
 SELECT a.id, a.name, o.total
 FROM accounts a
 LEFT JOIN orders o 
@@ -523,18 +524,14 @@ SELECT c.countryid, c.countryName, s.stateName
 FROM Country c
 LEFT JOIN State s
 ON c.countryid = s.countryid;
--- a LEFT JOIN; rows where country id is shared between both Country and State tables are joined together and listed in the results first; remaining rows in the Country table (the Left Table) without matches in the State table are still included, but tacked on to the end of the results. --
+-- a LEFT JOIN; rows where country id is shared between both Country and State tables are joined together and listed in the results first; rows in the Country table (the Left Table) without matches in the State table are tacked on to the end of the results with Nulls in the State columns. --
 
-
--- 2.17 --
 SELECT c.countryid, c.countryName, s.stateName
 FROM State s
 LEFT JOIN Country c
 ON c.countryid = s.countryid;
 -- Also a LEFT JOIN, but State is now the Left Table and Country is now the Right Table --
--- In this query, any rows with unmatched country ids in the State table (Left Table) now appear insteadat the bottom of the results. -- 
-
-
+-- In this query, any rows with unmatched country ids remaining in the State table (Left Table) now appear the bottom of the results instead; Country table columns in these rows are Null. --
 
 -- JOINS and Filtering (2.18) --
 SELECT orders.*,
