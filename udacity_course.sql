@@ -559,7 +559,9 @@ AND accounts.sales_rep_id = 321500
 -- Maybe use to mark all the orders made by sales rep 321500, while keeping all other orders in the result set as well. --
 -- Filtering on the ON clause will be incredibly useful when working with data aggregation though. --
 
--- 1 --
+   ---------------------
+
+    
 SELECT r.name region, s.name rep, a.name account
 FROM region r
 JOIN sales_reps s
@@ -569,34 +571,26 @@ JOIN accounts a
 ON s.id = a.sales_rep_id
 ORDER BY a.name;
 -- Provides all sales reps in the Midwest with their associated accounts. --
--- Prefilters the sales_reps table so only rows representing the "Midwest" region are left;
--- Rows from the sales_rep subset are joined with rows from the region table on region id, unmatched region ids are dropped.
+    -- Prefilters the sales_reps table so only rows with region names of "Midwest" region are left. --
+    -- Rows from the sales_rep subset are joined with rows from the region table on region id; region ids that match (those with region names of Midwest) are returned, everything else droped. -- 
+    -- The "Midwest sales_reps + region table combined" subset is then joined with the accounts table on sales representative id; sales representative ids that match (those connected with sales representatives from the Midwest) are combined with their accounts information, everything else is dropped. -- 
+    -- The remaining rows are sorted from A-Z by account name and the region name, sales rep name, and account name columns are returned. --
+
+
+SELECT r.name region, s.name rep, a.name account
+FROM region r
+JOIN sales_reps s
+ON r.id = s.region_id AND r.name = 'Midwest' AND s.name LIKE 'S%'
+JOIN accounts a
+ON s.id = a.sales_rep_id
+ORDER BY a.name;
+-- Provides all sales reps in the Midwest region whose first name starts with an "S", with their associated accounts. --
+    -- The same query as above, but ALSO requires that sales rep first names start with  an "S" in the sales_reps prefilter. --
+    -- Prefilters the sales_reps table so only rows with the region name of "Midwest" AND that have a sales representative associated with them whose name starts with an "S" are left --
+    -- Rows from the sales_rep subset are joined with rows from the region table where region id match (so just sales representative names starting with an "S" in the Midwest region), unmatched region ids are dropped. -- 
+    -- This second subset (prefiltered-sales_rep + region subset) is then combined with accounts table on sales rep id. Only accounts with matching sales representative ids and added to the rows. -- 
+-- The remaining rows are sorted from A-Z by account name and the region name, sales rep name, and account name columns are returned. --
 -- The results are sorted from A-Z by account name.
-
--- 2 --
-SELECT r.name region, s.name rep, a.name account
-FROM region r
-JOIN sales_reps s
-ON r.id = s.region_id AND r.name = 'Midwest' AND s.name LIKE 'S%'
-JOIN accounts a
-ON s.id = a.sales_rep_id
-ORDER BY a.name;
--- Returns the same 3 columns.
--- First, gathers only rows from the region table where region name is "Midwest" in a subset table
--- Also gathers only rows from the sales_reps table where the sales rep name begins with an "S" into a second subset table.
--- Then the "Midwest" subset table is joined with the "rep names that begin with an 'S'" subset table wherever region id matches between the two subsets - this creates a third subset. 
--- The "Midwest + rep names that begin with an 'S'" third subset is then joined with the accounts table wherever sales representative id matches between the third subset and the accounts table.
--- Results are ordered from A-Z by account name.
-
-SELECT r.name region, s.name rep, a.name account
-FROM region r
-JOIN sales_reps s
-ON r.id = s.region_id AND r.name = 'Midwest' AND s.name LIKE 'S%'
-JOIN accounts a
-ON s.id = a.sales_rep_id
-ORDER BY a.name;
--- You could also write query #2 like this. It returns the same results. --
--- This was the answer in 2.20 Solutions: Last Check. --
 
 
 -- 3 -- 
