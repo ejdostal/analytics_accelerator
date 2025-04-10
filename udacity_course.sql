@@ -533,19 +533,18 @@ ON c.countryid = s.countryid;
 -- Also a LEFT JOIN, but State is now the Left Table and Country is now the Right Table --
 -- In this query, any rows with unmatched country ids remaining in the State table (Left Table) now appear the bottom of the results instead; Country table columns in these rows are Null. --
 
--- JOINS and Filtering (2.18) --
+-- LEFT JOIN and Filtering (2.18) --
 SELECT orders.*,
 accounts.*
 FROM orders
 LEFT JOIN accounts
 ON orders.account_id = accounts.id
-WHERE accounts.sales_rep_id = 321500
--- Shows only rows where column ids match between both orders and accounts tables, in addition to all other rows existing in the orders table, where the sales representative id is 321500. 
-    -- Retrieves all columns from BOTH the orders table and the accounts table.
-    -- Returns all rows where the account has matches in both the orders table and the accounts table - as well as any additional rows in the orders table where account id did not match a column id in the accounts table.
-    -- Then filters those results down to just the rows in that subset containing a sales representative id of 32100.
-    -- The logic in the ON clause reduces the rows BEFORE combining the tables - so the orders and accounts tables are combined FIRST here.
-    -- The logic in the WHERE clause occurs AFTER the Join occurs - so the subset of rows from the Left Join is further filtered down to just show rows where sales_rep_id is 321500. 
+WHERE accounts.sales_rep_id = 321500 
+-- The orders table is joined with the accounts table on account_id. --
+-- First, rows where country id matches between orders and accounts tables are joined (Inner join). --
+-- Second, remaining rows in the orders table (the FROM or Left Table) without matches are tacked to end of the subset, with Nulls in their accounts columns. --
+-- Third, the subset of rows from his join filtered down further (so just rows where sales_rep_id is 321500 are returned). --
+-- This returns only the orders booked by sales rep 321500. --
 
 SELECT orders.*,
 accounts.*
@@ -553,15 +552,13 @@ FROM orders
 LEFT JOIN accounts
 ON orders.account_id = accounts.id
 AND accounts.sales_rep_id = 321500
--- Pre-filters orders table down to ONLY the rows where sales representative id is 32100 by moving this filter to the ON clause.
-    -- This effectively pre-filters the Right table to include only rows with sales rep id 321500 BEFORE the join is executed.
-    -- In other words, it's like a WHERE clause that applies BEFORE the join, rather than after. 
--- You can think of this like joining orders with a different table - on that includes only a subset of rows from the original accounts table.
--- Includes all rows in the orders table, plus any data in this new prefiltered table that match the account id in the orders table. 
--- This only works of LEFT JOIN - moving this filter to the ON clause of an (inner) will simply the same result as keeping it in the WHERE clause.
+-- The same query as above, but pre-filtering data BEFORE the LEFT JOIN is executed.
+-- First, the table in the LEFT JOIN clause (accounts) is filtered down to include ONLY accounts with a sales representative id of 321500 attached to them. --
+-- Next, rows in the Left Table (orders) where sales representative id = 321500 is combined with the rows in new prefiltered subset from the accounts table. --
+-- Third, any rows remaining in the Left Table (orders) where sales representative id did NOT equal 321500 are tacked on to the end of the results, with Nulls in the accounts columns. --
+-- Maybe use to mark all the orders made by sales rep 321500, while keeping all other orders in the result set as well. --
+-- Filtering on the ON clause will be incredibly useful when working with data aggregation though. --
 
-
--- (OUTER JOIN) Quiz: Last Check (2.19) --
 -- 1 --
 SELECT r.name region, s.name rep, a.name account
 FROM region r
@@ -571,22 +568,10 @@ AND r.name = 'Midwest'
 JOIN accounts a
 ON s.id = a.sales_rep_id
 ORDER BY a.name;
--- Returns 3 columns - the region name, sales representative name, and the account name.
--- First, gathers only rows from the region table where the name is "Midwest" and joins THOSE rows with information in the sales_reps table where the region id matches those in the "Midwest" subset. 
--- Then new information from the accounts table is joined to this second subset wherever sales representative id matches with the accounts table. 
--- Results are ordered from A-Z by account name.
-
-SELECT r.name region, s.name rep, a.name account
-FROM region r
-JOIN sales_reps s
-ON r.id = s.region_id
-AND r.name = 'Midwest'
-JOIN accounts a
-ON s.id = a.sales_rep_id
-ORDER BY a.name;
--- You could also write the query #1 like this. It returns the same results. --
--- This was the answer in 2.20 Solutions: Last Check. --
-
+-- Provides all sales reps in the Midwest with their associated accounts. --
+-- Prefilters the sales_reps table so only rows representing the "Midwest" region are left;
+-- Rows from the sales_rep subset are joined with rows from the region table on region id, unmatched region ids are dropped.
+-- The results are sorted from A-Z by account name.
 
 -- 2 --
 SELECT r.name region, s.name rep, a.name account
