@@ -558,9 +558,6 @@ AND accounts.sales_rep_id = 321500
 -- Third, any rows remaining in the Left Table (orders) where sales representative id did NOT equal 321500 are tacked on to the end of the results, with Nulls in the accounts columns. --
 -- Maybe use to mark all the orders made by sales rep 321500, while keeping all other orders in the result set as well. --
 -- Filtering on the ON clause will be incredibly useful when working with data aggregation though. --
-
-   ---------------------
-
     
 SELECT r.name region, s.name rep, a.name account
 FROM region r
@@ -571,11 +568,6 @@ JOIN accounts a
 ON s.id = a.sales_rep_id
 ORDER BY a.name;
 -- Provides all sales reps in the Midwest with their associated accounts. --
-    -- Prefilters the sales_reps table so only rows with region names of "Midwest" region are left. --
-    -- Rows from the sales_rep subset are joined with rows from the region table on region id; region ids that match (those with region names of Midwest) are returned, everything else droped. -- 
-    -- The "Midwest sales_reps + region table combined" subset is then joined with the accounts table on sales representative id; sales representative ids that match (those connected with sales representatives from the Midwest) are combined with their accounts information, everything else is dropped. -- 
-    -- The remaining rows are sorted from A-Z by account name and the region name, sales rep name, and account name columns are returned. --
-
 
 SELECT r.name region, s.name rep, a.name account
 FROM region r
@@ -585,15 +577,7 @@ JOIN accounts a
 ON s.id = a.sales_rep_id
 ORDER BY a.name;
 -- Provides all sales reps in the Midwest region whose first name starts with an "S", with their associated accounts. --
-    -- The same query as above, but ALSO requires that sales rep first names start with  an "S" in the sales_reps prefilter. --
-    -- Prefilters the sales_reps table so only rows with the region name of "Midwest" AND that have a sales representative associated with them whose name starts with an "S" are left --
-    -- Rows from the sales_rep subset are joined with rows from the region table where region id match (so just sales representative names starting with an "S" in the Midwest region), unmatched region ids are dropped. -- 
-    -- This second subset (prefiltered-sales_rep + region subset) is then combined with accounts table on sales rep id. Only accounts with matching sales representative ids and added to the rows. -- 
--- The remaining rows are sorted from A-Z by account name and the region name, sales rep name, and account name columns are returned. --
--- The results are sorted from A-Z by account name.
 
-
--- 3 -- 
 SELECT r.name region, s.name rep, a.name account
 FROM sales_reps s
 JOIN region r
@@ -602,25 +586,8 @@ JOIN accounts a
 ON a.sales_rep_id = s.id
 WHERE r.name = 'Midwest' AND s.name LIKE '% K%'
 ORDER BY a.name;
--- This was the answer in 2.20 Solutions: Last Check. --
--- These 3 columns are returned from the region, sales_reps and accounts tables.
--- Rows in the sales_reps table is joined with rows in the region table wherever region id matches. This creates a subset.
--- Then this subset is joined with information in the accounts table wherever sales representative id matches between the two. This creates a second subset.
--- Then this second subset is filtered down to only show rows with a region name of "Midwest" and where the sales representative last name starts with a "K." This creates a third subset.
--- Then this third (and final) subset is displayed from A-Z by account name.
+-- Provides the region for each sales rep in the Midwest whose last name starts with a "K", with their associated accounts. --
 
-SELECT r.name region, s.name rep, a.name account
-FROM region r
-JOIN sales_reps s
-ON r.id = region_id
-AND s.name LIKE '% K%' AND r.name = 'Midwest'
-JOIN accounts a
-ON s.id = a.sales_rep_id
-ORDER BY a.name;
--- You could also write query #3 like this. It returns the same results. --
--- This was my solution to 2.19 Quiz: Last Check. 
-
--- 4 --
 SELECT r.name region, a.name account,
 o.total_amt_usd/(o.total + 0.01) unit_price
 FROM region r
@@ -631,31 +598,21 @@ ON s.id = a.sales_rep_id
 JOIN orders o
 ON a.id = o.account_id
 WHERE o.standard_qty > 100 ;
--- Returns region name, account name and unit price of paper for all orders where standard paper order quantity exceeded $100.
--- Joins region table with sales_reps table wherever region id matches.
--- This subset of rows is then joined with the accounts table wherever sales representative id matches it. 
--- The remaining rows from THAT join is then combined with information from the orders table wherever account id matches it.
--- Then THOSE results are filtered to only show orders where the standard paper order quantity was greater than 100.
--- My solution AND the solution in 2.20 Solutions: Last Check. --
+-- Provides the name of each region for every order, as well as the account name and the unit price they paid for the order, only if the standard order quantity exceeded $100. --
 
--- 5 --
-SELECT r.name region, a.name account, 
-o.total_amt_usd / (o.total + 0.01) unit_price
+SELECT r.name region, a.name account, o.total_amt_usd/(o.total + 0.01) unit_price
 FROM region r
 JOIN sales_reps s
-ON r.id = s.region_id
+ON s.region_id = r.id
 JOIN accounts a
-ON s.id = a.sales_rep_id
+ON a.sales_rep_id = s.id
 JOIN orders o
-ON a.id = o.account_id
-WHERE standard_qty > 100 
-AND poster_qty > 50
+ON o.account_id = a.id
+WHERE o.standard_qty > 100 AND o.poster_qty > 50
 ORDER BY unit_price;
--- Same as query #4, but the final subset was are even further so as to show only orders where standard order quanity is greater than $100 AND poster order quantity is greater than $50. 
--- Results are sorted from least to greatest unit price. 
--- My solution AND the solution in 2.20 Solutions: Last Check. --
+-- Provides the name of each region for every orders, as well as the account name and the unit price they paid for the order - but only provides results if the standard order quantity exceeds $100 AND the poster order quantity exceed 50. -- 
+-- Results sorted from least to greatest by unit price. --
 
--- 6 --
 SELECT r.name region, a.name account, 
 o.total_amt_usd / (o.total + 0.01) unit_price
 FROM region r
@@ -668,28 +625,27 @@ ON a.id = o.account_id
 WHERE standard_qty > 100 
 AND poster_qty > 50
 ORDER BY unit_price DESC;
--- Same as query #5, but results are sorted from greatest to least unit price instead. 
--- My solution AND the solution in 2.20 Solutions: Last Check. 
+-- Same as query directly above, but sort is reversed; Results are sorted from greatest to least unit price. 
 
-
--- 7 --
 SELECT DISTINCT a.name, w.channel
 FROM accounts a
 JOIN web_events w
 ON a.id = w.account_id
 WHERE a.id = 1001;
--- Returns all the different channesl used by account id 1001. 
--- SELECT DISTINCT is used to narrow down the results to only the unique values.
--- My solution AND (basically) the solution in 2.20 Solutions: Last Check.
+-- Lists all the different channels used by account_id: 1001. SELECT DISTINCT narrows down the results to only the unique values. --
 
--- 8 -- 
 SELECT o.occurred_at occurred_at, a.name account,
 o.total, o.total_amt_usd
 FROM orders o
 JOIN accounts a
 ON o.account_id = a.id
 AND o.occurred_at BETWEEN '2015-01-01' AND '2016-01-01';
--- Finds all orders that occurred in 2015, showing the occurred_at, account name, order total, and total order amount in USD columns.
--- My solution AND (basically) the solution in 2.20 Solutions: Last Check. 
+-- Finds all the orders that occurred in 2015. --
 
-------------------------------------
+
+
+
+
+
+
+
