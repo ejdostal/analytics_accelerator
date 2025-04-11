@@ -121,6 +121,8 @@ Nulls: a datatype that specifies where data does not exist.
 Aggregations: These functions operate down columns, not across rows.
     - An important thing to remember: aggregators only aggregate vertically - the values of a column. 
         - If you want to perform a calculation across rows, you would do this with simple arithmetic.
+    - Use row-level output for early exploratory work, when searching your database to better understand the data.
+        - Once you get a since of what the data looks like, aggregates become more helpful in answering your questions.
 
     COUNT: Counts how many rows are in a table, and helps you to identify the number of Null values in any particular column. 
         - you can use COUNT on non-numerical columns
@@ -131,19 +133,23 @@ Aggregations: These functions operate down columns, not across rows.
             - If the COUNT result of a column is LESS than the number of rows in the table, we know the difference is how many Nulls are in that column. --
     - Use COUNT of a column to return the specific number of rows in column that are not Null (the aggregated number).
 
-
     SUM: Adds together all the values in a particular column
         - You can only use SUM of numeric columns.
         - SUM will ignore Nulls; it treats Nulls as 0. 
-    
+
     MIN / MAX: Return the lowest and highest values in a particular column. 
-        - Ignore Null values.
+        - Ignores Null values.
+        - Can be used to count numerical values (like COUNT)
+        - MIN will return the lowest number, earliest date, or non-numerical value as early in the alphabet as possible. 
+        - MAX does the opposite — it returns the highest number, the latest date, or the non-numerical value closest alphabetically to “Z.”
 
-    Average: Calculates the average of all the values in a particular column.
+    Average: Returns the mean of the data; the sum of all the values in the column, divided by the number of values in the column; what can we expect to see on regular basis?
+       - Can only be used on numerical columns 
+        - Ignores Null values completely; Rows with Null values are NOT calculated in the numerator or the denominator when calculating the average. 
+            - If you want to count Nulls as 0, you'll need to take a SUM and divide it be the COUNT, rather than using the AVG function. 
+    - Note: the Median might be a more appropriate measure of center for data than AVG for data, but finding the Median happens to be a pretty difficult thing to get using SQL alone.
     
-    *** Use row-level output for early exploratory work, when searching your database to better understand the data.
-    *** Once you get a since of what the data looks like, aggregates become more helpful in answering your questions.
-
+  
 ------------
 
 ** Best Practice **
@@ -720,7 +726,7 @@ FROM orders;
     -- Divides the summed prices of all standard paper ordered BY the summed totals of all standard paper quantities ordered. --
     -- Though the price (standard_amt_usd) and standard paper quantity ordered (standard_qty) varies from one order to the next, this ratio is across all of the sales made in the orders table. --
  
-
+-- MIN and MIX (3.9) --
 SELECT MIN(standard_qty) AS standard_min,
     MIN(gloss_qty) AS gloss_min,
     MIN(poster_qty) AS poster_min,
@@ -732,9 +738,42 @@ FROM orders;
     -- ex. Find the largest single order is for poster paper, despite the fact that it's the least popular overall (poster_qty showed the highest max). --
     -- Implication: Less popular products might still be ordered in larger quantities, so even though it's not the most popular item, company might want to produce enough of this item to be able to fulfill pretty big orders at any given time. --
 
+SELECT AVG(standard_qty) AS standard_avg,
+    AVG(gloss_qty) AS gloss_avg,
+    AVG(poster_qty) AS poster_avg
+FROM orders;
+-- Returns the average quantity of paper ordered for each paper type (average order quantity size) across all orders in the orders table. -- 
+    -- Answers: What order size can we expect to see on a regular basis? 
 
+SELECT MIN(occurred_at)
+FROM orders;
+-- Returns the date of the earliest order ever placed, using an aggregation. --
 
+SELECT occurred_at
+FROM orders
+ORDER BY occurred_at
+LIMIT 1;
+-- Returns the date of the earliest order every placed, using ORDER BY and LIMIT. --
 
+SELECT MAX(occurred_at)
+FROM web_events;
+-- Returns the date the most recent (latest) web event occurred, using an aggregation. --
+
+SELECT occurred_at
+FROM web_events 
+ORDER BY occurred_at DESC
+LIMIT 1;
+-- Returns the date the most recent (latest) web event occurred, using ORDER BY and LIMIT. --
+
+SELECT AVG(standard_qty) AS mean_standard,
+    AVG(gloss_qty) AS mean_gloss,
+    AVG(poster_qty) AS mean_poster,
+    AVG(standard_amt_usd) AS mean_standard_usd,
+    AVG(gloss_amt_usd) AS mean_gloss_usd,
+    AVG(poster_amt_usd) AS mean_poster_usd,
+FROM orders;
+-- Finds the mean (Average) amount spent per order for each paper type, as well as the mean amount of each paper type purchased per order. --
+-- Average number of sales for each paper type, as well as the average amount of paper qty ordered for each paper type. --
 
 
 
