@@ -137,6 +137,7 @@ Aggregations: These functions operate down columns, not across rows.
         - SUM will ignore Nulls; it treats Nulls as 0. 
     
     MIN / MAX: Return the lowest and highest values in a particular column. 
+        - Ignore Null values.
 
     Average: Calculates the average of all the values in a particular column.
     
@@ -720,7 +721,16 @@ FROM orders;
     -- Though the price (standard_amt_usd) and standard paper quantity ordered (standard_qty) varies from one order to the next, this ratio is across all of the sales made in the orders table. --
  
 
-
+SELECT MIN(standard_qty) AS standard_min,
+    MIN(gloss_qty) AS gloss_min,
+    MIN(poster_qty) AS poster_min,
+    MAX(standard_qty) AS standard_max,
+    MAX(gloss_qty) AS gloss_max,
+    MAX(poster_qty) AS poster_max,
+FROM orders;
+-- Finds the min and max of paper quantity ordered for each paper type. -- 
+    -- ex. Find the largest single order is for poster paper, despite the fact that it's the least popular overall (poster_qty showed the highest max). --
+    -- Implication: Less popular products might still be ordered in larger quantities, so even though it's not the most popular item, company might want to produce enough of this item to be able to fulfill pretty big orders at any given time. --
 
 
 
