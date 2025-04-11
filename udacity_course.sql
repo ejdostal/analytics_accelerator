@@ -59,7 +59,7 @@ LIMIT: limits results to the first few rows in the table.
 - useful when you want to see just the first few rows of a table. This can be much faster for loading than if we load the entire dataset. 
 - the LIMIT command is always the very last part of a query.
 
-JOIN: allows us to pull data from more than one table at a time. 
+JOIN clauses: allows us to pull data from more than one table at a time. 
     - Joining tables gives you access to each of the tables in the SELECT statement through the table name, a ".", and the column name you want to pull from that table.
     - To join two tables, list them in the FROM and JOIN clauses.
     - The table in the FROM statement is the Left table (and the first table from which your pulling data); the one in the JOIN statement is the Right table.
@@ -67,31 +67,26 @@ JOIN: allows us to pull data from more than one table at a time.
     ON: specifies the column on which you'd like to merge the two tables together; in the ON, we always have the primary key (PK) equal to the foreign key (FK)
            - A Primary key (PK) exists in every table and is a unique column for each row; Primary keys are unique for every row in a table; It is common for the primary key (PK) to be the first column in our tables in most databases. 
            - A Foreign key (FK) is a column in one table that is a primary key in another table; Each FK links to a primary key in another table; Foreign keys are what allow rows in a join to be non-unique.
-        - 
-
-- With LEFT JOIN, you can prefilter data BEFORE the join occurs by using logic in the ON clause instead of WHERE:
-    - Use logic in the ON clause with LEFT JOIN to prefilter data BEFORE the join occurs; This is like joining the FROM table with a different table in JOIN - one that only includes a subset of the rows in the original table.
-    - Keep logic in the WHERE clause with LEFT JOIN to filter the result set AFTER the join occurs; When the database executes the query, it executes the join and everything in the ON clause first; This builds a new result set; THEN that result set is filtered using the WHERE clause. 
-    
-- However, with (inner) JOIN, which clause the filter is in does NOT matter. 
-    - Moving this filter to the ON clause of an (inner) JOIN will produce the same result as keeping it in the WHERE clause.
-    - That's because (inner) JOINs only return the rows for which the two tables match; so results will be the same whether you filter before or after the join occurs.  
-
+        - With LEFT JOIN, you can prefilter data BEFORE the join occurs by using logic in the ON clause instead of in WHERE
+            - This is like joining the FROM table with a different table in JOIN - one that only includes a subset of the rows in the original table.
+            - If you keep the filter logic in the WHERE clause,the results are filtered AFTER the join occurs
+            - When the database executes the query, it executes the join and everything in the ON clause first, building a new result set; THEN that new result set is filtered using the WHERE clause. 
+        - With (inner) JOIN, whether the filter is in the ON clause or the WHERE clause  does NOT matter. 
 
 JOIN (inner join): an INNER JOIN only pulls data that exists in both tables.
-        - the results are the same whichever order you stick the tables in the FROM and JOIN clauses.
+    - the results are the same whichever order you stick the tables in the FROM and JOIN clauses.
 
-    LEFT JOIN (LEFT OUTER JOIN): pulls all the data tht exists in both tables, as well as all of the rows from the table in the FROM even if they do not exist in the JOIN statement.
-        - the order in which you stick the tables in the FROM and JOIN clauses can matter.
+LEFT JOIN (LEFT OUTER JOIN): pulls all the data tht exists in both tables, as well as all of the rows from the table in the FROM even if they do not exist in the JOIN statement.
+    - the order in which you stick the tables in the FROM and JOIN clauses can matter.
 
-    RIGHT JOIN (RIGHT OUTER JOIN): pulls all the data that exists in both tables, as well as all of the rows from the table in the JOIN even if they do not exist in the FROM statement. 
-        - A LEFT JOIN and RIGHT JOIN do the same thing if we change the tables that are in the FROM and JOIN statements.
-        - The rows in the Right table that don't match the rows in the Left table will be included at the bottom of the results; They don't match with rows in the Left table, so any columns from the Left table will contain no data (or will be Nulls) for these rows.
+RIGHT JOIN (RIGHT OUTER JOIN): pulls all the data that exists in both tables, as well as all of the rows from the table in the JOIN even if they do not exist in the FROM statement. 
+     - A LEFT JOIN and RIGHT JOIN do the same thing if we change the tables that are in the FROM and JOIN statements.
+     - The rows in the Right table that don't match the rows in the Left table will be included at the bottom of the results; They don't match with rows in the Left table, so any columns from the Left table will contain no data (or will be Nulls) for these rows.
 
-    *** LEFT JOIN, RIGHT JOIN, and FULL OUTER JOIN are all considered Outer Joins. ***
-        - If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
-        - Each of these new JOIN statements pulls all the same rows as an INNER JOIN, but they also potentially pull some additional rows; The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
-        - If there is not matching information in the JOINed table, then you will have columns with empty cells; any cells without data are considered NULL. 
+ *** LEFT JOIN, RIGHT JOIN, and FULL OUTER JOIN are all considered Outer Joins. ***
+    - If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
+    - Each of these new JOIN statements pulls all the same rows as an INNER JOIN, but they also potentially pull some additional rows; The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
+    - If there is not matching information in the JOINed table, then you will have columns with empty cells; any cells without data are considered NULL. 
        
 
 
