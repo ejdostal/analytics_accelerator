@@ -1,8 +1,12 @@
 /* Clauses, Commands / Statements:
 
-SELECT: chooses the columns to show (See all columns with *)
+SELECT: chooses the columns to show in the output. 
+    - To see all columns, use *.
+    - when using JOINs, SELECT also needs to the table every column comes from. 
+        - "TableA. " gives us all the columns from that table in the output.
+        - "TableA.ColumnNameC" gives us that specific column from that specific table in the output. 
 
-FROM: choose the tables you're pulling data from
+FROM: choose the tables you're pulling data from.
 
 WHERE: filters your results based on a set criteria; a "subset" of the table
 - When using WHERE with non-numeric data fields, LIKE, NOT, or IN operators are often used.
@@ -64,70 +68,44 @@ JOIN clauses: allows us to pull data from more than one table at a time.
     - To join two tables, list them in the FROM and JOIN clauses.
     - The table in the FROM statement is the Left table (and the first table from which your pulling data); the one in the JOIN statement is the Right table.
     
-    ON: specifies the column on which you'd like to merge the two tables together; in the ON, we always have the primary key (PK) equal to the foreign key (FK)
-           - A Primary key (PK) exists in every table and is a unique column for each row; Primary keys are unique for every row in a table; It is common for the primary key (PK) to be the first column in our tables in most databases. 
-           - A Foreign key (FK) is a column in one table that is a primary key in another table; Each FK links to a primary key in another table; Foreign keys are what allow rows in a join to be non-unique.
-        - With LEFT JOIN, you can prefilter data BEFORE the join occurs by using logic in the ON clause instead of in WHERE
-            - This is like joining the FROM table with a different table in JOIN - one that only includes a subset of the rows in the original table.
-            - If you keep the filter logic in the WHERE clause,the results are filtered AFTER the join occurs
-            - When the database executes the query, it executes the join and everything in the ON clause first, building a new result set; THEN that new result set is filtered using the WHERE clause. 
-        - With (inner) JOIN, whether the filter is in the ON clause or the WHERE clause  does NOT matter. 
-
-JOIN (inner join): an INNER JOIN only pulls data that exists in both tables.
-    - the results are the same whichever order you stick the tables in the FROM and JOIN clauses.
-
-LEFT JOIN (LEFT OUTER JOIN): pulls all the data tht exists in both tables, as well as all of the rows from the table in the FROM even if they do not exist in the JOIN statement.
-    - the order in which you stick the tables in the FROM and JOIN clauses can matter.
-
-RIGHT JOIN (RIGHT OUTER JOIN): pulls all the data that exists in both tables, as well as all of the rows from the table in the JOIN even if they do not exist in the FROM statement. 
-     - A LEFT JOIN and RIGHT JOIN do the same thing if we change the tables that are in the FROM and JOIN statements.
-     - The rows in the Right table that don't match the rows in the Left table will be included at the bottom of the results; They don't match with rows in the Left table, so any columns from the Left table will contain no data (or will be Nulls) for these rows.
-
- *** LEFT JOIN, RIGHT JOIN, and FULL OUTER JOIN are all considered Outer Joins. ***
-    - If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
-    - Each of these new JOIN statements pulls all the same rows as an INNER JOIN, but they also potentially pull some additional rows; The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
-    - If there is not matching information in the JOINed table, then you will have columns with empty cells; any cells without data are considered NULL. 
-       
-
-
-     ** Filtering JOINS **
-- In order to get the exact results you're after, you need to be careful about exactly how you filter the data.
-
-
-
-  
-
-           
-     
-
-Aliases: Give table names aliases when performing joins. (This can save you a lot of typing)
-    - The alias for a table is created in the FROM or JOIN clauses; use the alias to replace the table name throughout the rest of the query. 
-    - You can alias tables and columns using AS or not using it.
-    - Frequently an alias is just the first letter of the table name
-    - As with column names, the best practice is for aliases to be all lowercase letters, and to use underscores instead of spaces. 
-    - If you have two or more columns in your SELECT that have the same name after the table name (ex. accounts.name, sales_reps.name) you will NEED to alias them; otherwise it will only show ONE of those columns. 
-
-
-
-
-
-
-SELECT: indicates which column(s) of data you'd like to see in the output. 
-        - "TableA." gives us all the columns that table in the output.
-         - "TableA.ColumnNameC" gives us that specific column from that table in the output. We need to specify the table every column comes from in the SELECT statement.
+        ON: specifies the column on which you'd like to merge the two tables together; in the ON, we always have the primary key (PK) equal to the foreign key (FK)
+               - A Primary key (PK) exists in every table and is a unique column for each row; Primary keys are unique for every row in a table; It is common for the primary key (PK) to be the first column in our tables in most databases. 
+               - A Foreign key (FK) is a column in one table that is a primary key in another table; Each FK links to a primary key in another table; Foreign keys are what allow rows in a join to be non-unique.
     
-   
-       
+        Aliases: Give table names aliases when performing joins. (This can save you a lot of typing)
+            - The alias for a table is created in the FROM or JOIN clauses; use the alias to replace the table name throughout the rest of the query. 
+            - You can alias tables and columns using AS or not using it.
+            - Frequently an alias is just the first letter of the table name
+            - As with column names, the best practice is for aliases to be all lowercase letters, and to use underscores instead of spaces. 
+            - If you have two or more columns in your SELECT that have the same name after the table name (ex. accounts.name, sales_reps.name) you will NEED to alias them; otherwise it will only show ONE of those columns. 
     
-** JOIN Types **
-               
+    JOIN (inner join): an INNER JOIN only pulls data that exists in both tables.
+        * Table Order - The results of inner join are the same whichever order you stick the tables in the FROM and JOIN clauses.
+        * Filtering - Where you filter a table (in the ON clause or in the WHERE) clause doesn't matter; that because unmatched rows in both tables are dropped anyways.
+        
+    *** LEFT JOIN, RIGHT JOIN, and FULL OUTER JOIN are all considered Outer Joins.
+        - If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
+        - Each of these new JOIN statements pulls all the same rows as an INNER JOIN, but they also potentially pull some additional rows; The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
+        - If there is not matching information in the JOINed table, then you will have columns with empty cells; any cells without data are considered NULL. 
+    
+    LEFT JOIN (LEFT OUTER JOIN): pulls all the data tht exists in both tables, as well as all of the rows from the table in the FROM, even if they do not exist in the JOIN statement.
+        * Table Order - The results of a left join can change depending on the order you stick the tables in FROM and JOIN clauses.
+        * Prefiltering vs. Postfiltering - When the database executes the query, it executes the join and everything in the ON clause first, building a new result set; THEN that new result set is filtered using the WHERE clause. 
+            - You can prefilter data BEFORE the join occurs by using logic in the ON clause instead of in WHERE.
+                - This is like joining the FROM table with a different table in LEFT JOIN - one that only includes a subset of the rows in the original table.
+            - If you choose to keep the filter logic in the WHERE clause,the results are filtered AFTER the join occurs.               
+    
+    RIGHT JOIN (RIGHT OUTER JOIN): pulls all the data that exists in both tables, as well as all of the rows from the table in the JOIN even if they do not exist in the FROM statement. 
+         - A LEFT JOIN and RIGHT JOIN do the same thing if we change the tables that are in the FROM and JOIN statements.
+         - Rows in the Right table that Don't match the rows in the Left table, will still be included at the bottom of the results.
+             - Because they Don't match with the Left table, these columns from the Left table will contain no data (Nulls) for these rows.
+    
     OUTER JOIN: (FULL OUTER JOIN) This will return the inner join result set, as well as any unmatched rows from either of the two tables being joined.
-        - Again, this returns rows that do not match one another from the two tables. 
-        - The use cases for a full outer join are very rare.
-
-- There are other a few other advanced JOINS that are used in very specific use cases: UNION and UNION ALL, CROSS JOIN, and the tricky SELF JOIN. It's useful to be aware that they exist. 
-
-
+            - Again, this returns rows that do not match one another from the two tables. 
+            - The use cases for a full outer join are very rare.
+        
+    Advanced JOINs - a few other advanced JOINS that are used in very specific use cases: UNION and UNION ALL, CROSS JOIN, and SELF JOIN.
+        - It's useful to be aware that they exist. 
 
 -----------
 Derived columns - A new column created by manipulating existing columns in the database. 
@@ -135,8 +113,8 @@ Derived columns - A new column created by manipulating existing columns in the d
 
 ** Aggregations **
 - These functions operate down columns, not across rows.
-- Nulls are often ignored in aggregation functions.
-    - Nulls - a datatype that specifies where data does not exist.
+- Nulls - a datatype that specifies where data does not exist.
+    - Nulls are often ignored in aggregation functions.
     - When identifying NULLs in a WHERE clause, we write IS NULL or IS NOT NULL. (We don't use =, because NULL isn't considered a value in SQL. Rather, it is a property of the data.)
     - NULLs frequently occur when performing a LEFT or RIGHT JOIN. 
     - NULLs can also occur from simply missing data in our database.
@@ -146,9 +124,10 @@ SUM: Adds together all the values in a particular column; SUM treats Nulls as ze
 MIN / MAX: Return the lowest and highest values in a particular column. 
 Average: Calculates the average of all the values in a particular column.
 
-Use row-level output for early exploratory work, when searching your database to better understand the data.
-Once you get a since of what the data looks like, aggregates become more helpful in answering your questions.
+*** Use row-level output for early exploratory work, when searching your database to better understand the data.
+*** Once you get a since of what the data looks like, aggregates become more helpful in answering your questions.
 
+------------
 
 ** Best Practice **
 - Write SQL COMMANDS in all uppercase letters, keep everything else in your query lowercase.
@@ -158,7 +137,10 @@ Once you get a since of what the data looks like, aggregates become more helpful
 - Put a semicolon at the end of each statement. Depending on your SQL environment, your query may need a semicolon at the end to execute.
 If you environment allows it, it will also allow you to run multiple queries at once. */
 
+
+----------------------------------
 -- Queries from Udacity course --
+----------------------------------
 
 -- SELECT and FROM (1.11) --
 SELECT * 
