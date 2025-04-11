@@ -111,21 +111,31 @@ JOIN clauses: allows us to pull data from more than one table at a time.
 Derived columns - A new column created by manipulating existing columns in the database. 
 -----------
 
-** Aggregations **
-- These functions operate down columns, not across rows.
-- Nulls - a datatype that specifies where data does not exist.
+Nulls: a datatype that specifies where data does not exist.
     - Nulls are often ignored in aggregation functions.
     - When identifying NULLs in a WHERE clause, we write IS NULL or IS NOT NULL. (We don't use =, because NULL isn't considered a value in SQL. Rather, it is a property of the data.)
     - NULLs frequently occur when performing a LEFT or RIGHT JOIN. 
     - NULLs can also occur from simply missing data in our database.
 
-COUNT: Counts how many rows are in a particular column; you can use COUNT of non-numerical columns.
-SUM: Adds together all the values in a particular column; SUM treats Nulls as zero. 
-MIN / MAX: Return the lowest and highest values in a particular column. 
-Average: Calculates the average of all the values in a particular column.
+Aggregations: These functions operate down columns, not across rows.
 
-*** Use row-level output for early exploratory work, when searching your database to better understand the data.
-*** Once you get a since of what the data looks like, aggregates become more helpful in answering your questions.
+    COUNT: Counts how many rows are in a table, and helps you to identify the number of Null values in any particular column. 
+        - you can use COUNT on non-numerical columns
+        - COUNT ignores Nulls.
+        - Find total rows in a table: The result produced by a COUNT(*) is typically equally to the number of rows in the table; it's very unusual to have a row that is entirely null. 
+        - Find total non-Null values in a specific column: The difference between the COUNT of the rows in a particular column (ex. COUNT(column_name)) and the COUNT of the total number of rows in the table (ex. COUNT(*)), is the number of Null values there are in that particular column. 
+            - If the COUNT result of a column MATCHES the total number of rows in a table, there are no Nulls in the column. --
+            - If the COUNT result of a column is LESS than the number of rows in the table, we know the difference is the how many Nulls are in that column. --
+        
+    SUM: Adds together all the values in a particular column
+        - SUM treats Nulls as 0. 
+    
+    MIN / MAX: Return the lowest and highest values in a particular column. 
+
+    Average: Calculates the average of all the values in a particular column.
+    
+    *** Use row-level output for early exploratory work, when searching your database to better understand the data.
+    *** Once you get a since of what the data looks like, aggregates become more helpful in answering your questions.
 
 ------------
 
@@ -640,20 +650,19 @@ AND o.occurred_at BETWEEN '2015-01-01' AND '2016-01-01';
 SELECT *
 FROM accounts 
 WHERE primary_poc IS NULL;
--- Finds all the accounts for which there are no values in the primary_poc column. --
--- If you don't have point of contact, chances are you're not going to be able to keep that customer for much longer. --
+-- Finds all the accounts for which there are no values in the primary point of contact column. --
+    -- If you don't have point of contact, chances are you're not going to be able to keep that customer for much longer. --
 
 SELECT *
 FROM accounts 
 WHERE primary_poc IS NOT NULL;
--- Finds the inverse of the result set from the previous query; Returns all rows for which there ARE values in the primary_poc column. --
+-- Finds the inverse of the result set from the previous query; Returns all rows for which there ARE values in the primary point of contact field. --
 
 SELECT COUNT(*) AS order_count
 FROM orders
 WHERE occurred_at >= '2016-12-01'
 AND occurred_at >= '2017-01-01';
--- Counts the titak number of rows in orders table in the month of December 2016. -- 
-    -- The COUNT function is returning a count of all the rows that contain non-null data. --
+-- Counts the total number of rows in the orders table in the month of December 2016. (counts all rows that contain non-null data) --- 
     -- The result produced by a COUNT(*) is typically equally to the number of rows in the table, because it's very unusual to have a row that is entirely null. --
 
 SELECT COUNT(*) AS account_count
