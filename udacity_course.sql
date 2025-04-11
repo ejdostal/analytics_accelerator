@@ -123,10 +123,10 @@ Aggregations: These functions operate down columns, not across rows.
         - you can use COUNT on non-numerical columns
         - COUNT ignores Nulls.
         - Find total rows in a table: The result produced by a COUNT(*) is typically equally to the number of rows in the table; it's very unusual to have a row that is entirely null. 
-        - Find total non-Null values in a specific column: The difference between the COUNT of the rows in a particular column (ex. COUNT(column_name)) and the COUNT of the total number of rows in the table (ex. COUNT(*)), is the number of Null values there are in that particular column. 
+        - Find total non-Null values in a specific column: The difference between the COUNT of the table and the COUNT of the column is the total number of Nulls in the column.
             - If the COUNT result of a column MATCHES the total number of rows in a table, there are no Nulls in the column. --
             - If the COUNT result of a column is LESS than the number of rows in the table, we know the difference is the how many Nulls are in that column. --
-        
+
     SUM: Adds together all the values in a particular column
         - SUM treats Nulls as 0. 
     
@@ -656,24 +656,22 @@ WHERE primary_poc IS NULL;
 SELECT *
 FROM accounts 
 WHERE primary_poc IS NOT NULL;
--- Finds the inverse of the result set from the previous query; Returns all rows for which there ARE values in the primary point of contact field. --
+-- Finds the inverse of the query above; Returns all rows for which there ARE values in the primary point of contact field. --
 
 SELECT COUNT(*) AS order_count
 FROM orders
 WHERE occurred_at >= '2016-12-01'
 AND occurred_at >= '2017-01-01';
--- Counts the total number of rows in the orders table in the month of December 2016. (counts all rows that contain non-null data) --- 
-    -- The result produced by a COUNT(*) is typically equally to the number of rows in the table, because it's very unusual to have a row that is entirely null. --
+-- Counts the total number of rows in the orders table in the month of December 2016; it's very unusual to have a row that is entirely null. 
 
 SELECT COUNT(*) AS account_count
 FROM accounts;
--- Finds all the rows in the accounts table. --
+-- Finds the total number of rows in the accounts table. --
 
 SELECT COUNT(id) AS account_count
 FROM accounts;
--- The difference between the COUNT of the id column and the COUNT of the total number of rows in the table, is the number of Null values there are in the id column. --
-    -- COUNT can help us identify the number of null values in any particular column; Substitute the * in COUNT with a specific column to see how many non-null records there are in that column. --
-    -- If the COUNT  result of a column MATCHES the number of rows in a table, there are no nulls in the column. --
+-- Identifies the total number of non Null values in the id column of the accounts table. --
+    -- The difference between the COUNT of the column and the COUNT of the table is the total number of Nulls in the column. --
 
 SELECT COUNT(primary_poc) AS account_primary_poc_count
 FROM accounts;
