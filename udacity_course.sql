@@ -59,19 +59,34 @@ LIMIT: limits results to the first few rows in the table.
 - useful when you want to see just the first few rows of a table. This can be much faster for loading than if we load the entire dataset. 
 - the LIMIT command is always the very last part of a query.
 
-
-** JOIN Statements ** 
-    - The whole purpose of JOIN statements is to allow us to pull data from more than one table at a time. 
+JOIN: allows us to pull data from more than one table at a time. 
     - Joining tables gives you access to each of the tables in the SELECT statement through the table name, a ".", and the column name you want to pull from that table.
+    - To join two tables, list them in the FROM and JOIN clauses.
+    - The table in the FROM statement is the Left table and the first table from which your pulling data; the one in the JOIN statement is the Right table.
+    
+    JOIN (inner join): an INNER JOIN only pulls data that exists in both tables.
+        - the results are the same whichever order you stick the tables in the FROM and JOIN clauses.
 
-    SELECT: indicates which column(s) of data you'd like to see in the output. 
+    LEFT JOIN (LEFT OUTER JOIN): pulls all the data tht exists in both tables, as well as all of the rows from the table in the FROM even if they do not exist in the JOIN statement.
+        - the order in which you stick the tables in the FROM and JOIN clauses can matter.
+
+    RIGHT JOIN (RIGHT OUTER JOIN): pulls all the data that exists in both tables, as well as all of the rows from the table in the JOIN even if they do not exist in the FROM statement. 
+        - A LEFT JOIN and RIGHT JOIN do the same thing if we change the tables that are in the FROM and JOIN statements.
+        - The rows in the Right table that don't match the rows in the Left table will be included at the bottom of the results; They don't match with rows in the Left table, so any columns from the Left table will contain no data (or will be Nulls) for these rows.
+
+    *** LEFT JOIN, RIGHT JOIN, and FULL OUTER JOIN are all considered Outer Joins. ***
+        - If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
+        - Each of these new JOIN statements pulls all the same rows as an INNER JOIN, but they also potentially pull some additional rows; The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
+        - If there is not matching information in the JOINed table, then you will have columns with empty cells; any cells without data are considered NULL. 
+       
+
+
+SELECT: indicates which column(s) of data you'd like to see in the output. 
         - "TableA." gives us all the columns that table in the output.
          - "TableA.ColumnNameC" gives us that specific column from that table in the output. We need to specify the table every column comes from in the SELECT statement.
     
-    FROM: indicates the first table from which we're pulling data; JOIN: indicates the second table. 
-        - To join two tables, list them in the FROM and JOIN clauses.
-        - For (inner) JOIN, the result is still the same if you were to switch the tables in the FROM and JOIN.
-    
+   
+       
     ON: specifies the column on which you'd like to merge the two tables together; in the ON, we ALWAYS have the primary key (PK) equal to the foreign key (FK);  Primary-foreign key relationships are typically one-to-many, respectively.
         - A primary key (PK) exists in every table and is a unique column for each row; primary keys are unique for every row in a table. 
         - It is common for the primary key (PK) to be the first column in our tables in most databases. 
@@ -89,20 +104,6 @@ Aliases: Give table names aliases when performing joins. (This can save you a lo
 
 
 ** JOIN Types **
-    JOIN: (INNER JOIN) Only returns rows that appear in both tables; pulls rows only if they exist as a match across two tables; an INNER JOIN that only pulls data that exists in both tables.
-    
- ** Motivation to use other Joins **
-    - If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
-    - Each of these new JOIN statements pulls all the same rows as an INNER JOIN, but they also potentially pull some additional rows.
-    - If there is not matching information in the JOINed table, then you will have columns with empty cells; any cells without data are considered NULL. 
-    - The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
-    - The table in the FROM statement is the Left table; the one in the JOIN statement is the Right table.
-        
-    LEFT JOIN: (LEFT OUTER JOIN) Includes all the results that match with Right table, just like an Inner JOIN, as well as any results in the Left table that did not match; pulls all the data tht exists in both tables, as well as all of the rows from the table in the FROM even if they do not exist in the JOIN statement.
-            
-    RIGHT JOIN: (RIGHT OUTER JOIN) Includes all the results that match with Left table, just like an Inner JOIN, as well as any results in the Left table that did not match; pulls all the data that exists in both tables, as well as all of the rows from the table in the JOIN even if they do not exist in the FROM statement. 
-        - A LEFT JOIN and RIGHT JOIN do the same thing if we change the tables that are in the FROM and JOIN statements.
-        - The rows in the Right table that don't match the rows in the Left table will be included at the bottom of the results. They don't match with rows in the Left table, so any columns from the Left table will contain no data for these rows.
                
     OUTER JOIN: (FULL OUTER JOIN) This will return the inner join result set, as well as any unmatched rows from either of the two tables being joined.
         - Again, this returns rows that do not match one another from the two tables. 
