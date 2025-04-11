@@ -775,6 +775,16 @@ FROM orders;
 -- Finds the mean (Average) amount spent per order for each paper type, as well as the mean amount of each paper type purchased per order. --
 -- Average number of sales for each paper type, as well as the average amount of paper qty ordered for each paper type. --
 
+SELECT *
+FROM (SELECT total_amt_usd
+        FROM orders
+        ORDER BY total_amt_usd
+        LIMIT 3457) AS Table1
+ORDER BY total_amt_usd DESC
+LIMIT 2;
+-- Finds the median of total sales (total_amt_usd spent) on all orders. -- 
+    -- A median is a more appropriate representation of the data here than average because there are outliers. --
+    -- Note, this is more advanced than the topics we have covered thus far to build a general solution, but we can hard code a solution in the above way. --
 
 
 
