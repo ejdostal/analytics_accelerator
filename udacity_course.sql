@@ -62,9 +62,23 @@ LIMIT: limits results to the first few rows in the table.
 JOIN: allows us to pull data from more than one table at a time. 
     - Joining tables gives you access to each of the tables in the SELECT statement through the table name, a ".", and the column name you want to pull from that table.
     - To join two tables, list them in the FROM and JOIN clauses.
-    - The table in the FROM statement is the Left table and the first table from which your pulling data; the one in the JOIN statement is the Right table.
+    - The table in the FROM statement is the Left table (and the first table from which your pulling data); the one in the JOIN statement is the Right table.
     
-    JOIN (inner join): an INNER JOIN only pulls data that exists in both tables.
+    ON: specifies the column on which you'd like to merge the two tables together; in the ON, we always have the primary key (PK) equal to the foreign key (FK)
+           - A Primary key (PK) exists in every table and is a unique column for each row; Primary keys are unique for every row in a table; It is common for the primary key (PK) to be the first column in our tables in most databases. 
+           - A Foreign key (FK) is a column in one table that is a primary key in another table; Each FK links to a primary key in another table; Foreign keys are what allow rows in a join to be non-unique.
+        - 
+
+- With LEFT JOIN, you can prefilter data BEFORE the join occurs by using logic in the ON clause instead of WHERE:
+    - Use logic in the ON clause with LEFT JOIN to prefilter data BEFORE the join occurs; This is like joining the FROM table with a different table in JOIN - one that only includes a subset of the rows in the original table.
+    - Keep logic in the WHERE clause with LEFT JOIN to filter the result set AFTER the join occurs; When the database executes the query, it executes the join and everything in the ON clause first; This builds a new result set; THEN that result set is filtered using the WHERE clause. 
+    
+- However, with (inner) JOIN, which clause the filter is in does NOT matter. 
+    - Moving this filter to the ON clause of an (inner) JOIN will produce the same result as keeping it in the WHERE clause.
+    - That's because (inner) JOINs only return the rows for which the two tables match; so results will be the same whether you filter before or after the join occurs.  
+
+
+JOIN (inner join): an INNER JOIN only pulls data that exists in both tables.
         - the results are the same whichever order you stick the tables in the FROM and JOIN clauses.
 
     LEFT JOIN (LEFT OUTER JOIN): pulls all the data tht exists in both tables, as well as all of the rows from the table in the FROM even if they do not exist in the JOIN statement.
@@ -81,19 +95,15 @@ JOIN: allows us to pull data from more than one table at a time.
        
 
 
-SELECT: indicates which column(s) of data you'd like to see in the output. 
-        - "TableA." gives us all the columns that table in the output.
-         - "TableA.ColumnNameC" gives us that specific column from that table in the output. We need to specify the table every column comes from in the SELECT statement.
-    
-   
-       
-    ON: specifies the column on which you'd like to merge the two tables together; in the ON, we ALWAYS have the primary key (PK) equal to the foreign key (FK);  Primary-foreign key relationships are typically one-to-many, respectively.
-        - A primary key (PK) exists in every table and is a unique column for each row; primary keys are unique for every row in a table. 
-        - It is common for the primary key (PK) to be the first column in our tables in most databases. 
+     ** Filtering JOINS **
+- In order to get the exact results you're after, you need to be careful about exactly how you filter the data.
+
+
+
+  
+
            
-        - A foreign key (FK) is a column in one table that is a primary key in another table. 
-        - Each FK links to a primary key in another table.
-        - Foreign keys are what allow rows in a join to be non-unique.
+     
 
 Aliases: Give table names aliases when performing joins. (This can save you a lot of typing)
     - The alias for a table is created in the FROM or JOIN clauses; use the alias to replace the table name throughout the rest of the query. 
@@ -103,6 +113,17 @@ Aliases: Give table names aliases when performing joins. (This can save you a lo
     - If you have two or more columns in your SELECT that have the same name after the table name (ex. accounts.name, sales_reps.name) you will NEED to alias them; otherwise it will only show ONE of those columns. 
 
 
+
+
+
+
+SELECT: indicates which column(s) of data you'd like to see in the output. 
+        - "TableA." gives us all the columns that table in the output.
+         - "TableA.ColumnNameC" gives us that specific column from that table in the output. We need to specify the table every column comes from in the SELECT statement.
+    
+   
+       
+    
 ** JOIN Types **
                
     OUTER JOIN: (FULL OUTER JOIN) This will return the inner join result set, as well as any unmatched rows from either of the two tables being joined.
@@ -112,16 +133,6 @@ Aliases: Give table names aliases when performing joins. (This can save you a lo
 - There are other a few other advanced JOINS that are used in very specific use cases: UNION and UNION ALL, CROSS JOIN, and the tricky SELF JOIN. It's useful to be aware that they exist. 
 
 
-** Filtering JOINS **
-- In order to get the exact results you're after, you need to be careful about exactly how you filter the data.
-
-With LEFT JOIN, you can prefilter data BEFORE the join occurs by using logic in the ON clause instead of WHERE:
-    - Use logic in the ON clause with LEFT JOIN to prefilter data BEFORE the join occurs; This is like joining the FROM table with a different table in JOIN - one that only includes a subset of the rows in the original table.
-    - Keep logic in the WHERE clause with LEFT JOIN to filter the result set AFTER the join occurs; When the database executes the query, it executes the join and everything in the ON clause first; This builds a new result set; THEN that result set is filtered using the WHERE clause. 
-
-However, with (inner) JOIN, which clause the filter is in does NOT matter. 
-    - Moving this filter to the ON clause of an (inner) JOIN will produce the same result as keeping it in the WHERE clause.
-    - That's because (inner) JOINs only return the rows for which the two tables match; so results will be the same whether you filter before or after the join occurs.    
 
 -----------
 Derived columns - A new column created by manipulating existing columns in the database. 
