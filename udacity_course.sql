@@ -119,6 +119,8 @@ Nulls: a datatype that specifies where data does not exist.
 - Use ISNULL or IS NOT NULL to SHOW all the rows in a specific column for which their is or isn't Null values.
 
 Aggregations: These functions operate down columns, not across rows.
+    - An important thing to remember: aggregators only aggregate vertically - the values of a column. 
+        - If you want to perform a calculation across rows, you would do this with simple arithmetic.
 
     COUNT: Counts how many rows are in a table, and helps you to identify the number of Null values in any particular column. 
         - you can use COUNT on non-numerical columns
@@ -131,7 +133,8 @@ Aggregations: These functions operate down columns, not across rows.
 
 
     SUM: Adds together all the values in a particular column
-        - SUM treats Nulls as 0. 
+        - You can only use SUM of numeric columns.
+        - SUM will ignore Nulls; it treats Nulls as 0. 
     
     MIN / MAX: Return the lowest and highest values in a particular column. 
 
@@ -686,37 +689,37 @@ FROM accounts;
     -- COUNT works on any column, including those with non-numerical values. --
 
 
+-- SUM (3.6) --
 SELECT SUM(standard_qty) AS standard,
 SUM(gloss_qty) AS gloss,
 SUM(poster_qty) AS poster
 FROM orders;
--- Totals up all sales of each paper type and compares them to one another. --
--- Useful for Inventory planning - how much of each paper type should we produce? --
--- Works similar to COUNT - just specify column names rather than using *. --
--- SUM is only for columns that have quantitative data; the SUM function treats Nulls as zero. 
+-- Totals up the sum of all numerical values in each column and then lists them as aggregations next to each other. --
+    -- Totals up the sums of all sales of each paper type and lists next to each other for comparison; Could be useful for inventory planning - ex. how much of each paper type should we produce? --
 
 SELECT SUM(poster_qty) AS total_poster_sales
 FROM orders;
--- Finds the total amount of poster_qty paper ordered in the orders table. --
+-- Sums the total amount of poster paper ordered across all orders in the orders table, using the poster_qty column. --  
 
 SELECT SUM(standard_qty) AS total_standard_sales
 FROM orders;
--- Finds the total amount of standard_qty paper ordered in the orders table. --
+-- Sums the total amount of standard paper ordered across all orders in the orders table, using the standard_qty column. --  
 
 SELECT SUM(total_amt_usd) AS total_dollar_sales
 FROM orders;
--- Finds the total dollar amount of sales using the total_amt_usd in the orders table. --
+-- Sums the total dollar amount of sales generated across all orders in the orders table, using the total_amt_usd column. --  
 
 SELECT standard_amt_usd + gloss_amt_usd AS standard_glossy_total_amt
 FROM orders;
--- Finds the total dollar amount spent in USD on both standard AND glossy paper for each order in the orders table. --
+-- Sums the total dollar amount spent on standard paper AND glossy paper across all orders in the orders table, using the sum of the summed standard_amt_usd column AND the summed + gloss_amt_usd column. --
 
 SELECT SUM(standard_amt_usd)/ SUM(standard_qty) AS standard_price_per_unit
 FROM orders;
--- Finds the standard paper price per unit across all of the sales made in the orders table. -- 
--- The price and standard quantity of paper varies from one order to the next.
--- Summing the standard paper prices and dividing it by the sum of the standard paper quantities, creates a standard paper price per unit ratio across all of the sales made in the orders table. --
--- Notice, this solution used both an aggregate and our mathematical operators. --
+-- Finds the standard paper - price per unit across all of the sales made in the orders table. -- 
+    -- Divides the summed prices of all standard paper ordered BY the summed totals of all standard paper quantities ordered. --
+    -- Though the price (standard_amt_usd) and standard paper quantity ordered (standard_qty) varies from one order to the next, this ratio is across all of the sales made in the orders table. --
+ 
+
 
 
 
