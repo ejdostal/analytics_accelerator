@@ -116,6 +116,7 @@ Nulls: a datatype that specifies where data does not exist.
     - When identifying NULLs in a WHERE clause, we write IS NULL or IS NOT NULL. (We don't use =, because NULL isn't considered a value in SQL. Rather, it is a property of the data.)
     - NULLs frequently occur when performing a LEFT or RIGHT JOIN. 
     - NULLs can also occur from simply missing data in our database.
+- Use ISNULL or IS NOT NULL to SHOW all the rows in a specific column for which their is or isn't Null values.
 
 Aggregations: These functions operate down columns, not across rows.
 
@@ -125,7 +126,9 @@ Aggregations: These functions operate down columns, not across rows.
         - Find total rows in a table: The result produced by a COUNT(*) is typically equally to the number of rows in the table; it's very unusual to have a row that is entirely null. 
         - Find total non-Null values in a specific column: The difference between the COUNT of the table and the COUNT of the column is the total number of Nulls in the column.
             - If the COUNT result of a column MATCHES the total number of rows in a table, there are no Nulls in the column. --
-            - If the COUNT result of a column is LESS than the number of rows in the table, we know the difference is the how many Nulls are in that column. --
+            - If the COUNT result of a column is LESS than the number of rows in the table, we know the difference is how many Nulls are in that column. --
+    - Use COUNT of a column to return the specific number of rows in column that are not Null (the aggregated number).
+
 
     SUM: Adds together all the values in a particular column
         - SUM treats Nulls as 0. 
@@ -650,7 +653,7 @@ AND o.occurred_at BETWEEN '2015-01-01' AND '2016-01-01';
 SELECT *
 FROM accounts 
 WHERE primary_poc IS NULL;
--- Finds all the accounts for which there are no values in the primary point of contact column. --
+-- Shows all the accounts for which there are no values in the primary point of contact column. --
     -- If you don't have point of contact, chances are you're not going to be able to keep that customer for much longer. --
 
 SELECT *
@@ -658,11 +661,14 @@ FROM accounts
 WHERE primary_poc IS NOT NULL;
 -- Finds the inverse of the query above; Returns all rows for which there ARE values in the primary point of contact field. --
 
+
+-- COUNT (3.4) --
 SELECT COUNT(*) AS order_count
 FROM orders
 WHERE occurred_at >= '2016-12-01'
 AND occurred_at >= '2017-01-01';
--- Counts the total number of rows in the orders table in the month of December 2016; it's very unusual to have a row that is entirely null. 
+-- Counts the total number of rows in the orders table in the month of December 2016; it's very unusual to have a row that is entirely null.
+-- Returned as an aggregation (a single numeric value)
 
 SELECT COUNT(*) AS account_count
 FROM accounts;
@@ -671,13 +677,14 @@ FROM accounts;
 SELECT COUNT(id) AS account_count
 FROM accounts;
 -- Identifies the total number of non Null values in the id column of the accounts table. --
-    -- The difference between the COUNT of the column and the COUNT of the table is the total number of Nulls in the column. --
+    -- Returned as an aggregation (a single numeric value)
+-- The difference between the COUNT of the column and the COUNT of the table is the total number of Nulls in that specific column. --
 
 SELECT COUNT(primary_poc) AS account_primary_poc_count
 FROM accounts;
--- The difference between the COUNT of the primary_poc column and the COUNT of the total number of rows in the table, is the number of Null values there are in the primary_poc column. --
-    -- If the COUNT result of a column is LESS than the number of rows in the table, we know the difference is the number of nulls. --
+-- Identifies the total number of non Null values in the primary point of contact column as an aggregation. --
     -- COUNT works on any column, including those with non-numerical values. --
+
 
 SELECT SUM(standard_qty) AS standard,
 SUM(gloss_qty) AS gloss,
