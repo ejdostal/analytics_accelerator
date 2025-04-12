@@ -872,7 +872,6 @@ GROUP BY r.name
 ORDER BY num_reps;
 -- Finds the number of sales representatives in each region, ordered from fewest to most representatives. -- 
 
-
 SELECT account_id,
     channel,
     COUNT(id) AS events
@@ -886,7 +885,42 @@ ORDER BY account_id, channel;
 -- Counts up all of the events for each channel for each account id. --
 -- Results ordered first by account id, then by events within the account id (ordered to highlight the highest volume channels for each account). --
    
+SELECT a.name account, AVG(standard_qty) standard_qty_avg,
+AVG(gloss_qty) gloss_qty_avg,
+AVG(poster_qty) poster_qty_avg
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name;
+-- For each account, determines the average amount of each paper type purchased across their orders. --
 
+SELECT a.name account, AVG(o.standard_amt_usd) avg_standard,
+AVG(o.gloss_amt_usd) avg_gloss,
+AVG(o.poster_amt_usd) avg_poster
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name;
+-- For each account, Determines the average amount spent per order on each paper type. --
 
+SELECT s.name rep, w.channel, COUNT(*) num_events
+FROM sales_reps s
+JOIN accounts a
+ON a.sales_rep_id = s.id
+JOIN web_events w
+ON w.account_id = a.id
+GROUP BY s.name, w.channel
+ORDER BY num_events DESC;
+-- Determines the number of times a particular channel was used in the web_events table for each sales_rep, ordered from most to least occurrences. --
 
-
+SELECT r.name region, w.channel, COUNT(*) num_events
+FROM region r
+JOIN sales_reps s
+ON r.id = s.region_id
+JOIN accounts a
+ON s.id = a.sales_rep_id
+JOIN web_events w
+ON a.id = w.account_id
+GROUP BY r.name, w.channel
+ORDER BY num_events DESC;
+-- Determines the number of times a particular channel was used in the web_events table for each region, ordered from highest to least number of occurrences. --
