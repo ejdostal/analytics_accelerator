@@ -148,7 +148,18 @@ Aggregations: These functions operate down columns, not across rows.
         - Ignores Null values completely; Rows with Null values are NOT calculated in the numerator or the denominator when calculating the average. 
             - If you want to count Nulls as 0, you'll need to take a SUM and divide it be the COUNT, rather than using the AVG function. 
     - Note: the Median might be a more appropriate measure of center for data than AVG for data, but finding the Median happens to be a pretty difficult thing to get using SQL alone.
-    
+
+GROUP BY: allows you to create segments that will aggregate independent from one another; in other words, it takes the sum of data limited to each account, rather than across the entire dataset.
+- can be use to aggregate data within subsets of data (ex. grouping for different accounts, different regions, or different sales representatives.)
+- Any column in the SELECT statement that is not within an aggregator must be in the GROUP BY clause.
+- The GROUP BY always goes between WHERE and ORDER BY.
+- SQL evaluates the aggregations before the LIMIT clause.
+- If you don’t group by any columns, you’ll get a 1-row result.
+- If you group by a column with enough unique values that it exceeds the LIMIT number, the aggregates will be calculated, and then some rows will simply be omitted from the results.
+- Wherever there's a field in the SELECT statement that's not being aggregated, the query expects it to be in the GROUP BY clause; a column that's not aggregated and not in the GROUP BY will return an error.
+
+
+
   
 ------------
 
@@ -785,6 +796,36 @@ LIMIT 2;
 -- Finds the median of total sales (total_amt_usd spent) on all orders. -- 
     -- A median is a more appropriate representation of the data here than average because there are outliers. --
     -- Note, this is more advanced than the topics we have covered thus far to build a general solution, but we can hard code a solution in the above way. --
+
+
+-- GROUP BY (3.13) -- 
+
+SELECT account_id,
+    SUM(standard_qty) AS standard_sum,
+    SUM(gloss_qty) AS gloss_sum,
+    SUM(poster_qty) AS poster_sum
+FROM orders
+    GROUP BY account_id
+    ORDER BY account_id;
+-- Sums the total quantites of paper ordered, by paper type, for every account in the dataset.
+-- Creates a separate set of sums for each account id in the dataset.
+-- account id is added to a GROUP BY clause to clarify that is is to be made into a grouping - not summed and collapsed like the other columns.
+-- Aggregates results into segments - where each segment is one  of the values in the account id column.
+-- Takes the sum of data limited to each account, rather than across the entire dataset. --
+
+
+SELECT a.name, o.occurred_at
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+ORDER BY o.occurred_at
+LIMIT 1;
+-- Return the account that placed the earliest order in the orders table, both account name and occurrance date. --
+
+
+
+
+
 
 
 
