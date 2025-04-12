@@ -822,7 +822,7 @@ ORDER BY o.occurred_at
 LIMIT 1;
 -- Returns the account that placed the earliest order in the orders table, by both account name and occurrance date. --
 
-SELECT a.name account, SUM(o.total_amt_usd) total_sales_usd
+SELECT a.name account, SUM(o.total_amt_usd) total_sales
 FROM orders o
 JOIN accounts a
 ON o.account_id = a.id
@@ -837,8 +837,8 @@ ORDER BY w.occurred_at DESC
 LIMIT 1;
 -- Returns the channel date and account name for the most recent (or latest) web event. --
 
-SELECT channel, COUNT(channel)
-FROM web_events
+SELECT channel, COUNT(*)
+FROM web_events 
 GROUP BY channel;
 -- Finds the total number of times each type of channel from the web_events table was used. --
 
@@ -850,7 +850,7 @@ ORDER BY w.occurred_at
 LIMIT 1;
 -- Returns the primary contact associated with the earliest web_event. --
 
-SELECT a.name, MIN(o.total_amt_usd) min
+SELECT a.name, MIN(o.total_amt_usd) smallest_order
 FROM orders o
 JOIN accounts a
 ON o.account_id = a.id
@@ -858,13 +858,15 @@ GROUP BY a.name
 ORDER BY MIN(o.total_amt_usd);
 -- Finds the smallest order placed by each account in terms of total USD, ordered from smallest to greatest. --
 
-SELECT COUNT(s) total_reps, r.name region
-FROM sales_reps s
-JOIN region r
-ON s.region_id = r.id
+SELECT r.name, COUNT(*) num_reps
+FROM region r
+JOIN sales_reps s
+ON r.id = s.region_id
 GROUP BY r.name
-ORDER BY COUNT(s);
+ORDER BY num_reps;
 -- Finds the number of sales representatives in each region, ordered from fewest to most representatives. -- 
+
+
 
 
 
