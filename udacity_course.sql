@@ -850,10 +850,21 @@ ORDER BY w.occurred_at
 LIMIT 1;
 -- Returns the primary contact associated with the earliest web_event. --
 
+SELECT a.name, MIN(o.total_amt_usd) min
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name
+ORDER BY MIN(o.total_amt_usd);
+-- Finds the smallest order placed by each account in terms of total USD, ordered from smallest to greatest. --
 
-
-
-
+SELECT COUNT(s) total_reps, r.name region
+FROM sales_reps s
+JOIN region r
+ON s.region_id = r.id
+GROUP BY r.name
+ORDER BY COUNT(s);
+-- Finds the number of sales representatives in each region, ordered from fewest to most representatives. -- 
 
 
 
