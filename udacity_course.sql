@@ -820,7 +820,35 @@ JOIN orders o
 ON a.id = o.account_id
 ORDER BY o.occurred_at
 LIMIT 1;
--- Return the account that placed the earliest order in the orders table, both account name and occurrance date. --
+-- Returns the account that placed the earliest order in the orders table, by both account name and occurrance date. --
+
+SELECT a.name account, SUM(o.total_amt_usd) total_sales_usd
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name;
+-- Finds the total sum of sales (in USD) for each account. --
+
+SELECT w.occurred_at, w.channel, a.name
+FROM web_events w
+JOIN accounts a
+ON w.account_id = a.id
+ORDER BY w.occurred_at DESC
+LIMIT 1;
+-- Returns the channel date and account name for the most recent (or latest) web event. --
+
+SELECT channel, COUNT(channel)
+FROM web_events
+GROUP BY channel;
+-- Finds the total number of times each type of channel from the web_events table was used. --
+
+SELECT a.primary_poc
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+ORDER BY w.occurred_at
+LIMIT 1;
+-- Returns the primary contact associated with the earliest web_event. --
 
 
 
