@@ -157,8 +157,14 @@ GROUP BY: allows you to create segments that will aggregate independent from one
 - If you don’t group by any columns, you’ll get a 1-row result.
 - If you group by a column with enough unique values that it exceeds the LIMIT number, the aggregates will be calculated, and then some rows will simply be omitted from the results.
 - Wherever there's a field in the SELECT statement that's not being aggregated, the query expects it to be in the GROUP BY clause; a column that's not aggregated and not in the GROUP BY will return an error.
-
-
+- If you want to segment your data into even more granular chunks, you can group by multiple columns.  
+- You can GROUP BY multiple columns at once. This is often useful to aggregate across a number of different segments.
+- GROUP BY and ORDER BY can be used with multiple columns in the same query. 
+- The order in the ORDER BY determines which column is ordered on first.  
+- You can order DESC for any column in your ORDER BY.
+- The order of column names in your GROUP BY clause doesn’t matter—the results will be the same regardless. 
+- As with ORDER BY, you can substitute numbers for column names in the GROUP BY clause. 
+    - It’s generally recommended to do this only when you’re grouping many columns, or if something else is causing the text in the GROUP BY clause to be excessively long.
 
   
 ------------
@@ -866,6 +872,20 @@ GROUP BY r.name
 ORDER BY num_reps;
 -- Finds the number of sales representatives in each region, ordered from fewest to most representatives. -- 
 
+
+SELECT account_id,
+    channel,
+    COUNT(id) AS events
+FROM web_events
+GROUP BY account_id, channel
+ORDER BY account_id, channel;
+-- Describes how each account interacted with various advertising channels --
+ -- ex. Which channels are driving traffic and leading to purchases? --
+    -- ex. Are we investing in channels that aren't worth the cost? --
+    -- ex. How much traffic are we obtaining from each channel? --
+-- Counts up all of the events for each channel for each account id. --
+-- Results ordered first by account id, then by events within the account id (ordered to highlight the highest volume channels for each account). --
+   
 
 
 
