@@ -1017,6 +1017,25 @@ ORDER BY account_id
     -- HAVING was used here instead of WHERE because you're filtering on an aggregate.
     -- HAVING is only useful when grouping by one or more columns; No grouping on an aggregate means you'll jsut be returned one line anyway. 
 
+SELECT s.id, s.name, COUNT(*) num_accounts
+FROM accounts a
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+GROUP BY s.id, s.name
+HAVING COUNT(*) > 5
+ORDER BY num_accounts;
+-- Returns all the sales reps that have more than 5 accounts. 
+-- You can't use an alias in HAVING; you have to use the aggregate for it to work.
+-- All non-aggregated columns in SELECT must also appear in GROUP BY.
 
+SELECT a.id, a.name, COUNT(*) num_orders
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+HAVING COUNT(*) > 20
+ORDER BY num_orders;
+-- Returns all accounts with more than 20 orders.
+-- You can't use an alias in GROUP BY; you need to identify by original table and column name (see above).
 
 
