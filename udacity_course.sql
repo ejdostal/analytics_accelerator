@@ -166,7 +166,15 @@ GROUP BY: allows you to create segments that will aggregate independent from one
 - As with ORDER BY, you can substitute numbers for column names in the GROUP BY clause. 
     - It’s generally recommended to do this only when you’re grouping many columns, or if something else is causing the text in the GROUP BY clause to be excessively long.
 
-  
+
+DISTINCT:
+- always used in SELECT statements
+- provides the unique rows for all columns written in the SELECT statement (to this for all columns, use it only once, immediately after SELECT)
+- NOTE: DISTINCT can slow your queries down quite a bit, particularly in aggregations.
+- if you want to group columns but DON'T need to include aggregations, use DISTINCT instead of GROUP BY.
+
+
+
 ------------
 
 ** Best Practice **
@@ -884,7 +892,8 @@ ORDER BY account_id, channel;
     -- ex. How much traffic are we obtaining from each channel? --
 -- Counts up all of the events for each channel for each account id. --
 -- Results ordered first by account id, then by events within the account id (ordered to highlight the highest volume channels for each account). --
-   
+-- see SELECT DISTINCT below for more about this particular query.
+
 SELECT a.name account, AVG(standard_qty) standard_qty_avg,
 AVG(gloss_qty) gloss_qty_avg,
 AVG(poster_qty) poster_qty_avg
@@ -924,3 +933,25 @@ ON a.id = w.account_id
 GROUP BY r.name, w.channel
 ORDER BY num_events DESC;
 -- Determines the number of times a particular channel was used in the web_events table for each region, ordered from highest to least number of occurrences. --
+
+
+-- DISTINCT (3.19) --
+
+SELECT account_id,
+    channel,
+    COUNT(id) AS events
+FROM web_events
+GROUP BY account_id, channel
+ORDER BY account_id, events DESC;
+-- Shows the count of web events by channel by account; Groups (and aggregates) results by account id.
+-- GROUP BY is used to group results by columns when performing aggregations.
+
+SELECT DISTINCT account_id,
+    channel
+FROM web_events
+ORDER BY account_id
+-- Shows channels by account id.
+-- DISTINCT can be used to group results by column when you don't use aggregations.
+-- DISTINCT comes immediately after the SELECT clause.
+
+
