@@ -956,10 +956,6 @@ ORDER BY account_id
 
 
 -- Tests if there are any accounts associated with more than one region. --    
-    SELECT DISTINCT id, name
-    FROM accounts;
-    -- returns every unique row for the id and name columns in the accounts table; returns each only once.
-    -- ex. returns 351 results
     
     SELECT a.id as "account id", r.id as "region id", 
     a.name as "account name", r.name as "region name"
@@ -968,13 +964,33 @@ ORDER BY account_id
     ON s.id = a.sales_rep_id
     JOIN region r
     ON r.id = s.region_id;
-    -- returns all associated accounts. --
-    -- ex. returns 351 results; each account is associated with only one region. 
-    -- If the SELECT DISTINCT query had returned more rows than the second query, that means that some accounts could be associated with more than one region. 
+    -- returns all accounts and their associated regions. --
+    -- ex. returns 351 results
+
+    SELECT DISTINCT id, name
+    FROM accounts;
+    -- returns every unique account in the company.
+    -- ex. returns 351 results; Because the counts are the same, each account is associated with only one region. 
+    --  If each account was associated with more than one region, the first query should have returned more rows than the second query.
 
 
+-- Tests if there are any sales reps who have worked on more than one account. --
+
+    SELECT s.id, s.name, COUNT(*) num_accounts
+    FROM accounts a
+    JOIN sales_reps s
+    ON s.id = a.sales_rep_id
+    GROUP BY s.id, s.name
+    ORDER BY num_accounts;
+    -- Groups by sales rep id and name, and then counts up all their accounts. -- 
+    -- ex. Counts show that the fewest number of accounts any sales rep works on is 3.
+    -- ex. There are 50 results.
+    -- There are 50 sales reps, and they all have more than one account.
 
 
-
+    SELECT DISTINCT id, name
+    FROM sales_reps;
+    -- returns every unique sales rep in the company.
+    -- ex. returns 50 results; Confirms that all of the sales reps are accounted for in the first query. 
 
 
