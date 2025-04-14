@@ -1038,4 +1038,24 @@ ORDER BY num_orders;
 -- Returns all accounts with more than 20 orders.
 -- You can't use an alias in GROUP BY; you need to identify by original table and column name (see above).
 
+SELECT a.id, a.name, SUM(o.total_amt_usd) total_spent
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+HAVING SUM(o.total_amt_usd) > 30000
+ORDER BY total_usd;
+-- Returns all accounts that spent more than $30,000 usd total across all orders.
+
+SELECT a.id, a.name, SUM(o.total_amt_usd) total_spent
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+HAVING SUM(o.total_amt_usd) < 1000
+ORDER BY total_usd;
+-- Returns all accounts that spent less than $1000 usd total across all orders.
+
+
+
 
