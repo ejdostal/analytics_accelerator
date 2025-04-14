@@ -305,7 +305,7 @@ WHERE referrer_url LIKE '%google%';
 
 SELECT * 
 FROM accounts
-WHERE name LIKE 'C%';
+WHERE name LIKE 'C%'; 
 -- shows all records for companies whose name starts with "C" --
 
 SELECT *
