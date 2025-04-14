@@ -166,14 +166,23 @@ GROUP BY: allows you to create segments that will aggregate independent from one
 - As with ORDER BY, you can substitute numbers for column names in the GROUP BY clause. 
     - It’s generally recommended to do this only when you’re grouping many columns, or if something else is causing the text in the GROUP BY clause to be excessively long.
 
-
 DISTINCT:
 - always used in SELECT statements
 - provides the unique rows for all columns written in the SELECT statement (to this for all columns, use it only once, immediately after SELECT)
 - NOTE: DISTINCT can slow your queries down quite a bit, particularly in aggregations.
 - if you want to group columns but DON'T need to include aggregations, use DISTINCT instead of GROUP BY.
 
+HAVING:
+- a clean way to filter a query a query that has been aggregated 
+- commonly done using subqueries
+- anytime you want to perform a WHERE on an element of your query containing an aggregate, you have to using HAVING instead
+- the WHERE clause doesn't allow you to filter on aggregate columns
+- HAVING is only useful when grouping columns; if aggregating across the entire dataset, the output is only one line anyway so there's no need to filter beyond that. 
+    - WHERE subsets the returned data based on a logical condition.
+    - WHERE appears after the FROM, JOIN, and ON clauses, but before GROUP BY.
 
+    - HAVING appears after the GROUP BY clause, but before the ORDER BY clause.
+    - HAVING is like WHERE, but it works on logical statements involving aggregations.
 
 ------------
 
@@ -956,7 +965,6 @@ ORDER BY account_id
 
 
 -- Tests if there are any accounts associated with more than one region. --    
-    
     SELECT a.id as "account id", r.id as "region id", 
     a.name as "account name", r.name as "region name"
     FROM accounts a
@@ -975,7 +983,6 @@ ORDER BY account_id
 
 
 -- Tests if there are any sales reps who have worked on more than one account. --
-
     SELECT s.id, s.name, COUNT(*) num_accounts
     FROM accounts a
     JOIN sales_reps s
@@ -987,10 +994,29 @@ ORDER BY account_id
     -- ex. There are 50 results.
     -- There are 50 sales reps, and they all have more than one account.
 
-
     SELECT DISTINCT id, name
     FROM sales_reps;
     -- returns every unique sales rep in the company.
     -- ex. returns 50 results; Confirms that all of the sales reps are accounted for in the first query. 
+
+
+    SELECT account_id, 
+        SUM(total_amt_usd) AS sum_total_amt_usd
+    FROM orders
+    GROUP BY 1
+    GROUP BY 2 DESC;
+    -- gets the sum of sales for each account, ordered from highest to lowest sales.
+    -- the WHERE clause doesn't allow you to filter on aggregate columns; so it's hard to filter here by specific values (ex. show only accounts with over $250,0000 in sales)
+
+    SELECT account_id, 
+    SUM(total_amt_usd) AS sum_total_amt_usd
+    FROM orders
+    GROUP BY 1
+    HAVING SUM(total_amt_usd) >= 250000;
+    -- filters the query down to just the account ids with more than $250,000 in sales.   
+    -- HAVING was used here instead of WHERE because you're filtering on an aggregate.
+    -- HAVING is only useful when grouping by one or more columns; No grouping on an aggregate means you'll jsut be returned one line anyway. 
+
+
 
 
