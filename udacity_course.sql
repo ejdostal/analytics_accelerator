@@ -908,7 +908,7 @@ JOIN web_events w
 ON a.id = w.account_id
 ORDER BY w.occurred_at
 LIMIT 1;
--- Returns the primary contact associated with the earliest web_event. --
+-- Returns the primary contact associated with the earliest web_event. 
 
 SELECT a.name, MIN(o.total_amt_usd) smallest_order
 FROM orders o
@@ -916,7 +916,7 @@ JOIN accounts a
 ON o.account_id = a.id
 GROUP BY a.name
 ORDER BY MIN(o.total_amt_usd);
--- Finds the smallest order (in sales) placed for each account, sorted from smallest to greatest individual order sales. --
+-- Finds the smallest order (in sales) placed for each account, sorted from smallest to greatest individual order sales. 
 
 SELECT r.name, COUNT(*) num_reps
 FROM region r
@@ -924,24 +924,20 @@ JOIN sales_reps s
 ON r.id = s.region_id
 GROUP BY r.name
 ORDER BY num_reps;
--- Finds the total number of sales reps associated with each region, order by regions with the fewest representatives to those with the most. --
-
-
-
+-- Finds the total number of sales reps associated with each region, order by regions with the fewest representatives to those with the most. 
 
 SELECT account_id,
     channel,
     COUNT(id) AS events
 FROM web_events
 GROUP BY account_id, channel
-ORDER BY account_id, channel;
--- Describes how each account interacted with various advertising channels --
- -- ex. Which channels are driving traffic and leading to purchases? --
-    -- ex. Are we investing in channels that aren't worth the cost? --
-    -- ex. How much traffic are we obtaining from each channel? --
--- Counts up all of the events for each channel for each account id. --
--- Results ordered first by account id, then by events within the account id (ordered to highlight the highest volume channels for each account). --
--- see SELECT DISTINCT below for more about this particular query.
+ORDER BY account_id, events DESC;
+-- Counts the total number of web_events associated with each channel by account id. Sorted first by smallest to largest account id; then from largest total web events to least. --
+    -- This is a good start into analyzing how each account interacted with various advertising channels. From here you might go on to answer: 
+        -- ex. How much traffic are we obtaining from each channel? 
+        -- ex. Which channels are driving traffic and leading to purchases? 
+        -- ex. Are we investing in channels that aren't worth the cost? 
+-- see DISTINCT (below) for a deeper look into this query.
 
 SELECT a.name account, AVG(standard_qty) standard_qty_avg,
 AVG(gloss_qty) gloss_qty_avg,
