@@ -713,35 +713,38 @@ SELECT *
 FROM orders
 WHERE occurred_at >= '2016-12-01'
 AND occurred_at < '2017-01-01';
--- Returns list of all orders from the month of December 2016; tells you how many total results there are in the upper right hand corner. (ex. 463) 
+-- Returns a list of all orders from the month of December 2016
+-- Also tells you how many total results there are, in the upper right hand corner. (ex. 463) 
 
 SELECT COUNT(*) AS order_count
 FROM orders
 WHERE occurred_at >= '2016-12-01'
 AND occurred_at >= '2017-01-01';
--- Also counts the total number of rows in the orders table for the month of December 2016, but returned as a single numeric value, or aggregation across the entire dataset. 
--- COUNT function returns a count of all the rows that contain some non-null data. (ex. 463)
--- It is very unusual to have a row that is entirely null, so the result produced by a COUNT(*) is typically equal to the number of rows in the table. 
+-- Also returns the total number of rows in the orders table for the month of December 2016 - but as a single numeric value, or aggregation, across the entire dataset. (ex. 463)
+    -- The COUNT function returns a count of all the rows containing some non-null data. 
+    -- It is very unusual to have a row that is entirely null, so the result produced by a COUNT(*) is typically equal to the number of rows in the table. 
+-- COUNT(*) and COUNT(column_name) is particularly useful with GROUP BY.
 
 SELECT COUNT(*) AS account_count
 FROM accounts;
--- Finds the total number of rows in the accounts table. (ex. 354)
+-- Finds the total number of rows in the table as a single numeric value, or aggregation. (ex. 354)
 
 SELECT COUNT(id) AS account_count
 FROM accounts;
--- Finds the total number of non-null records in an individual column: the id column in the accounts table.
--- Since there are non-null values in the id column, it returns the same number of records as COUNT(*). (ex. 354)
+-- Finds the total number of non-null records in the individual id column.
+-- Since there are NO non-null values in the id column, it returns the same number of records as COUNT(*). (ex. also 354)
 
 SELECT COUNT(primary_poc) AS account_primary_poc_count
 FROM accounts;
--- Identifies the total number non-null records in the primary point of contact column. 
--- 
-
+-- Finds the total number non-null records in the primary point of contact column. 
+-- Since there are 9 non-Null values in the primary_poc_count column, only 345 rows are returned (9 less than the total number of rows in the table).
 
 SELECT *
-FROM
-
-
+FROM accounts
+WHERE primary_poc IS NULL;
+-- Returns a list of the 9 rows with Null values in the primary_poc column; also tells you how many total results there are in the upper right hand corner. (ex. 9) 
+-- This verifies there are 9 Null values in the primary_poc column.
+    -- Note that the COUNT function can also be used on non-numerical columns.
 
 
 -- SUM (3.6) --
