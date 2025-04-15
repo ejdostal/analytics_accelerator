@@ -115,21 +115,22 @@ Nulls: a datatype that specifies where data does not exist.
     - Nulls are often ignored in aggregation functions.
     - When identifying NULLs in a WHERE clause, we write IS NULL or IS NOT NULL. (We don't use =, because NULL isn't considered a value in SQL. Rather, it is a property of the data.)
     - NULLs frequently occur when performing a LEFT or RIGHT JOIN. 
-    - NULLs can also occur from simply missing data in our database.
+    - NULLs can also occur from simply missing data in our database
 - Use ISNULL or IS NOT NULL to SHOW all the rows in a specific column for which their is or isn't Null values.
 
-Aggregations: These functions operate down columns, not across rows.
-    - An important thing to remember: aggregators only aggregate vertically - the values of a column. 
-        - If you want to perform a calculation across rows, you would do this with simple arithmetic.
-    - Use row-level output for early exploratory work, when searching your database to better understand the data.
-        - Once you get a since of what the data looks like, aggregates become more helpful in answering your questions.
 
-    COUNT: Counts how many rows are in a table, and helps you to identify the number of Null values in any particular column. 
+Aggregations: These functions operate down columns, not across rows.
+- An important thing to remember: aggregators only aggregate vertically - the values of a column. 
+- If you want to perform a calculation across rows, you would do this with simple arithmetic.
+- Use row-level output for early exploratory work, when searching your database to better understand the data.
+- Once you get a since of what the data looks like, aggregates become more helpful in answering your questions.
+
+    COUNT: Counts how many rows are in a table; Helps you to identify the number of Null values in any particular column. 
         - COUNT ignores Nulls.
-        - This is why COUNT is used to find which rows that have missing data.
+        - This is why COUNT is used to find which rows that have missing data:
             1. Find total rows in a table: The result produced by a COUNT(*) is typically equally to the number of rows in the table; it's very unusual to have a row that is entirely null. 
             2. Identify the number of Null values in a particular column (or the specific number of rows in column that are not Null) ; COUNT(column_name)
-            - The difference between the COUNT(*) and the COUNT of the column is the total number of Nulls in that column.
+        - The difference between the COUNT(*) and the COUNT of the column is the total number of Nulls in that column.
         - You can use COUNT on non-numerical columns.
 
     SUM: Adds together all the values in a particular column
@@ -748,12 +749,14 @@ WHERE primary_poc IS NULL;
 
 
 -- SUM (3.6) --
+
 SELECT SUM(standard_qty) AS standard,
 SUM(gloss_qty) AS gloss,
 SUM(poster_qty) AS poster
 FROM orders;
--- Totals up the sum of all numerical values in each column and then lists them as aggregations next to each other. --
-    -- Totals up the sums of all sales of each paper type and lists next to each other for comparison; Could be useful for inventory planning - ex. how much of each paper type should we produce? --
+-- Totals up the sum of all numerical values in each column and then lists them as aggregations, in columns next to each other. 
+-- Finds the total quantity of paper sold across all orders for each paper type column.
+-- Potentially useful for inventory planning, answers: How much of each paper type should we produce? 
 
 SELECT SUM(poster_qty) AS total_poster_sales
 FROM orders;
@@ -839,7 +842,6 @@ LIMIT 2;
 
 
 -- GROUP BY (3.13) -- 
-
 SELECT account_id,
     SUM(standard_qty) AS standard_sum,
     SUM(gloss_qty) AS gloss_sum,
