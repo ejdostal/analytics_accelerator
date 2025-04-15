@@ -852,7 +852,8 @@ LIMIT 2;
     -- Note, this is more advanced than the topics we have covered thus far to build a general solution, but we can hard code a solution in the above way. --
 
 
--- GROUP BY (3.13) -- 
+-- GROUP BY: one column (3.13) -- 
+
 SELECT account_id,
     SUM(standard_qty) AS standard_sum,
     SUM(gloss_qty) AS gloss_sum,
@@ -865,7 +866,6 @@ FROM orders
 -- account id is added to a GROUP BY clause to clarify that is is to be made into a grouping - not summed and collapsed like the other columns.
 -- Aggregates results into segments - where each segment is one  of the values in the account id column.
 -- Takes the sum of data limited to each account, rather than across the entire dataset. --
-
 
 SELECT a.name, o.occurred_at
 FROM accounts a
@@ -926,13 +926,16 @@ GROUP BY r.name
 ORDER BY num_reps;
 -- Finds the total number of sales reps associated with each region, order by regions with the fewest representatives to those with the most. 
 
+
+-- GROUP BY: multiple columns (3.16) --
+
 SELECT account_id,
     channel,
     COUNT(id) AS events
 FROM web_events
 GROUP BY account_id, channel
 ORDER BY account_id, events DESC;
--- Counts the total number of web_events associated with each channel by account id. Sorted first by smallest to largest account id; then from largest total web events to least. --
+-- Counts the total number of web events for each channel on account id. Sorted first by smallest to largest account id; then from largest total web events to least. --
     -- This is a good start into analyzing how each account interacted with various advertising channels. From here you might go on to answer: 
         -- ex. How much traffic are we obtaining from each channel? 
         -- ex. Which channels are driving traffic and leading to purchases? 
@@ -946,7 +949,7 @@ FROM accounts a
 JOIN orders o
 ON a.id = o.account_id
 GROUP BY a.name;
--- For each account, determines the average amount of each paper type purchased across their orders. --
+-- Finds the average quantity of standard paper ordered for each account, across all orders in the orders table; also finds the average quantity of gloss paper and average quantity of poster paper ordered for each account, across all orders in the orders table.
 
 SELECT a.name account, AVG(o.standard_amt_usd) avg_standard,
 AVG(o.gloss_amt_usd) avg_gloss,
@@ -965,7 +968,7 @@ JOIN web_events w
 ON w.account_id = a.id
 GROUP BY s.name, w.channel
 ORDER BY num_events DESC;
--- Determines the number of times a particular channel was used in the web_events table for each sales_rep, ordered from most to least occurrences. --
+-- Counts how many times each channel is used in association with each sales rep, ordered from most occurrances to least occurences. -- 
 
 SELECT r.name region, w.channel, COUNT(*) num_events
 FROM region r
@@ -977,7 +980,7 @@ JOIN web_events w
 ON a.id = w.account_id
 GROUP BY r.name, w.channel
 ORDER BY num_events DESC;
--- Determines the number of times a particular channel was used in the web_events table for each region, ordered from highest to least number of occurrences. --
+-- Counts the number of times a particular channel was used in the web_events table for each region, ordered from most occurrances to least occurences.
 
 
 -- DISTINCT (3.19) --
