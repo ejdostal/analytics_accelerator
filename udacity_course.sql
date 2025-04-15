@@ -125,13 +125,12 @@ Aggregations: These functions operate down columns, not across rows.
         - Once you get a since of what the data looks like, aggregates become more helpful in answering your questions.
 
     COUNT: Counts how many rows are in a table, and helps you to identify the number of Null values in any particular column. 
-        - you can use COUNT on non-numerical columns
         - COUNT ignores Nulls.
-        - Find total rows in a table: The result produced by a COUNT(*) is typically equally to the number of rows in the table; it's very unusual to have a row that is entirely null. 
-        - Find total non-Null values in a specific column: The difference between the COUNT of the table and the COUNT of the column is the total number of Nulls in the column.
-            - If the COUNT result of a column MATCHES the total number of rows in a table, there are no Nulls in the column. --
-            - If the COUNT result of a column is LESS than the number of rows in the table, we know the difference is how many Nulls are in that column. --
-    - Use COUNT of a column to return the specific number of rows in column that are not Null (the aggregated number).
+        - This is why COUNT is used to find which rows that have missing data.
+            1. Find total rows in a table: The result produced by a COUNT(*) is typically equally to the number of rows in the table; it's very unusual to have a row that is entirely null. 
+            2. Identify the number of Null values in a particular column (or the specific number of rows in column that are not Null) ; COUNT(column_name)
+            - The difference between the COUNT(*) and the COUNT of the column is the total number of Nulls in that column.
+        - You can use COUNT on non-numerical columns.
 
     SUM: Adds together all the values in a particular column
         - You can only use SUM of numeric columns.
@@ -710,27 +709,39 @@ WHERE primary_poc IS NOT NULL;
 
 
 -- COUNT (3.4) --
+SELECT *
+FROM orders
+WHERE occurred_at >= '2016-12-01'
+AND occurred_at < '2017-01-01';
+-- Returns list of all orders from the month of December 2016; tells you how many total results there are in the upper right hand corner. (ex. 463) 
+
 SELECT COUNT(*) AS order_count
 FROM orders
 WHERE occurred_at >= '2016-12-01'
 AND occurred_at >= '2017-01-01';
--- Counts the total number of rows in the orders table in the month of December 2016; it's very unusual to have a row that is entirely null.
--- Returned as an aggregation (a single numeric value)
+-- Also counts the total number of rows in the orders table for the month of December 2016, but returned as a single numeric value, or aggregation across the entire dataset. 
+-- COUNT function returns a count of all the rows that contain some non-null data. (ex. 463)
+-- It is very unusual to have a row that is entirely null, so the result produced by a COUNT(*) is typically equal to the number of rows in the table. 
 
 SELECT COUNT(*) AS account_count
 FROM accounts;
--- Finds the total number of rows in the accounts table. --
+-- Finds the total number of rows in the accounts table. (ex. 354)
 
 SELECT COUNT(id) AS account_count
 FROM accounts;
--- Identifies the total number of non Null values in the id column of the accounts table. --
-    -- Returned as an aggregation (a single numeric value)
--- The difference between the COUNT of the column and the COUNT of the table is the total number of Nulls in that specific column. --
+-- Finds the total number of non-null records in an individual column: the id column in the accounts table.
+-- Since there are non-null values in the id column, it returns the same number of records as COUNT(*). (ex. 354)
 
 SELECT COUNT(primary_poc) AS account_primary_poc_count
 FROM accounts;
--- Identifies the total number of non Null values in the primary point of contact column as an aggregation. --
-    -- COUNT works on any column, including those with non-numerical values. --
+-- Identifies the total number non-null records in the primary point of contact column. 
+-- 
+
+
+SELECT *
+FROM
+
+
 
 
 -- SUM (3.6) --
@@ -1058,6 +1069,25 @@ GROUP BY a.id, a.name
 HAVING SUM(o.total_amt_usd) < 1000
 ORDER BY total_usd;
 -- Returns all accounts that spent less than $1000 usd total across all orders.
+
+
+SELECT a.id, a.name, SUM(o.total_amt_usd) total_spent
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+ORDER BY total_spent DESC
+LIMIT 1;
+
+
+
+
+
+
+
+
+
+
 
 
 
