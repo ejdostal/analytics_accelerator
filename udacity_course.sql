@@ -150,11 +150,11 @@ Aggregations: These functions operate down columns, not across rows.
     - Note: the Median might be a more appropriate measure of center for data than AVG for data, but finding the Median happens to be a pretty difficult thing to get using SQL alone.
 
 GROUP BY: allows you to create segments that will aggregate independent from one another; in other words, it takes the sum of data limited to each account, rather than across the entire dataset.
-- can be use to aggregate data within subsets of data (ex. grouping for different accounts, different regions, or different sales representatives.)
+- Used to aggregate data within subsets of data (ex. grouping for different accounts, different regions, or different sales representatives.)
 - Any column in the SELECT statement that is not within an aggregator must be in the GROUP BY clause.
 - The GROUP BY always goes between WHERE and ORDER BY.
-- SQL evaluates the aggregations before the LIMIT clause.
-- If you don’t group by any columns, you’ll get a 1-row result.
+- SQL evaluates the aggregations before the LIMIT clause, so you know all data is evaluated for aggregation.
+- If you don’t group by any columns, you’ll get a 1-row result; you're aggregating across the entire dataset.
 - If you group by a column with enough unique values that it exceeds the LIMIT number, the aggregates will be calculated, and then some rows will simply be omitted from the results.
 - Wherever there's a field in the SELECT statement that's not being aggregated, the query expects it to be in the GROUP BY clause; a column that's not aggregated and not in the GROUP BY will return an error.
 - If you want to segment your data into even more granular chunks, you can group by multiple columns.  
@@ -168,21 +168,24 @@ GROUP BY: allows you to create segments that will aggregate independent from one
 
 DISTINCT:
 - always used in SELECT statements
-- provides the unique rows for all columns written in the SELECT statement (to this for all columns, use it only once, immediately after SELECT)
+- provides the unique rows for ALL columns written in the SELECT statement (to do this for all columns, use it only once, immediately after SELECT)
 - NOTE: DISTINCT can slow your queries down quite a bit, particularly in aggregations.
 - if you want to group columns but DON'T need to include aggregations, use DISTINCT instead of GROUP BY.
 
 HAVING:
-- a clean way to filter a query a query that has been aggregated 
-- commonly done using subqueries
 - anytime you want to perform a WHERE on an element of your query containing an aggregate, you have to using HAVING instead
+- HAVING is like WHERE, but it works on logical statements involving aggregations.
 - the WHERE clause doesn't allow you to filter on aggregate columns
-- HAVING is only useful when grouping columns; if aggregating across the entire dataset, the output is only one line anyway so there's no need to filter beyond that. 
+- a clean way to filter a query that has been aggregated 
+- HAVING appears after the GROUP BY clause, but before the ORDER BY clause.
+- commonly done using subqueries
+
+- Only useful with aggregates when grouping columns; if there's no grouping, the output is across the entire dataset so its only one line anyway.
     - WHERE subsets the returned data based on a logical condition.
     - WHERE appears after the FROM, JOIN, and ON clauses, but before GROUP BY.
 
-    - HAVING appears after the GROUP BY clause, but before the ORDER BY clause.
-    - HAVING is like WHERE, but it works on logical statements involving aggregations.
+    
+    
 
 ------------
 
