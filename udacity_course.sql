@@ -140,8 +140,8 @@ Aggregations: These functions operate down columns, not across rows.
     MIN / MAX: Return the lowest and highest values in a particular column. 
         - Ignores Null values.
         - Can be used to count numerical values (like COUNT)
-        - MIN will return the lowest number, earliest date, or non-numerical value as early in the alphabet as possible. 
-        - MAX does the opposite — it returns the highest number, the latest date, or the non-numerical value closest alphabetically to “Z.”
+        - Depending on the column type, MIN will return the lowest number, earliest date, or non-numerical value as early in the alphabet as possible. 
+        - Depending on the column type, MAX will return the highest number, the latest date, or the non-numerical value closest alphabetically to “Z.”
 
     Average: Returns the mean of the data; the sum of all the values in the column, divided by the number of values in the column; what can we expect to see on regular basis?
        - Can only be used on numerical columns 
@@ -697,6 +697,7 @@ AND o.occurred_at BETWEEN '2015-01-01' AND '2016-01-01';
 
 
 -- NULLS (3.3) --
+
 SELECT *
 FROM accounts 
 WHERE primary_poc IS NULL;
@@ -710,6 +711,7 @@ WHERE primary_poc IS NOT NULL;
 
 
 -- COUNT (3.4) --
+
 SELECT *
 FROM orders
 WHERE occurred_at >= '2016-12-01'
@@ -776,11 +778,13 @@ FROM orders;
 
 SELECT SUM(standard_amt_usd)/ SUM(standard_qty) AS standard_price_per_unit
 FROM orders;
--- Finds the standard paper - price per unit across all of the sales made in the orders table. -- 
+-- Finds the standard paper price per unit across all of the sales made in the orders table. -- 
     -- Divides the summed prices of all standard paper ordered BY the summed totals of all standard paper quantities ordered. --
     -- Though the price (standard_amt_usd) and standard paper quantity ordered (standard_qty) varies from one order to the next, this ratio is across all of the sales made in the orders table. --
- 
--- MIN and MIX (3.9) --
+
+
+-- MIN and MAX (3.9) --
+
 SELECT MIN(standard_qty) AS standard_min,
     MIN(gloss_qty) AS gloss_min,
     MIN(poster_qty) AS poster_min,
@@ -788,20 +792,27 @@ SELECT MIN(standard_qty) AS standard_min,
     MAX(gloss_qty) AS gloss_max,
     MAX(poster_qty) AS poster_max,
 FROM orders;
--- Finds the min and max of paper quantity ordered for each paper type. -- 
-    -- ex. Find the largest single order is for poster paper, despite the fact that it's the least popular overall (poster_qty showed the highest max). --
-    -- Implication: Less popular products might still be ordered in larger quantities, so even though it's not the most popular item, company might want to produce enough of this item to be able to fulfill pretty big orders at any given time. --
+-- Picks the minimum amount of paper ordered in the orders table for each paper type column, the maximum amount of paper order ordered across all orders for each paper type column
+    -- Potential implications: If the single largest individual order qty ordered is for poster paper (the MAX of the maximums returned) and you know from prior querying that it also has the least total orders overall by far of all the paper types, you might want to consider keeping poster paper stocked in large amounts to anticipate large order quantities. 
+    -- Implication: Less popular products might still be ordered in larger quantities, so even though it's not the most popular item, company might want to produce enough of this item to be able to fulfill pretty big orders at any given time. 
+
+-- Depending on the column type, MIN will return the lowest number, earliest date, or non-numerical value as early in the alphabet as possible. 
+-- Depending on the column type, MAX will return the highest number, the latest date, or the non-numerical value closest alphabetically to “Z.”
+
+
+-- AVG (3.10) --
 
 SELECT AVG(standard_qty) AS standard_avg,
     AVG(gloss_qty) AS gloss_avg,
     AVG(poster_qty) AS poster_avg
 FROM orders;
--- Returns the average quantity of paper ordered for each paper type (average order quantity size) across all orders in the orders table. -- 
+-- Returns the average quantity of paper ordered for each paper type (average order quantity size) across all orders in the orders table. 
     -- Answers: What order size can we expect to see on a regular basis? 
 
 SELECT MIN(occurred_at)
 FROM orders;
--- Returns the date of the earliest order ever placed, using an aggregation. --
+-- Returns the date of the earliest order ever placed, using an aggregation.
+-- Depending on the column type, MIN will return the lowest number, earliest date, or non-numerical value as early in the alphabet as possible. 
 
 SELECT occurred_at
 FROM orders
@@ -882,7 +893,14 @@ LIMIT 1;
 SELECT channel, COUNT(*)
 FROM web_events 
 GROUP BY channel;
--- Finds the total number of times each type of channel from the web_events table was used. --
+-- Groups each channel by the its total number of web_events that took place (all rows in the web_events table, by each channel). --
+
+SELECT a.primary_poc, MIN(w.occurred_at) earliest_event
+FROM accounts a 
+JOIN web_events w
+ON a.id = w.account_id
+GROUP BY a.primary_poc;
+-- Returns the earliest web event for each primary point of contact.
 
 SELECT a.primary_poc
 FROM accounts a
@@ -898,7 +916,7 @@ JOIN accounts a
 ON o.account_id = a.id
 GROUP BY a.name
 ORDER BY MIN(o.total_amt_usd);
--- Finds the smallest order placed by each account in terms of total USD, ordered from smallest to greatest. --
+-- Finds the smallest order (in sales) placed for each account, sorted from smallest to greatest individual order sales. --
 
 SELECT r.name, COUNT(*) num_reps
 FROM region r
@@ -906,7 +924,10 @@ JOIN sales_reps s
 ON r.id = s.region_id
 GROUP BY r.name
 ORDER BY num_reps;
--- Finds the number of sales representatives in each region, ordered from fewest to most representatives. -- 
+-- Finds the total number of sales reps associated with each region, order by regions with the fewest representatives to those with the most. --
+
+
+
 
 SELECT account_id,
     channel,
