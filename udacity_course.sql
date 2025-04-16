@@ -1249,10 +1249,21 @@ LIMIT 1;
 
 -- CASE and Aggregations (3.30) -- 
 
-SELECT CASE WHEN total > 500 THEN 'Over 500'
-    ELSE '500 or under' END AS total_group,
-    COUNT(*) AS order_count
-FROM orders
-GROUP BY 1;
--- The easiest way to count all the members of a group is to create a column that groups the way you want it to, then create another column to count by that group. 
-    -- Using the WHERE clause only allows you to count by one condition at a time; We would need a separate query for each one. 
+-- When to use CASE vs. when to use WHERE. --
+    SELECT CASE WHEN total > 500 THEN 'Over 500'
+        ELSE '500 or under' END AS total_group,
+        COUNT(*) AS order_count
+    FROM orders
+    GROUP BY 1;
+    -- The easiest way to count all the members of a group is to create a column that groups the way you want it to, then create another column to count by that group. 
+    -- There are some advantages to separating data into separate columns like this depending on what you want to do, 
+        -- But often this level of separation might be easier to do in another programming language - rather than with SQL.
+
+    SELECT COUNT(1) orders_over_500_units
+    FROM orders
+    WHERE total > 500;
+    -- getting the same information using a WHERE clause means only being able to get one set of data from the CASE at a time.
+
+
+
+
