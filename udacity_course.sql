@@ -985,23 +985,24 @@ ORDER BY num_events DESC;
 
 -- DISTINCT (3.19) --
 
+-- Comparison between when to use GROUP BY vs when to use DISTINCT. ---
 SELECT account_id,
     channel,
     COUNT(id) AS events
 FROM web_events
 GROUP BY account_id, channel
 ORDER BY account_id, events DESC;
--- Shows the count of web events by channel by account; Groups (and aggregates) results by account id.
--- GROUP BY is used to group results by columns when performing aggregations.
+-- Shows the total web events for each channel by account.
+    -- GROUP BY is used to group results by columns when performing aggregations.
 
 SELECT DISTINCT account_id,
     channel
 FROM web_events
 ORDER BY account_id
--- Shows channels by account id.
--- DISTINCT can be used to group results by column when you don't use aggregations.
--- DISTINCT comes immediately after the SELECT clause.
-
+-- Lists every channel used by each account id.
+    -- DISTINCT provides the unique rows for all columns written in the SELECT statement; DISTINCT comes immediately after the SELECT clause.
+    -- DISTINCT can also be used to group results by column when you don't use aggregations.
+    -- No aggregations are in the SELECT statement, so GROUP BY isn't needed here either.
 
 -- Tests if there are any accounts associated with more than one region. --    
     SELECT a.id as "account id", r.id as "region id", 
