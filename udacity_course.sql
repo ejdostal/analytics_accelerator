@@ -1230,3 +1230,20 @@ LIMIT 1;
 -- Truncates order timestamp to the month level, then groups each month by the total sales made for that month in gloss paper.
 -- Filters results down to just the accounts with a name of "Walmart", and orders from largest total sales made in a month to least total sales made; limits to the first result (the greatest total). 
 
+
+-- CASE (3.29) -- 
+
+-- How to get around problems with division by 0, using CASE. --
+
+    SELECT id, account_id, standard_amt_usd/standard_qty AS unit_price
+    FROM orders
+    LIMIT 10;
+    -- In the Basic SQL lesson, you avoided problems with division by 0 by limiting results to only records not containing quantites of 0. (ex. the first 10 records)
+
+    SELECT account_id, CASE WHEN standard_qty = 0 OR standard_qty IS NULL THEN 0
+        ELSE standard_amt_usd/standard_qty END AS unit_price
+    FROM orders
+    LIMIT 10; 
+    -- Any time the standard_qty is zero, it returns a 0, otherwise, it returns the unit_price.
+        -- ex. the results show that we essentially charge all of our accounts 4.99 for standard paper; It makes sense this doesn't fluctuate.
+
