@@ -1180,15 +1180,53 @@ ORDER BY 2 DESC;
 -- After aggregation, the query groups each dow by the total sum of sales across all orders, ordered from day of the week with the largest total sales to the day of the week with the least. 
 
 
+SELECT DATE_PART('year', occurred_at) AS year,
+SUM(total_amt_usd) total_sales
+FROM orders 
+GROUP BY 1
+ORDER BY 1, 2 DESC;
+-- Finds the total sales in terms of total dollars for all orders in a year, ordered from least to greatest.
+-- ex. In the results, you'll notice that 2013 and 2017 have much smaller totals than the other years.
+    -- If we look further into the monthly data, we see that this is because there is only one month of sales for each of these years (December for 2013 and January for 2017)
+        -- Therefore neither of these years are being evenly represented.
+    -- Sales have been increasing year over year, with 2016 being the largest sales to date. At this rate, we might expect 2017 to have the largest sales.
 
+SELECT DATE_PART('month', occurred_at) ord_month, SUM(total_amt_usd) total_spent
+FROM orders
+WHERE occurred_at BETWEEN '2014-01-01' AND '2017-01-01'
+GROUP BY 1
+ORDER BY 2 DESC; 
+-- Answers the question: Which month had the greatest sales in terms of total dollars?
+-- Sums total sales made for each month, listed from highest total sales to least. 
+-- Filters the data so that only data from 2014 through 2016 is considered, because 2013 and 2017 are not evenly represented in this dataset (see note in query above)
 
+SELECT DATE_PART('year', occurred_at) year,  COUNT(*) total_orders
+FROM orders
+GROUP BY 1
+ORDER BY 2 DESC;
+-- Answers the question: which year had the greatest sales in terms of total number of orders?
+-- Counts the total number of orders placed in each year, then orders years from greatest total orders to least total orders.
+    -- ex. Again, 2013 and 2017 are not evenly represented to the other years in the dataset.
 
+SELECT DATE_PART('month', occurred_at) ord_month, COUNT(*) total_sales
+FROM orders
+WHERE occurred_at BETWEEN '2014-01-01' AND '2017-01-01'
+GROUP BY 1
+ORDER BY 2 DESC; 
+-- Answers the question: which month had the greatest sales in terms of total number of orders?
+-- Counts the total number of orders placed in each month, then orders months from greatest total orders to least total orders.
+    -- To make a fair comparison from one month to another 2017 and 2013 data were removed.
 
-
-
-
-
-
-
-
+SELECT DATE_TRUNC('month', o.occurred_at) month_yr,
+SUM(o.gloss_amt_usd) gloss_total_sales
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+WHERE a.name = 'Walmart'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 1;
+-- Answers the question: Which month of which year did Walmart spend the most on gloss paper in terms of dollars?
+-- Truncates order timestamp to the month level, then groups each month by the total sales made for that month in gloss paper.
+-- Filters results down to just the accounts with a name of "Walmart", and orders from largest total sales made in a month to least total sales made; limits to the first result (the greatest total). 
 
