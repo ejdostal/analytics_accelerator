@@ -1021,7 +1021,6 @@ ORDER BY account_id
     -- ex. returns 351 results; Because the counts are the same, each account is associated with only one region. 
     --  If each account was associated with more than one region, the first query should have returned more rows than the second query.
 
-
 -- Tests if there are any sales reps who have worked on more than one account. --
     SELECT s.id, s.name, COUNT(*) num_accounts
     FROM accounts a
@@ -1039,6 +1038,8 @@ ORDER BY account_id
     -- returns every unique sales rep in the company.
     -- ex. returns 50 results; Confirms that all of the sales reps are accounted for in the first query. 
 
+
+-- HAVING (3.22) --
 
     SELECT account_id, 
         SUM(total_amt_usd) AS sum_total_amt_usd
@@ -1096,7 +1097,6 @@ HAVING SUM(o.total_amt_usd) < 1000
 ORDER BY total_usd;
 -- Returns all accounts that spent less than $1000 usd total across all orders.
 
-
 SELECT a.id, a.name, SUM(o.total_amt_usd) total_spent
 FROM accounts a
 JOIN orders o
@@ -1104,9 +1104,17 @@ ON a.id = o.account_id
 GROUP BY a.id, a.name
 ORDER BY total_spent DESC
 LIMIT 1;
+-- Returns the account that has spent the most. 
+    -- Sums the totals of all orders for each accounts, listing them from highest total to least total; limited to 1 to return just one company with the single highest total.
 
-
-
+SELECT a.id, a.name, w.channel, COUNT(*) use_of_channel
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+GROUP BY a.id, a.name, w.channel
+HAVING COUNT(*) > 6 AND w.channel = 'facebook'
+ORDER BY use_of_channel;
+--
 
 
 
