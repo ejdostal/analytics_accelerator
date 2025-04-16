@@ -1234,7 +1234,6 @@ LIMIT 1;
 -- CASE (3.29) -- 
 
 -- How to get around problems with division by 0, using CASE. --
-
     SELECT id, account_id, standard_amt_usd/standard_qty AS unit_price
     FROM orders
     LIMIT 10;
@@ -1247,3 +1246,13 @@ LIMIT 1;
     -- Any time the standard_qty is zero, it returns a 0, otherwise, it returns the unit_price.
         -- ex. the results show that we essentially charge all of our accounts 4.99 for standard paper; It makes sense this doesn't fluctuate.
 
+
+-- CASE and Aggregations (3.30) -- 
+
+SELECT CASE WHEN total > 500 THEN 'Over 500'
+    ELSE '500 or under' END AS total_group,
+    COUNT(*) AS order_count
+FROM orders
+GROUP BY 1;
+-- The easiest way to count all the members of a group is to create a column that groups the way you want it to, then create another column to count by that group. 
+    -- Using the WHERE clause only allows you to count by one condition at a time; We would need a separate query for each one. 
