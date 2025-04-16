@@ -1149,40 +1149,38 @@ ORDER BY use_of_channel DESC
 LIMIT 10;
 -- Returns the top 10 channels most frequently used by most accounts (ex. all of the top 10 are for the direct channel).
 
+
 -- DATE Functions (3.25) --
 
-SELECT occurred_at,
-    SUM(standard_qty) AS standard_qty_sum
-FROM orders
-GROUP BY occurred_at
-ORDER BY occurred_at;
--- Date columns tend to have transaction data down to a second; so most timestamps are going to be unique
--- Aggregating by date fields isn't very practical unless you round each date to the nearest day, week, or year first. 
-
-SELECT DATE_TRUNC('day', occurred_at) AS day,
-    SUM(standard_qty) AS standard_qty_sum
-FROM orders
-GROUP BY DATE_TRUNC('day', occurred_at)
-ORDER BY DATE_TRUNC('day', occurred_at);
--- It's more practical to aggregate by the nearest day, week, or month when working with dates
--- Sums the quantites of standard paper by day
--- To group by day, you'll need to truncate the date so the seconds and hours are zeroed out for each timestamp.
+-- Why we have to use date functions to aggregate with dates. --
+    SELECT occurred_at,
+        SUM(standard_qty) AS standard_qty_sum
+    FROM orders
+    GROUP BY occurred_at
+    ORDER BY occurred_at;
+    -- Most timestamps are unique, so aggregating by date fields won't be very practical unless you round each date to the nearest day, week, or year first. 
+    
+    SELECT DATE_TRUNC('day', occurred_at) AS day,
+        SUM(standard_qty) AS standard_qty_sum
+    FROM orders
+    GROUP BY DATE_TRUNC('day', occurred_at)
+    ORDER BY DATE_TRUNC('day', occurred_at);
+    -- Sums the quantites of standard paper by day
     -- It's important to group by the same metric that's included in the SELECT statement to ensure your results are consistent
-
-SELECT DATE_TRUNC('day', occurred_at) AS day,
-    SUM(standard_qty) AS standard_qty_sum
-FROM orders
-GROUP BY DATE_TRUNC('day', occurred_at)
-ORDER BY DATE_TRUNC('day', occurred_at);
--- In some databases, it's possible to group by a year and truncate on day in the SELECT statement.
-    -- This is something that most people only do on accident, because it provides results that are confusing and, in many cases, wrong for the type of question you're trying to answer. 
--- The easiest way to make sure you're grouping correctly is to use column numbers instead of retyping the exact functions.
+     -- The easiest way to make sure you're grouping correctly is to use column numbers instead of retyping the exact functions.
 
 SELECT DATE_PART('dow', occurred_at) AS day_of_week,
-    account_id,
-    occurred_at,
-    total
-FROM orders;
+    SUM(total) AS total_qty
+FROM orders
+GROUP BY 1
+ORDER BY 2 DESC;
+-- Answers: What day of the week are the most sales made?
+    -- DATE_PART Pulls out only the day of the week for each occurence date; 'dow' pulls the day of the week with 0 as Sunday and 6 as Saturday.
+    -- The 1 and 2 here identify these columns in the SELECT statement
+-- After aggregation, the query groups each dow by the total sum of sales across all orders, ordered from day of the week with the largest total sales to the day of the week with the least. 
+
+
+
 
 
 
