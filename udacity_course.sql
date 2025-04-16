@@ -1265,5 +1265,16 @@ LIMIT 1;
     -- getting the same information using a WHERE clause means only being able to get one set of data from the CASE at a time.
 
 
+SELECT account_id, total_amt_usd,
+CASE WHEN total_amt_usd >= 3000 THEN 'Large'
+ELSE 'Small' END AS order_level
+FROM orders;
+-- Displays the account id, total amount of the order and "Large" or "Small" in the order_level column, depending on whether the total order amount was less than $3,000 or not. 
 
-
+SELECT CASE WHEN total >= 2000 THEN 'At Least 2000'
+	  WHEN total >= 1000 AND total < 2000 THEN 'Between 1000 and 2000'
+      ELSE 'Less than 1000' END AS order_category,
+COUNT(*) AS order_count
+FROM orders
+GROUP BY 1;
+-- Displays the number of items in each order and classifies them according to 3 levels in the order_category column, depending on their totals: "At Least 2000", "Between 1000 and 2000" and "Less than 1000".
