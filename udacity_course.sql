@@ -1104,8 +1104,17 @@ ON a.id = o.account_id
 GROUP BY a.id, a.name
 ORDER BY total_spent DESC
 LIMIT 1;
--- Returns the account that has spent the most. 
+-- Returns the account that has spent the most 
     -- Sums the totals of all orders for each accounts, listing them from highest total to least total; limited to 1 to return just one company with the single highest total.
+
+SELECT a.id, a.name, SUM(o.total_amt_usd) total_spent
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+ORDER BY total_spent
+LIMIT 1;
+-- Returns the account that has spent the least. 
 
 SELECT a.id, a.name, w.channel, COUNT(*) use_of_channel
 FROM accounts a
@@ -1114,15 +1123,26 @@ ON a.id = w.account_id
 GROUP BY a.id, a.name, w.channel
 HAVING COUNT(*) > 6 AND w.channel = 'facebook'
 ORDER BY use_of_channel;
---
+-- Shows the total number of times the facebook channel was used to contact customers, for each account, but only shows accounts where that total was greater than 6.
 
+SELECT a.id, a.name, w.channel, COUNT(*) use_of_channel
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+WHERE w.channel = 'facebook'
+GROUP BY a.id, a.name, w.channel
+ORDER BY use_of_channel DESC
+LIMIT 1;
+-- Returns account that used the facebook channel the most.
+    -- Note: It is a best practice to use a larger limit number first such as 3 or 5 to see if there are ties before using LIMIT 1.
 
-
-
-
-
-
-
-
+SELECT a.id, a.name, w.channel, COUNT(*) use_of_channel
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+GROUP BY a.id, a.name, w.channel
+ORDER BY use_of_channel DESC
+LIMIT 10;
+-- Returns the top 10 channels most frequently used by most accounts (ex. all of the top 10 are for the direct channel).
 
 
