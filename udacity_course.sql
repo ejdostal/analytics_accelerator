@@ -1381,3 +1381,42 @@ GROUP BY channel
 ORDER BY 2 DESC;
 -- Shows the average number of events a day for each channel.
 	-- Since the subquery breaks it out by day, this is giving you the average number of events by channel per day. 
+
+
+-- Formatting Subqueries (4.5) --
+
+SELECT *
+FROM (SELECT DATE_TRUNC('day',occurred_at) AS day,
+                channel, COUNT(*) as events
+      FROM web_events 
+      GROUP BY 1,2
+      ORDER BY 3 DESC) sub;
+-- Formatting SQL will help you understand your code better when you return to it.
+-- When using subqueries, it's important to provide some way to easily determine which parts of the query will be executed together; 
+	-- Most people do this by indenting the subquery in some way
+	-- Helpful line breaks can also make it easier to read
+
+SELECT *
+FROM (SELECT DATE_TRUNC('day',occurred_at) AS day,
+                channel, COUNT(*) as events
+      FROM web_events 
+      GROUP BY 1,2
+      ORDER BY 3 DESC) sub
+GROUP BY day, channel, events
+ORDER BY 2 DESC;
+-- Statements part of the same subquery (or query) should be indented to the same levels.
+	-- This helps you to easily determine which parts of the query will be executed together.
+
+SELECT *
+FROM orders
+WHERE DATE_TRUNC('month', occurred_at)=
+(SELECT DATE_TRUNC('month', MIN(occurred_at)) AS min_month
+	FROM orders)
+ORDER BY occurred_at;
+-- Returns all orders occurring in the same month as the company's first order ever. 
+	-- Subquery returns the order month of the company's first order ever.
+	-- Outer query then uses the subquery results (the first order month) to filter all orders in the orders table, ordering from earliest to latest order date within that timeframe.
+
+
+	
+	
