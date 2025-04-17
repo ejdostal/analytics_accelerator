@@ -1329,3 +1329,23 @@ ORDER BY 3 DESC;
 -- Identifies top performing sales reps by orders of greater than 200 OR total sales greater than $75,000 across all orders.
 -- Middle performers are those with orders greater than 150 (but less than 200) OR total sales greater than $50,000 (but less than $75,000).
 -- Low performers are sales reps with less than 150 orders AND total sales less than $50,000.
+
+
+-- Subqueries (4.3) --
+
+SELECT channel,
+	AVG(event_count) AS avg_event_count
+FROM
+(SELECT DATE_TRUNC('day', occurred_at) AS day,
+	channel,
+	COUNT(*) AS event_count
+FROM web_events
+GROUP BY 1,2) sub
+GROUP BY 1
+ORDER BY 2 DESC;
+-- Returns the average number of events for each day for each channel.
+	-- The subquery provides the the first table: the number of events for each channel on each day.
+	-- The outer query runs across the result set of the inner query to average these values together, in a second query.
+-- The inner query has to be able to run on it's own; the inner query acts as one table in the FROM clause of the outer query.
+
+
