@@ -1315,3 +1315,17 @@ GROUP BY s.name
 ORDER BY 2 DESC;
 -- Identifies the top performing sales reps by orders of greater than 200, sorted by sales rep with the most to least number of orders.
 
+SELECT s.name, COUNT(*), SUM(o.total_amt_usd) total_spent, 
+        CASE WHEN COUNT(*) > 200 OR SUM(o.total_amt_usd) > 750000 THEN 'top'
+        WHEN COUNT(*) > 150 OR SUM(o.total_amt_usd) > 500000 THEN 'middle'
+        ELSE 'low' END AS sales_rep_level
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id 
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+GROUP BY s.name
+ORDER BY 3 DESC;
+-- Identifies top performing sales reps by orders of greater than 200 OR total sales greater than $75,000 across all orders.
+-- Middle performers are those with orders greater than 150 (but less than 200) OR total sales greater than $50,000 (but less than $75,000).
+-- Low performers are sales reps with less than 150 orders AND total sales less than $50,000.
