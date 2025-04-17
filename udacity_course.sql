@@ -1431,4 +1431,19 @@ WHERE DATE_TRUNC('month', occurred_at) =
 (SELECT MIN(DATE_TRUNC('month', occurred_at)) first_order_month
 FROM orders)
 -- Finds only the orders that took place in the same month and year as the first order, and then pulls the average for each type of paper qty in this month; includes the total amount spent on all orders during this month as well. 
+
+
 	
+	
+SELECT s.name rep, r.name region, SUM(o.total_amt_usd) total_sales
+FROM region r
+JOIN sales_reps s
+ON r.id = s.region_id
+JOIN accounts a
+ON s.id = a.sales_rep_id
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY 1, 2
+ORDER BY 3 DESC;
+-- Provides the name of the sales rep in each region with the largest amount of total sales.
+-- Finds the totals associated with each sales rep andd region in which they were located. Then orders from greatest to least sales and limits to the first sales rep.
