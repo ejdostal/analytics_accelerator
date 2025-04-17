@@ -1407,6 +1407,11 @@ ORDER BY 2 DESC;
 -- Statements part of the same subquery (or query) should be indented to the same levels.
 	-- This helps you to easily determine which parts of the query will be executed together.
 
+SELECT DATE_TRUNC('month', MIN(occurred_at)) 
+FROM orders;
+-- Pulls the first month/year combo from the orders table.
+
+
 SELECT *
 FROM orders
 WHERE DATE_TRUNC('month', occurred_at)=
@@ -1417,6 +1422,13 @@ ORDER BY occurred_at;
 	-- Subquery returns the order month of the company's first order ever.
 	-- Outer query then uses the subquery results (the first order month) to filter all orders in the orders table, ordering from earliest to latest order date within that timeframe.
 
-
-	
+SELECT AVG(standard_qty) standard_avg,
+            AVG(gloss_qty) gloss_avg,
+            AVG(poster_qty) poster_avg,
+            SUM(total_amt_usd) total_spent_all
+FROM orders 
+WHERE DATE_TRUNC('month', occurred_at) =
+(SELECT MIN(DATE_TRUNC('month', occurred_at)) first_order_month
+FROM orders)
+-- Finds only the orders that took place in the same month and year as the first order, and then pulls the average for each type of paper qty in this month; includes the total amount spent on all orders during this month as well. 
 	
