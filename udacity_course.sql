@@ -1278,3 +1278,40 @@ COUNT(*) AS order_count
 FROM orders
 GROUP BY 1;
 -- Displays the number of items in each order and classifies them according to 3 levels in the order_category column, depending on their totals: "At Least 2000", "Between 1000 and 2000" and "Less than 1000".
+
+SELECT a.name, SUM(total_amt_usd) total_spent, 
+        CASE WHEN SUM(total_amt_usd) > 200000 THEN 'top'
+        WHEN  SUM(total_amt_usd) > 100000 THEN 'middle'
+        ELSE 'low' END AS customer_level
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id 
+GROUP BY a.name
+ORDER BY 2 DESC;
+-- Organizes customers (accounts) into 3 different branches based on their lifetime values (total sale of all orders). 
+-- > 100,000 is being used in the second CASE statement - instead of BETWEEN 200,000 and 100,000 
+	-- isn't BETWEEN inclusive though ?
+
+SELECT a.name, SUM(total_amt_usd) total_spent, 
+        CASE WHEN SUM(total_amt_usd) > 200000 THEN 'top'
+        WHEN  SUM(total_amt_usd) > 100000 THEN 'middle'
+        ELSE 'low' END AS customer_level
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+WHERE occurred_at > '2015-12-31' 
+GROUP BY 1
+ORDER BY 2 DESC;
+-- Performs a similar calculation to the query above, but only the total amount customers (accounts) spent in 2016 and 2017.
+-- BETWEEN assumes the time is at 00:00:00 (i.e. midnight) for dates. Also, the entire datatset only goes to Jan 2 2017. 
+
+SELECT s.name, COUNT(*) num_orders, CASE WHEN COUNT(*)> 200 THEN 'top' ELSE 'not' END top_performing
+FROM sales_reps s
+JOIN accounts a
+ON s.id = a.sales_rep_id
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY s.name
+ORDER BY 2 DESC;
+-- Identifies the top performing sales reps by orders of greater than 200, sorted by sales rep with the most to least number of orders.
+
