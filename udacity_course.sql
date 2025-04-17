@@ -1354,29 +1354,30 @@ GROUP BY 2,3
 ORDER BY day;
 -- Counts the total number of events that occurred on each day for each channel, ordered by day number.
 
-SELECT COUNT(*) num_events, channel, DATE_PART('day', occurred_at) AS day, DATE_TRUNC('day', occurred_at) date
+SELECT DATE_TRUNC('day',occurred_at) AS day,
+       channel, COUNT(*) as events
 FROM web_events
-GROUP BY 2,3,4
-ORDER BY 1 DESC;
+GROUP BY 1,2
+ORDER BY 3 DESC;
 -- Counts the total number of events that occurred on each day for each channel - sorted by day and channel combinations with with the greatest total number events to day and channel combinations with the least total number of events.
-
+	-- Same as previous query, but uses DATE_TRUNC rather than DATE_PART (and slightly different syntax - from solutions page).
 SELECT *
-FROM (SELECT COUNT(*) num_events, channel, DATE_PART('day', occurred_at) AS day, DATE_TRUNC('day', occurred_at) date
-FROM web_events
-GROUP BY 2,3,4
-ORDER BY 1 DESC) sub
+FROM (SELECT DATE_TRUNC('day',occurred_at) AS day,
+                channel, COUNT(*) as events
+          FROM web_events 
+          GROUP BY 1,2
+          ORDER BY 3 DESC) sub;
 -- This query simply returns all the data from the subquery. 
-	-- subqueries (or queries you nest within an outer query) must always have an alias.
+	-- wraps subquery in parenthesis and sticks in the FROM clause of the outer query.
+	-- Gives the subquery an alias, "sub"
+	-- includes a * in outer SELECT statement 
 
-SELECT channel,
-AVG(num_events) AS avg_num_events
-FROM 
-(SELECT COUNT(*) num_events, 
- channel, 
- DATE_PART('day', occurred_at) AS day, 
- DATE_TRUNC('day', occurred_at) date
-FROM web_events
-GROUP BY 2,3,4)sub
-GROUP BY 1
+SELECT channel, AVG(events) AS average_events
+FROM (SELECT DATE_TRUNC('day',occurred_at) AS day,
+                channel, COUNT(*) as events
+         FROM web_events 
+         GROUP BY 1,2) sub
+GROUP BY channel
 ORDER BY 2 DESC;
--- Finds the average number of events for each channel. Since the subquery breaks this out by day, this is giving you the average number of events by channel per day. 
+-- Shows the average number of events a day for each channel.
+	-- Since the subquery breaks it out by day, this is giving you the average number of events by channel per day. 
