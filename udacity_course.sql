@@ -1348,4 +1348,35 @@ ORDER BY 2 DESC;
 	-- The outer query runs across the result set of the inner query to average these values together, in a second query.
 -- The inner query has to be able to run on it's own; the inner query acts as one table in the FROM clause of the outer query.
 
+SELECT COUNT(*) num_events, channel, DATE_PART('day', occurred_at) AS day
+FROM web_events
+GROUP BY 2,3
+ORDER BY day;
+-- Counts the total number of events that occurred on each day for each channel, ordered by day number.
 
+SELECT COUNT(*) num_events, channel, DATE_PART('day', occurred_at) AS day, DATE_TRUNC('day', occurred_at) date
+FROM web_events
+GROUP BY 2,3,4
+ORDER BY 1 DESC;
+-- Counts the total number of events that occurred on each day for each channel - sorted by day and channel combinations with with the greatest total number events to day and channel combinations with the least total number of events.
+
+SELECT *
+FROM (SELECT COUNT(*) num_events, channel, DATE_PART('day', occurred_at) AS day, DATE_TRUNC('day', occurred_at) date
+FROM web_events
+GROUP BY 2,3,4
+ORDER BY 1 DESC) sub
+-- This query simply returns all the data from the subquery. 
+	-- subqueries (or queries you nest within an outer query) must always have an alias.
+
+SELECT channel,
+AVG(num_events) AS avg_num_events
+FROM 
+(SELECT COUNT(*) num_events, 
+ channel, 
+ DATE_PART('day', occurred_at) AS day, 
+ DATE_TRUNC('day', occurred_at) date
+FROM web_events
+GROUP BY 2,3,4)sub
+GROUP BY 1
+ORDER BY 2 DESC;
+-- Finds the average number of events for each channel. Since the subquery breaks this out by day, this is giving you the average number of events by channel per day. 
