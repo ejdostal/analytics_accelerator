@@ -1546,10 +1546,50 @@ FROM orders)
 -- Pulls the name and total number of orders placed only from the region where total sales is equivalent to the Maximum total sales across all regions.
 
 
+-- 3. Returns the number of accounts that had more total purchases than the account with the most standard_qty of paper purchased overall. --
 
+	-- Step 1 -- 
+	SELECT a.name account_name, SUM(o.standard_qty) total_std, SUM(o.total) total
+	FROM accounts a
+	JOIN orders o
+	ON o.account_id = a.id
+	GROUP BY 1
+	ORDER BY 2 DESC
+	LIMIT 1;
+	-- Finds the account with the most standard_qty of paper purchased; also returns the total amount of paper that account purchased in general.
 
+	-- Step 2 -- 
+	SELECT a.name
+	FROM orders o
+	JOIN accounts a
+	ON a.id = o.account_id
+	GROUP BY 1
+	HAVING SUM(o.total) > (SELECT total 
+	                      FROM (SELECT a.name act_name, SUM(o.standard_qty) tot_std, SUM(o.total) total
+	                            FROM accounts a
+	                            JOIN orders o
+	                            ON o.account_id = a.id
+	                            GROUP BY 1
+	                            ORDER BY 2 DESC
+	                            LIMIT 1) sub);
+	-- Returns just the accounts with more total paper purchased in general than the account with the most standard_qty of paper purchased.
 
-
-
+	-- Step 3: Final Solution --
+	SELECT COUNT(*)
+	FROM (SELECT a.name
+	          FROM orders o
+	          JOIN accounts a
+	          ON a.id = o.account_id
+	          GROUP BY 1
+	          HAVING SUM(o.total) > (SELECT total 
+	                      FROM (SELECT a.name act_name, SUM(o.standard_qty) tot_std, SUM(o.total) total
+	                            FROM accounts a
+	                            JOIN orders o
+	                            ON o.account_id = a.id
+	                            GROUP BY 1
+	                            ORDER BY 2 DESC
+	                            LIMIT 1) inner_tab)
+	                ) counter_tab;
+	-- Counts all the rows returned for accounts purchasing more total paper than the account that purchased the most total standard paper. 
 
 
