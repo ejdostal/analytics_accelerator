@@ -1463,6 +1463,8 @@ FROM orders)
                 GROUP BY 1, 2) t1
         GROUP BY 1;
 	-- Outer query pulls only the maximum total sales for each region from the previous results. --
+	-- sales_rep is NOT pulled in this outer query, because it would group results by unique sales_rep again - which would return all the entries that we filtered out. -- 
+		-- each sales_rep is only included one time with their maximum total sales in the first query, so they would all be considered maxs in the second query.
 
 
 	-- Step 3 -- 
@@ -1489,7 +1491,7 @@ FROM orders)
 	        GROUP BY 1,2
 	        ORDER BY 3 DESC) t3
 	ON t3.region_name = t2.region_name AND t3.total_amt = t2.total_amt;
-
+	-- Is matching the results from the first and second query (t2) back to the results of -----, where the regions match and the total sales is equal to the max sales. 
 	
 	
 	
