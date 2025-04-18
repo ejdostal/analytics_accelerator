@@ -1592,4 +1592,33 @@ FROM orders)
 	                ) counter_tab;
 	-- Counts all the rows returned for accounts purchasing more total paper than the account that purchased the most total standard paper. 
 
+-- 4. Finds how many web events the customer who spent the most on orders had on each channel.
+
+	-- Step 1 -- 
+	SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
+	FROM orders o
+	JOIN accounts a
+	ON a.id = o.account_id
+	GROUP BY a.id, a.name
+	ORDER BY 3 DESC
+	LIMIT 1;
+	--- Finds the customer with the most spent in lifetime value. 
+
+	-- Step 2: Final Solution --
+	SELECT a.name, w.channel, COUNT(*)
+	FROM accounts a
+	JOIN web_events w
+	ON a.id = w.account_id AND a.id =  (SELECT id
+	                        FROM (SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
+	                              FROM orders o
+	                              JOIN accounts a
+	                              ON a.id = o.account_id
+	                              GROUP BY a.id, a.name
+	                              ORDER BY 3 DESC
+	                              LIMIT 1) inner_table)
+	GROUP BY 1, 2
+	ORDER BY 3 DESC;
+	-- For the account with an account id equal to the one that spent the most on orders, the total number of web events per channel is calculated.
+		-- An ORDER BY was added for no real reason.
+		-- The account name was added to assure only one account was pulled.
 
