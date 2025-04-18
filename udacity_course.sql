@@ -1623,17 +1623,53 @@ FROM orders)
 		-- The account name was added to assure only one account was pulled.
 
 
--- 5. Finds the average amount spent (in dollars) across the top 10 accounts with the most total spending. --
-SELECT AVG(tot_spent)
-FROM (SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
-         FROM orders o
-         JOIN accounts a
-         ON a.id = o.account_id
-         GROUP BY a.id, a.name
-         ORDER BY 3 DESC
-          LIMIT 10) temp;
--- Takes the average of these 10 amounts.
 
--- 6. 
+-- 5. Finds the lifetime average amount spent (in total_amt_usd) for the top 10 total spending accounts. --
 
+	-- Step 1 -- 
+	SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
+	FROM orders o
+	JOIN accounts a
+	ON a.id = o.account_id
+	GROUP BY a.id, a.name
+	ORDER BY 3 DESC
+	LIMIT 10;
+	-- First, we just want to find the top 10 accounts in terms of highest total_amt_usd.
+
+	-- Step 2 -- 
+	SELECT AVG(tot_spent)
+	FROM (SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
+	        FROM orders o
+	        JOIN accounts a
+	        ON a.id = o.account_id
+	        GROUP BY a.id, a.name
+	        ORDER BY 3 DESC
+	        LIMIT 10) temp;
+	-- Now, we just want the average of these 10 amounts.
+
+
+-- 6. Finds the lifetime average amount spent (in total_amt_usd) just for the companies that spent more per order, on average, than the average of all orders. --
+
+	-- Step 1 --
+	SELECT AVG(o.total_amt_usd) avg_all 
+	FROM orders o 
+	-- First, we want to pull the average of all accounts in terms of total_amt_usd.
+	
+	-- Step 2 --
+	SELECT o.account_id, AVG(o.total_amt_usd) 
+	FROM orders o 
+	GROUP BY 1 
+	HAVING AVG(o.total_amt_usd) > 
+		(SELECT AVG(o.total_amt_usd) avg_all FROM orders o); 
+	-- Then, we want to only pull the accounts with more than this average amount.
+	
+	-- Step 3 --
+	SELECT AVG(avg_amt) 
+	FROM (SELECT o.account_id, AVG(o.total_amt_usd) avg_amt 
+		FROM orders o 
+		GROUP BY 1 
+		HAVING AVG(o.total_amt_usd) > 
+			(SELECT AVG(o.total_amt_usd) avg_all FROM orders o)) temp_table; 
+
+	-- Finally, we just want the average of these values. 
 
