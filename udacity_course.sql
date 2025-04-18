@@ -1673,3 +1673,49 @@ FROM orders)
 
 	-- Finally, we just want the average of these values. 
 
+
+
+-- WITH (or CTE: Common Table Expressions) (4.11) --
+
+	-- Comparison of subquery and CTE to solve the same problem. --
+	-- Finds the average number of events per day in each marketing channel. --
+
+	-- 1. Subquery --
+	SELECT channel,
+		AVG(event_count) AS avg_event_count
+	FROM
+	(SELECT DATE_TRUNC('day', occurred_at) AS day,
+		channel,
+		COUNT(*) AS event_count
+		FROM web_events
+	GROUP BY 1,2
+	)sub
+	GROUP BY 1
+	ORDER BY 2 DESC;
+	-- This query uses a subquery to find the average number of events per day in each marketing channel. 	
+	-- One problem with subqueries is they can make your queries lengthy and difficult to read.
+
+
+	-- 2. CTE --
+	WITH events AS ( SELECT DATE_TRUNC('day', occurred_at) AS day,
+		channel,
+		COUNT(*) AS event_count
+		FROM web_events
+	GROUP BY 1,2)
+		
+	SELECT channel,
+		AVG(event_count) AS avg_event_count
+	FROM events
+	GROUP BY 1
+	ORDER BY 2 DESC;
+	-- The subquery from the query above is broken out into its own common table expression (CTE).
+		-- Common Table Expressions (CTEs) serve the same purpose as subqueries but are more common in practice and cleaner for a future reader to follow the logic. 
+		-- The CTE is created using the WITH command
+		-- CTEs need to be defined at the beginning of the query in order to use them in our final query at the bottom
+		-- CTEs need to be given aliases just like subqueries (ex. events)
+
+	
+
+
+
+
