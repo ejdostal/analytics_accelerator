@@ -1592,7 +1592,7 @@ FROM orders)
 	                ) counter_tab;
 	-- Counts all the rows returned for accounts purchasing more total paper than the account that purchased the most total standard paper. 
 
--- 4. Finds how many web events the customer who spent the most on orders had on each channel.
+-- 4. Finds how many web events the customer who spent the most on orders had on each channel. --
 
 	-- Step 1 -- 
 	SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
@@ -1621,4 +1621,19 @@ FROM orders)
 	-- For the account with an account id equal to the one that spent the most on orders, the total number of web events per channel is calculated.
 		-- An ORDER BY was added for no real reason.
 		-- The account name was added to assure only one account was pulled.
+
+
+-- 5. Finds the average amount spent (in dollars) across the top 10 accounts with the most total spending. --
+SELECT AVG(tot_spent)
+FROM (SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
+         FROM orders o
+         JOIN accounts a
+         ON a.id = o.account_id
+         GROUP BY a.id, a.name
+         ORDER BY 3 DESC
+          LIMIT 10) temp;
+-- Takes the average of these 10 amounts.
+
+-- 6. 
+
 
