@@ -1433,10 +1433,9 @@ FROM orders)
 -- Finds only the orders that took place in the same month and year as the first order, and then pulls the average for each type of paper qty in this month; includes the total amount spent on all orders during this month as well. 
 
 
--- Subquery Mania -- 
+-- Subquery Mania (4.9)-- 
 
 -- Provides the name of the sales_rep in each region with the largest amount of total_amt_usd sales. --
-
 	-- Step 1 --
 	SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
 	FROM sales_reps s
@@ -1466,7 +1465,6 @@ FROM orders)
 	-- sales_rep is NOT pulled in this outer query, because it would group results by unique sales_rep again - which would return all the entries that we filtered out. -- 
 		-- each sales_rep is only included one time with their maximum total sales in the first query, so they would all be considered maxs in the second query.
 
-
 	-- Step 3 -- 
 	SELECT t3.rep_name, t3.region_name, t3.total_amt
 	FROM(SELECT region_name, MAX(total_amt) total_amt
@@ -1491,19 +1489,44 @@ FROM orders)
 	        GROUP BY 1,2
 	        ORDER BY 3 DESC) t3
 	ON t3.region_name = t2.region_name AND t3.total_amt = t2.total_amt;
-	-- Is matching the results from the first and second query (t2) back to the results of -----, where the regions match and the total sales is equal to the max sales. 
+	-- Is matching the results from the first and second query (t2) back to the results of the first table (t3 - essentially a second version of t1), 
+		-- We are joining where the regions match AND the Max sales in t2 are equal to rows in t3; this will also pull the representatives associated with that max sale for that region.
+
+
+SELECT region, MAX(total_sales) max, total_orders 
+FROM
+	(SELECT r.name region, SUM(o.total_amt_usd) total_sales, COUNT(*) total_orders
+	FROM region r
+	JOIN sales_reps s
+	ON r.id = s.region_id
+	JOIN accounts a
+	ON s.id = a.sales_rep_id
+	JOIN orders o
+	ON a.id = o.account_id
+	GROUP BY r.name) t1
+GROUP BY 1,3
+ORDER BY max DESC
+LIMIT 1
+
 	
-	
-	
-SELECT s.name rep, r.name region, SUM(o.total_amt_usd) total_sales
-FROM region r
-JOIN sales_reps s
-ON r.id = s.region_id
+SELECT r.name, COUNT(o.total) total_orders
+FROM sales_reps s
 JOIN accounts a
-ON s.id = a.sales_rep_id
+ON a.sales_rep_id = s.id
 JOIN orders o
-ON a.id = o.account_id
-GROUP BY 1, 2
-ORDER BY 3 DESC;
--- Provides the name of the sales rep in each region with the largest amount of total sales.
--- Finds the totals associated with each sales rep andd region in which they were located. Then orders from greatest to least sales and limits to the first sales rep.
+ON o.account_id = a.id
+JOIN region r
+ON r.id = s.region_id
+GROUP BY r.name
+HAVING SUM(o.total_amt_usd) = (
+         SELECT MAX(total_amt)
+         FROM (SELECT r.name region_name, SUM(o.total_amt_usd) total_amt
+                 FROM sales_reps s
+                 JOIN accounts a
+                 ON a.sales_rep_id = s.id
+                 JOIN orders o
+                 ON o.account_id = a.id
+                 JOIN region r
+                 ON r.id = s.region_id
+                 GROUP BY r.name) sub);
+
