@@ -1506,7 +1506,7 @@ FROM orders)
 	JOIN region r
 	ON r.id = s.region_id
 	GROUP BY r.name;
-	-- Finds the total sales for each region.
+	-- Finds the total sum of sales per region.
 
 	-- Step 2 --
 	SELECT MAX(total_amt)
@@ -1519,7 +1519,7 @@ FROM orders)
 	                JOIN region r
 	                ON r.id = s.region_id
 	                GROUP BY r.name) sub;
-	-- Selects just the region with the Max total sales from the results of the first query.  
+	-- Selects the region whose total sum of sales is the maximum of all the regions sum of sales.
 
 	-- Step 3: Final Solution --
 	SELECT r.name, COUNT(o.total) total_orders
@@ -1537,13 +1537,16 @@ FROM orders)
 	                 FROM sales_reps s
 	                 JOIN accounts a
 	                 ON a.sales_rep_id = s.id
-	                 JOIN orders o
+	                 JOIN ord
 	                 ON o.account_id = a.id
 	                 JOIN region r
-	                 ON r.id = s.region_id
-	                 GROUP BY r.name) sub);
+	                 ON r.id = s.region_i
+	                 GROUP BY r.name) t1);
 
--- Pulls the name and total number of orders placed only from the region where total sales is equivalent to the Maximum total sales across all regions.
+-- Returns the name and total orders placed for the region whose total sum of sales is the MAXIMUM of all regions total sums of sales.
+-- t1: each region next to their total sum of sales (4 in total)
+-- HAVING: filters down to only the row with highest sum of sales (from t1 results)
+-- Outer query: returns the region name and count of total orders for the region with the highest sum of sales.
 
 
 -- 3. Returns the number of accounts that had more total purchases than the account with the most standard_qty of paper purchased overall. --
