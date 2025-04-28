@@ -1717,7 +1717,32 @@ FROM orders)
 		-- CTEs need to be defined at the beginning of the query in order to use them in our final query at the bottom
 		-- CTEs need to be given aliases just like subqueries (ex. events)
 
+
+-- 7.2 Window Functions
+
+SELECT standard_qty,
+	SUM(standard_qty) OVER (ORDER BY occurred_at) AS running_total
+FROM orders; 
+
+-- Takes the sum of standard_qty across all rows leading up to a given row, in order by occurred_at.
+-- This query creates an aggregation without using GROUP BY.
+
+SELECT standard_qty, 
+DATE_TRUNC('month', occurred_at) AS month,
+SUM(standard_qty) OVER(PARTITION BY DATE_TRUNC('month', occurred_at)) AS running_total
+FROM orders
 	
+-- Takes the sum of standard_qty across all rows leading up to a given row, partitioned by the month in which 
+the transaction occurred and ordered by occurrence timestamp. 
+-- This query groups and orders the query by the month in which the transaction occurred. 
+-- The running total will start over at the beginning of each month.
+-- ORDER BY treats every partition as separate and is what creates the running total.	
+
+SELECT standard_qty,
+	DATE_TRUNC ('month', occurred_at) AS month,
+	SUM(standard_qty) OVER (PARTITION BY DATE_TRUNC ('month', occurred_at)) AS running_total
+FROM orders; 
+-- Without ORDER BY each value would simply be the sum of all the standard quantity values in its respective month. 
 
 
 
