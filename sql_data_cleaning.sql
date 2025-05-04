@@ -31,6 +31,12 @@ FROM accounts
 GROUP BY 1
 ORDER BY 2 DESC;
 
+/* Pulls the first character of each company name to see the distribution of company names that begin with each letter (or number). */
+
+SELECT LEFT(UPPER(name), 1) AS first_letter, COUNT(*) num_companies    /* UPPER ensures that both upper and lowercase versions of the same letter end up in the same group. */
+FROM accounts
+GROUP BY 1
+ORDER BY 2 DESC;
 
 
 
