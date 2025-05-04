@@ -29,3 +29,9 @@ SELECT first_name,
 FROM customer_data 
 
 
+/* Provides the type of web address (or extension) each company is using for their website and provides how many of each website type exist in the accounts table. */
+
+SELECT RIGHT(website, 3) AS domain, COUNT(*) num_companies
+FROM accounts
+GROUP BY 1
+ORDER BY 2 DESC;
