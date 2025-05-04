@@ -14,21 +14,19 @@
 -- Queries --
 
 /* Pulls area code, phone number without area code (twice, in two different ways) for each customer name. */ 
+
 SELECT first_name,
   last_name,
   phone_number
-  LEFT(phone_number, 3) AS area_code,      
--- pulls the area code out of the phone number.
-  RIGHT(phone_number, 8) AS phone_number_only,    
--- pulls the entire phone number, with hyphen, but without area code.
-  RIGHT(phone_number, LENGTH(phone_number) - 4) AS phone_number_alt   
--- you can also represent the RIGHT function as a function of the length: the full phone number (12 characters) - the area code, with hyphen (4 characters) =  the phone number, with hyphen, without area code. 
+  LEFT(phone_number, 3) AS area_code,      -- pulls the area code out of the phone number.
+  RIGHT(phone_number, 8) AS phone_number_only,    -- pulls the entire phone number, with hyphen, but without area code.
+  RIGHT(phone_number, LENGTH(phone_number) - 4) AS phone_number_alt   -- you can also represent the RIGHT function as a function of the length: the full phone number (12 characters) - the area code, with hyphen (4 characters) =  the phone number, with hyphen, without area code. 
 FROM customer_data 
 
-
+  
 /* Provides the type of web address (or extension) each company is using for their website and provides how many of each website type exist in the accounts table. */
 
-SELECT RIGHT(website, 3) AS domain, COUNT(*) num_companies
+  SELECT RIGHT(website, 3) AS domain, COUNT(*) num_companies
 FROM accounts
 GROUP BY 1
 ORDER BY 2 DESC;
