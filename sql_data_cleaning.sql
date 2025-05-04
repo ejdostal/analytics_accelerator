@@ -38,5 +38,17 @@ FROM accounts
 GROUP BY 1
 ORDER BY 2 DESC;
 
+/* Separates company names into two groups: one where company names start with a number, another where company names start with a letter. Then finds the proportion of company names that start with a letter vs. starts with a number. */
 
-
+WITH t1 AS ( 
+SELECT name, 
+CASE WHEN LEFT(UPPER(name), 1) IN('0','1','2','3','4','5','6','7','8','9') 
+    THEN 1 ELSE 0 END AS num,      /* in the "num" group, company names that start with a number return 1, names that start with a letter return 0. */
+CASE WHEN LEFT(UPPER(name), 1) IN ('0','1','2','3','4','5','6','7','8','9') 
+    THEN 0 ELSE 1 END AS letter    /* in the "letter" group, company name names that start with a number return 0, names that start with a letter return 1. */
+FROM accounts
+)
+  
+SELECT SUM(num) nums, SUM(letter) letters 
+FROM t1;     /* in the "nums" column, all values in the "num" group are summed. (company names starting with a number returned 1's) */
+             /* in the "letters" column, all values in the "letter" group are summed. (company names starting with a letter  returned 1's) */
