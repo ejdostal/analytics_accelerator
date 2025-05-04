@@ -11,7 +11,7 @@
 - RIGHT pulls a specified number of characters for each row in a specified column starting at the end (or from the right)
 - LENGTH provides the number of characters for each row of a specified column; returns the length of the string. */
 
-*/ Queries:
+/* Queries:
   
 Pulls area code, phone number without area code (twice, in two different ways) for each customer name. */ 
 
