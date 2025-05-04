@@ -2,6 +2,21 @@
 
 1. Clean and re-structure messy data.
 2. Convert columns to different data types.
-3. Tricks for manipulating NULLs. */
+3. Tricks for manipulating NULLs. 
 
+Text fields - make clean groups that will be useful to aggregate across. 
 
+When using functions inside of other functions - the innermost functions will be evaluated first 
+- followed by the functions that encapsulate them. */
+
+SELECT first_name,
+  last_name,
+  phone_number
+  LEFT(phone_number, 3) AS area_code,    -- pulls the area code out of the phone number.
+  RIGHT(phone_number, 8) AS phone_number_only,  -- pulls the entire phone number, with hyphen, but without area code.
+  RIGHT(phone_number, LENGTH(phone_number) - 4) AS phone_number_alt
+  /* you can also represent the RIGHT function as a function of the length:
+   the full phone number (12 characters) - the area code, with hyphen (4 characters)
+    =  the entire phone number, with hyphen, but without area code. */
+FROM customer_data 
+-- The LENGTH function returns the length of the string.
