@@ -10,6 +10,9 @@
 - LEFT pulls a specified number of characters for each row in a specified column starting at the beginning (or from the left)
 - RIGHT pulls a specified number of characters for each row in a specified column starting at the end (or from the right)
 - LENGTH provides the number of characters for each row of a specified column; returns the length of the string.
+- POSITION takes a character and a column, and provides the index where that character is for each row. The index of the first position is 1 in SQL. 
+- STRPOS provides the same result as POSITION, but the syntax for achieving those results is a bit different --> STRPOS(city_state, ',') vs. POSITION(',' IN city_state)
+  - POSITION and STRPOS are case-sensitive, so if you want to pull an index regardless of the case of a letter, you might need to use LOWER or UPPER.
 
 Queries:
 --------
@@ -64,3 +67,21 @@ FROM (SELECT name,
   CASE WHEN LEFT(UPPER(name), 1) IN ('A','E','I','O','U') 
       THEN 0 ELSE 1 END AS other      -- in the "other" group, company names that DON'T start with a vowel return 1, names that start with a vowel 0. 
 FROM accounts) t1;
+
+
+-- Separates city and state, then returns just the city for each row in the "city" column.
+
+SELECT first_name,
+  last_name,
+  city_state,
+  POSTITION(',' IN city_state) AS comma_position,     -- returns the index number for where the comma in city_state in each row (using POSITION).
+  STRPOS(city_state, ',') AS substr_comma_position,   -- also returns the index number for where the comma in city_state in each row (using STRPOS).
+  LOWER(city_state) AS lowercase,        -- converts all letters in city_state field to lowercase.
+  UPPER(city_state) AS uppercase,        -- converts all letters in city_state field to uppercase.
+  LEFT(city_state, POSITION(',' IN city_state) - 1) AS city    -- returns the full text up to the position of the comma, minus the actual comma.
+FROM customer_data;
+
+
+
+
+
