@@ -54,12 +54,12 @@ FROM t1;     /* in the "nums" column, all values in the "num" group are summed. 
              /* in the "letters" column, all values in the "letter" group are summed. (company names starting with a letter  returned 1's) */
 
 
-/* Finds the proportion of company names starting with a vowel vs. those that start with anything else (consonant). */
+/* Finds the proportion of company names starting with a vowel vs. those starting with something else (consonant). */
 
-SELECT SUM(vowels) vowels, SUM(other) other
+SELECT SUM(vowels) vowels, SUM(other) others   /* In the "vowels" column, all 1's in the "vowel" group are summed up, in the "others" column all 1's in the "others" group are summed. */ 
 FROM (SELECT name, 
   CASE WHEN LEFT(UPPER(name), 1) IN ('A','E','I','O','U') 
-      THEN 1 ELSE 0 END AS vowels, 
+      THEN 1 ELSE 0 END AS vowels,     /* in the "vowels" group, company names that start with a vowel return 1, names that DON'T start with a vowel return 0. */
   CASE WHEN LEFT(UPPER(name), 1) IN ('A','E','I','O','U') 
-      THEN 0 ELSE 1 END AS other
+      THEN 0 ELSE 1 END AS other       /* in the "other" group, company names that DON'T start with a vowel return 1, names that start with a vowel 0. */
 FROM accounts) t1;
