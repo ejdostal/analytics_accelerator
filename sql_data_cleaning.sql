@@ -51,8 +51,7 @@ CASE WHEN LEFT(UPPER(name), 1) IN('0','1','2','3','4','5','6','7','8','9')
 CASE WHEN LEFT(UPPER(name), 1) IN ('0','1','2','3','4','5','6','7','8','9') 
     THEN 0 ELSE 1 END AS letter    -- in the "letter" group, company name names that start with a number return 0, names that start with a letter return 1. 
 FROM accounts
-)
-  
+) 
 SELECT SUM(num) nums, SUM(letter) letters 
 FROM t1;     -- in the "nums" column, all values in the "num" group are summed. (company names starting with a number returned 1's)
              -- in the "letters" column, all values in the "letter" group are summed. (company names starting with a letter  returned 1's)
@@ -98,3 +97,17 @@ FROM accounts;
 SELECT LEFT(primary_poc, STRPOS(primary_poc, ' ') -1 ) first_name,       -- calculates the index position of the space, then returns everything to the left of it, minus the actual space
 RIGHT(primary_poc, LENGTH(primary_poc) - STRPOS(primary_poc, ' ')) last_name      -- calculates the index position of the space, subtracts the position of the space in the text from the total number of characters in the text, then returns everything that number of characters from the right, or end, of the text. 
 FROM accounts;
+
+
+-- 1b) Separates the first name and last name of the sales rep into 2 different columns, using POSITION to find the index of the space in the text.
+SELECT LEFT(name, POSITION(' ' IN name) - 1) first_name,    -- finds the index position of the space in the text, then returns everything that number of characters in, minus the actual space. 
+RIGHT(name, LENGTH(name) - POSITION(' ' IN name)) last_name   --- finds the index position of the space in the text, subtracts that from the total number of characters in the whole text, thne returns everyhting that number of the characters from the right, or end, of the text. 
+FROM sales_reps;
+
+-- 2b) Separates the first name and last name of the sales rep into 2 different columns, using STRPOS to find the index of the space in the text.
+
+SELECT LEFT(name, STRPOS(name, ' ') - 1) first_name, 
+RIGHT(name, LENGTH(name) - STRPOS(name, ' ')) last_name
+FROM sales_reps;
+
+
