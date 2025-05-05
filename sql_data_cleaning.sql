@@ -111,4 +111,33 @@ RIGHT(name, LENGTH(name) - STRPOS(name, ' ')) last_name
 FROM sales_reps;
 
 
-Example change...
+-- Combines first and last name (from 2 different columns) into a single column (full name).
+
+SELECT first_name,
+  last_name, 
+  CONCAT(first_name, ' ', last_name) AS full_name,  -- concatenates first and last name together into one "full_name" column, using CONCAT()
+  first_name || ' ' || last_name AS full_name_alt   -- concatenates first and last name together into one "full_name_alt" column, using Piping (||)
+FROM customer_data;
+
+
+-- 3a) Creates an email address for each primary_poc in a company from the primary_poc's name and the company's name - using a Subquery and POSITION.
+
+SELECT first_name, last_name, CONCAT(first_name, '.', last_name, '@', name, '.com') email_address
+FROM (SELECT name,
+    LEFT(primary_poc, POSITION( ' ' IN primary_poc)-1) first_name, 
+    RIGHT(primary_poc, LENGTH(primary_poc) - POSITION(' ' IN primary_poc)) last_name
+  FROM accounts
+  )                                           
+AS t1;
+
+-- 3b) Also creates an email address for each primary_poc in a company from the primary_poc's name and the company's name - instead using a CTE and STRPOS.
+
+WITH t1 AS (
+    SELECT LEFT(primary_poc, STRPOS(primary_poc, ' ') -1 ) first_name,  
+    RIGHT(primary_poc, LENGTH(primary_poc) - STRPOS(primary_poc, ' ')) last_name, name
+    FROM accounts
+    )
+
+SELECT first_name, last_name, CONCAT(first_name, '.', last_name, '@', name, '.com')
+FROM t1;
+
