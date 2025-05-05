@@ -69,7 +69,7 @@ FROM (SELECT name,
 FROM accounts) t1;
 
 
--- Separates city and state, then returns just the city for each row in the "city" column.
+-- Separates city and state, then returns just the city name in a "city" column.
 
 SELECT first_name,
   last_name,
@@ -82,6 +82,20 @@ SELECT first_name,
 FROM customer_data;
 
 
+-- 1a) Separates the first name and last name of the primary_poc in 2 different columns.
+
+SELECT LEFT(primary_poc, POSITION(' ' IN primary_poc) -1 ) first_name,         -- finds the index number of the space in the primary_poc column, the returns the full text in the primary_poc column up to the position of that space, minus the actual space.
+RIGHT(primary_poc, LENGTH(primary_poc) - POSITION(' ' IN primary_poc)) last_name      
+  /* Finds the total number of characters of the text in the primary_poc column
+    then finds the index number of the space in the primary_poc column
+    Subtracts the number of characters to the space in the text from the total number of characters in the text
+    Then returns everything that number of characters to the right of the text. (everything after the space) 
+  */
+FROM accounts;
 
 
-
+  -- 2a) Also eparates the first name and last name of the primary_poc in 2 different columns, but uses STRPOS syntax rather than POSITION.
+  
+  SELECT LEFT(primary_poc, STRPOS(primary_poc, ' ') -1 ) first_name,    -- calculates the index position of the space, then returns everything to the left of it, minus the actual space
+  RIGHT(primary_poc, LENGTH(primary_poc) - STRPOS(primary_poc, ' ')) last_name
+  FROM accounts;
