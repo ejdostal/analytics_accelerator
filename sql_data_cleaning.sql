@@ -52,3 +52,14 @@ FROM accounts
 SELECT SUM(num) nums, SUM(letter) letters 
 FROM t1;     /* in the "nums" column, all values in the "num" group are summed. (company names starting with a number returned 1's) */
              /* in the "letters" column, all values in the "letter" group are summed. (company names starting with a letter  returned 1's) */
+
+
+/*  */
+
+SELECT SUM(vowels) vowels, SUM(other) other
+FROM (SELECT name, 
+  CASE WHEN LEFT(UPPER(name), 1) IN ('A','E','I','O','U') 
+      THEN 1 ELSE 0 END AS vowels, 
+  CASE WHEN LEFT(UPPER(name), 1) IN ('A','E','I','O','U') 
+      THEN 0 ELSE 1 END AS other
+FROM accounts) t1;
