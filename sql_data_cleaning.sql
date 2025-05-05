@@ -54,7 +54,7 @@ FROM t1;     /* in the "nums" column, all values in the "num" group are summed. 
              /* in the "letters" column, all values in the "letter" group are summed. (company names starting with a letter  returned 1's) */
 
 
-/*  */
+/* Finds the proportion of company names starting with a vowel vs. those that start with anything else (consonant). */
 
 SELECT SUM(vowels) vowels, SUM(other) other
 FROM (SELECT name, 
