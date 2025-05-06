@@ -251,7 +251,7 @@ FROM accounts
 WHERE primary_poc IS NULL 
 
 
--- Counts the primary_poc column, without Nulls in "regular_count" column ; without Nulls in "modified_count" column using COALESCE.
+-- Counts the primary_poc column, ignoring Nulls in "regular_count" column ; including Nulls in "modified_count" column, using COALESCE.
 
 SELECT COUNT(primary_poc) AS regular_count,
 COUNT(COALESCE (primary_poc, 'no POC')) AS modified_count 
