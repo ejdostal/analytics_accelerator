@@ -13,6 +13,18 @@
 - POSITION takes a character and a column, and provides the index where that character is for each row. The index of the first position is 1 in SQL. 
 - STRPOS provides the same result as POSITION, but the syntax for achieving those results is a bit different --> STRPOS(city_state, ',') vs. POSITION(',' IN city_state)
   - POSITION and STRPOS are case-sensitive, so if you want to pull an index regardless of the case of a letter, you might need to use LOWER or UPPER.
+- CONCAT and Pipping || both allow you to combine columns together across rows.
+
+- CAST changes a column from one data type to another.
+  - Both CAST and :: allow for the converting of one data type to another (the CAST function get a little tricky to read).
+  - Remember Dates in SQL are stored YYYY - MM - DD.
+  - CAST is useful to change lots of column types, but most useful for numbers or dates.
+    - Performing any type of string operation on a number (ex. LEFT, RIGHT, SUBSTRING) while automatically turn it into a string anyway.
+
+- TO_DATE converts string to date according to the given format.
+- DATE_TRUNC estimates your date to a particular part of your date-time column (day, month, year)
+- DATE_PART pulls a specific portion of a date from your date-time column, elliminating the rest (ex. pulls just the dow for the order)
+- TRIM removes characters from the beginning and end of a string. (often moving data from Excel to other storage systems can add unwanted spaces to the beginning or end of a row.)
 
 Queries:
 --------
@@ -140,4 +152,68 @@ WITH t1 AS (
 
 SELECT first_name, last_name, CONCAT(first_name, '.', last_name, '@', name, '.com')
 FROM t1;
+
+
+-- 3c Creates an email address for each primary_poc in a company from the primary_poc's name and the company's name, effectively removing all the spaces from the company name (so the email address will work).
+
+WITH t1 AS (
+  SELECT LEFT(primary_poc,    
+  STRPOS(primary_poc, ' ') -1 ) first_name,  
+  RIGHT(primary_poc, LENGTH(primary_poc) - STRPOS(primary_poc, ' ')) last_name, 
+  name
+  FROM accounts
+)
+          
+SELECT first_name, 
+  last_name, 
+  CONCAT(first_name, '.', last_name, '@', REPLACE(name, ' ', ''), '.com')
+FROM  t1;
+
+
+-- 4a. Creates an initial password that the primary_poc can change on their first login. 
+
+WITH t1 AS (
+SELECT LEFT(primary_poc, POSITION(' ' IN primary_poc) -1) first_name,
+RIGHT(primary_poc, LENGTH(primary_poc) - POSITION(' ' in primary_poc)) last_name,
+REPLACE(name, ' ', '') company_name                                 FROM accounts
+ ),
+
+t2 AS (
+  SELECT LEFT(first_name, 1) first_letter_first,
+  RIGHT (first_name, 1) last_letter_first,
+  LEFT(last_name, 1) first_letter_last,
+  RIGHT (last_name, 1) last_letter_last,
+  LENGTH(first_name) len_first_name,
+  LENGTH(last_name) len_last_name,
+  company_name
+  FROM t1)
+
+SELECT UPPER(CONCAT(first_letter_first, last_letter_first, first_letter_last, last_letter_last, len_first_name, len_last_name, company_name)) AS password
+FROM t2
+
+
+-- 4b. Also, creates an initial password that the primary_poc can change on their first login - but perhaps better because it uses less code.
+
+WITH t1 AS (
+    SELECT LEFT(primary_poc,     
+    STRPOS(primary_poc, ' ') -1 ) first_name,  
+    RIGHT(primary_poc, LENGTH(primary_poc) - STRPOS(primary_poc, ' ')) last_name, 
+    name
+    FROM accounts) -- isolates the first and last names of the primary_poc
+
+SELECT first_name, 
+last_name, 
+CONCAT(first_name, '.', last_name, '@', name, '.com'), 
+LEFT(LOWER(first_name), 1) || RIGHT(LOWER(first_name), 1) || LEFT(LOWER(last_name), 1) || RIGHT(LOWER(last_name), 1) || LENGTH(first_name) || LENGTH(last_name) || REPLACE(UPPER(name), ' ', '')
+FROM t1;         -- Concatenates the first and last letters of the first name, first and last letters of the last name, the length of both names, and the company name - all in uppercase letters - into a password for each primary_poc
+
+
+-- Takes 3 separate columns of day, month, and year of each given record and converts it into a single date.
+
+SELECT *,
+  DATE_PART('month', TO_DATE(month, 'month')) AS clean_month,   -- takes a text month (ex. January) and converts it from a string type to a date type, then pulls just the month from it (ex. 1).
+  year || '-' || DATE_PART('month', TO_DATE(month, 'month')) || '-' day AS concatenated_date,   -- concatenates the new "clean_month" column with existing day and month columns to produce something that looks like a date for each record.
+  CAST (year || '-' || DATE_PART('month', TO_DATE(month, 'month')) || '-' || day AS date) AS formatted_date   -- changes the new "concatenated_date" column into a date format (so the database now understands that this is a date).
+  (year || '-' || DATE_PART('month', TO_DATE(month, 'month')) || '-' day)::date AS fromatted_date_alt    -- also changes the new "concatenated_date" column into a date format, but using shorthand for CAST
+FROM ad_clicks
 
