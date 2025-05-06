@@ -25,6 +25,12 @@
 - DATE_TRUNC estimates your date to a particular part of your date-time column (day, month, year)
 - DATE_PART pulls a specific portion of a date from your date-time column, elliminating the rest (ex. pulls just the dow for the order)
 - TRIM removes characters from the beginning and end of a string. (often moving data from Excel to other storage systems can add unwanted spaces to the beginning or end of a row.)
+- SUBSTR extracts a portion of the string, starting a given number of characters in and then returning a given number of characters. 
+- COALESCE returns the first non-NULL value passed for each row.
+  - ex. display Nulls as "0" when wanting to use numerical data
+  - ex. When performing OUTER JOINs resulting in some unmatched rows to display Nulls as something other than a Null value
+  - ex. When working with COUNT, AVERAGE, or another function that treats Nulls differently from 0's
+
 
 Queries:
 --------
@@ -217,3 +223,37 @@ SELECT *,
   (year || '-' || DATE_PART('month', TO_DATE(month, 'month')) || '-' day)::date AS fromatted_date_alt    -- also changes the new "concatenated_date" column into a date format, but using shorthand for CAST
 FROM ad_clicks
 
+
+-- 5a. Pulls the values from the date column into a "yyyy-mm-dd" format using SUBSTR and LEFT.
+
+SELECT date orig_date, 
+(SUBSTR(date, 7, 4)  -- starting with the 7th character in the string, pulls the 4 digits of the year.
+|| '-' 
+|| LEFT(date, 2)     -- starting from the beginning of the string (LEFT is used instead of SUBSTR), pulls the 2 digits for the month 
+|| '-'
+|| SUBSTR(date, 4, 2)  -- starting with the 4th character in the string, pulls the 2 digits for the day.
+) new_date     -- all substrings are combined in the new "new_date" column.
+FROM sf_crime_data;
+
+
+-- 5b. Also pulls the values from the date column into a "yyyy-mm-dd" format using SUBSTR and LEFT, then converts the new "new_date" column into a date type.
+
+SELECT date orig_date, 
+(SUBSTR(date, 7, 4) || '-' || LEFT(date, 2) || '-' || SUBSTR(date, 4, 2))::DATE new_date
+FROM sf_crime_data;
+
+
+-- Replaces the Null values in the primary_poc column with "no POC."
+
+SELECT *,
+COALESCE (primary_poc, 'no POC') AS primary_poc_modified 
+FROM accounts
+WHERE primary_poc IS NULL 
+
+
+-- Counts the primary_poc column, without Nulls in "regular_count" column ; without Nulls in "modified_count" column using COALESCE.
+
+SELECT COUNT(primary_poc) AS regular_count,
+COUNT(COALESCE (primary_poc, 'no POC')) AS modified_count 
+FROM accounts
+WHERE primary_poc IS NULL 
