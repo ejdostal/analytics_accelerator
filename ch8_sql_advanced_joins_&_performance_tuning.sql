@@ -43,10 +43,28 @@ Query Performance considerations:
 * Reduce the number of calculations that need to be performed to make a query run faster.  
 Some high-level things that will affect the number of calculations a given query will make include:
 
-  1. Table size - if your query hits one or more tables with millions of rows or more it could affect performance.
-  2. Joins - if your query joins two tables in a way that substantially increases the row count of the result set, youre query is likely to be slow.
-  3. Aggregations - requiring multiple rows to produce a result requires more computation than simply retrieving those rows. 
-    - COUNT DISTINCT takes an especially long time because it must check all rows against one another for duplicate values.
+1. Table size - if your query hits one or more tables with millions of rows or more it could affect performance.
+
+  Use a subset of data to test a query first:
+    - If you have time series data, limiting to a small time window can make your queries run more quickly.
+    - You can always perform exploratory analysis on a subset of data, refine your work into a final query, then remove
+    the limitation and run your work across the entire data set. The final query might take a long time to run, but at 
+    least you can run the intermediate steps quickly.
+    - This is why most SQL editors automatically append a limit to most SQL queries. They expect that for exploration 
+    a limited result set is fine. Once you have a final query, you can turn off the limit and get the full results. 
+
+  When working with subqueries:
+    - When working with subqueries, limiting the amount of data you're working with in the place where it will be executed 
+    first will have the maximum impact on query run time.
+    - Keep in mind, that applying a limit to a sub query will dramatically alter your results. So you should use it to TEST query logic, but NOT to get actual results.
+    - Generally, when working with subqueries, you should limit the amount of data you're working with in the place where it will be executed FIRST in order for
+    it to have maximum impact on a query runtime. 
+
+2. Joins - if your query joins two tables in a way that substantially increases the row count of the result set, youre query is likely to be slow.
+  
+3. Aggregations - requiring multiple rows to produce a result requires more computation than simply retrieving those rows. 
+  - COUNT DISTINCT takes an especially long time because it must check all rows against one another for duplicate values.
+
 
 Query runtime is also dependent on things you can't control related to the database itself:
 
@@ -54,7 +72,8 @@ Query runtime is also dependent on things you can't control related to the datab
   - it can be especially bad if others are performing particularly resource-intensive queries that fulfill some the criteria mentioned above.
 2. Database software and optimization 
   - different databases vary in speed for a given task. For example, Postgres is optimized to read and write new rows quickly, while Redshift 
-  is optimized to perform fast aggregations. 
+  is optimized to perform fast aggregations. If you know the system you're using using, you can work within its bounds to make your queries 
+  more efficient.
 
 
 --- 8.3  FULL OUTER JOIN  ---
@@ -240,6 +259,48 @@ GROUP BY 1
 ORDER BY 2 DESC;
 
 
--- 8.15 Performance Tuning ---
+/* -- 8.15 Performance Tuning ---
 
-vs code test 
+- Filter the data to include only the observations you need. This can dramatically improve query speed. 
+- You can also always perform exploratory analysis on a subset of data, refine your work into a final query, then remove the limitation and run your work across the entire data set.
+
+It's also worth noting that LIMIT doesn't work quite the same with speeding up aggregations: */
+
+-- Query: -- 
+SELECT *
+FROM orders
+WHERE occurred_at >= '2016-01-01'
+AND occurred_at < '2016-07-01'
+
+-- Test query - with a LIMIT in the Outer Query: --
+SELECT acccount_id,
+  SUM(poster_qty) AS sum_poster_qty
+FROM orders
+WHERE occurred_at >= '2016-01-01'
+AND occurred_at < '2016-07-01'
+GROUP BY 1
+LIMIT 10;
+/* This won't speed up your aggregations much - that's because the most "expensive" parts of the query (aggregations) are performed FIRST, and THEN the result set is limited.
+
+Test query - with a LIMIT in the Inner Query: */
+SELECT account_id, 
+  SUM(poster_qty) AS sum_poster_qty
+FROM (
+  SELECT *
+  FROM orders
+  LIMIT 100) sub
+WHERE occurred_at >= '2016-01-01'
+AND occurred_at < '2016-07-01'
+GROUP BY 1; 
+/* 
+- Limiting the data set BEFORE performing the aggregation to speed up performance, using a subquery or CTE, can significantly speed up performance.
+- When working with subqueries, limiting the amount of data you're working with in the place where it will be executed first will have the maximum impact on query run time.
+- Keep in mind, that applying a limit to a sub query will dramatically alter your results. So you should use it to TEST query logic, but NOT to get actual results.
+*/
+
+
+
+ 
+
+
+
