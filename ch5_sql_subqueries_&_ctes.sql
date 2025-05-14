@@ -1,138 +1,98 @@
-/* SQL Subqueries & CTEs
+/*
+-- SQL Subqueries & CTEs --
 
-Whenever we need to use existing tables to create a new table that we then want to query again, 
-this is an indication that we will need to use some sort of subquery. 
+Subqueries are also known as inner queries or nested queries. Whenever we need to use existing tables to create a new 
+table that we then want to query again, this is an indication that we will need to use some sort of subquery.
 
-Question: Which channels send the most traffic per day on average? 
+Statements part of the same subquery (or query) should be indented to the same levels. This helps you to easily determine which parts of the query will be executed together. */ 
 
-1. First, query the underlying to table to make sure the data makes sense for what you are trying to do. */ 
-SELECT *
-FROM web_events;
+-- 5.2 Subqueries - Part 1 --
 
-/* 2. Next, count up all the events by each channel by each day. */
-SELECT DATE_TRUNC('day', occurred_at) AS day,
-	channel, 
-	COUNT(*) AS event_count
-FROM web_events
-GROUP BY 1,2
-ORDER BY 1;
+-- Which channels send the most traffic per day on average? 
 
-/* 3. The last step is to average across the events column that we created. 
-
-In order to do that, we need to query against the results of this query. 
-
-We do that by wrapping the query in parentheses and using it in the FROM
-clause of the next query. */
-
-SELECT *
-FROM
-(SELECT DATE_TRUNC('day', occurred_at) AS day,
+	-- Counts up all the events by each channel for each day.
+	SELECT DATE_TRUNC('day', occurred_at) AS day,
 		channel, 
 		COUNT(*) AS event_count
 	FROM web_events
 	GROUP BY 1,2
-	ORDER BY 1) sub
+	ORDER BY 1;
 
-/* It is now a query within a query, also known as a subquery. 
+	/* Pulls all results from the subquery into the outer query. Subqueries are required to have aliases, 
+	which are added after the parentheses (the same way you would add an alias to a table). */
+	SELECT *
+	FROM
+	(SELECT DATE_TRUNC('day', occurred_at) AS day,
+			channel, 
+			COUNT(*) AS event_count
+		FROM web_events
+		GROUP BY 1,2
+		ORDER BY 1) sub
 
-Subqueries are required to have aliases, which are added after the parentheses - 
-the same way you would add an alias to a table. 
+	/* Averages events per each channel (using the event_count column created in the subquery). Since we broke out 
+	by day earlier, this this gives you an average per day. We add a GROUP BY and ORDER BY statement to outer query. 
+	Since we reorder on the final aggregation in outer query anyway, we removethe ORDER BY statement in the subquery 
+	to keep things clean: */
 
-Here we are just selecting all the data from the subquery. 
+	SELECT channel
+	FROM AVG (event_count) AS avg_event_count
+	(SELECT DATE_TRUNC('day', occurred_at) AS day,
+			channel, 
+			COUNT(*) AS event_count
+		FROM web_events
+		GROUP BY 1,2
+	) sub 
+	GROUP BY 1
+	ORDER BY 2 DESC
 
-Let's go the last mile and average events per each channel. */
-
-SELECT channel
-FROM AVG (event_count) AS avg_event_count
-(SELECT DATE_TRUNC('day', occurred_at) AS day,
-		channel, 
-		COUNT(*) AS event_count
-	FROM web_events
-	GROUP BY 1,2
-) sub
-GROUP BY 1
-ORDER BY 2 DESC
-
-/* Since the subquery acts as one table in the FROM clause, we'll put a GROUP BY 
-clause after the subquery. 
-
-Since we'll now reorder on the new aggregation in this query, we no longer need 
-the ORDER BY statement in the subquery so we take it out to keep things clean. 
-
-Since you broke out by day earlier, this is giving you an average per day.
-
-To keep things clear, let's break down how this new query runs:
-
-1. First the inner query will run. The inner query must run on it's own as
-the database will treat it as an independent query.
-
-2. Once your inner query is complete, the rest of the query, also known as the outer query,
-will run across the result set created by the inner query.
+/* To summarize, this is how the new query runs:
+	1. First, the inner query runs. The inner query must run on it's own as the database will treat it as an independent query.
+	2. Once your inner query is complete, the rest of the query (the outer query) runs across the result set created by the inner query.
 
 	Note: A nice feature that many SQL editors share is the ability to highlight a portion 
 	of the query and run only that portion. This is especially helpful when making changes 
 	to an inner query.
 
 
-4.6: More on Subqueries. 
+-- 5.6: Subqueries - Part 2 --
 
-In the first subquery you wrote, you created a table that you could then query again 
-in the FROM statement. 
+- In the first subquery you wrote, you created a table that you could then query again in the FROM statement. Subqueries are especially useful using conditional logic, 
+in conjunction with WHERE or JOIN clauses, and in the WHEN portion of a CASE statement. Most conditional logic will work with subqueries containing one-cell results. IN is 
+the only type of conditonal logic that will work when the inner query contains multiple results. 
 
-However, if you are only returning a single value, you might use that value in a 
-logical statement like WHERE, HAVING, or even SELECT - the value could be nested
-within a CASE statement.
-
-Note that you should not include an alias when you write a subquery in a conditional statement. 
-This is because a subquery in conditional logic is treated as an individual value (or set of values in the IN case) 
+Note: Don't include an alias when you write a subquery in a conditional statement. That's because the subquery is being treated here as an individual value - (or set of values in the IN case) 
 rather than as a table.
 
-If we had returned an entire column IN would need to be used to perform a logical argument. 
+Subqueries can essentially be used anywhere you might use a table name, column name, or individual value:
+- If the subquery returns a SINGLE value, you can use it in a logical statement like WHERE, HAVING, or even SELECT - in the WHEN portion of a CASE statement.
+- If the subquery returns an entire COLUMN, IN would need to be used to perform a logical argument. 
+- If the subquery returns an entire TABLE, then you must use an ALIAS for the table, and perform additional logic on the entire table. */
 
 
-If we are returning an entire table, then we must use an ALIAS for the table, 
-and perform additional logic on the entire table.
+-- Return only orders that occurred in the same month as the company's first order ever. 
 
-Subqueries can be used anywhere you might use a table name, column name, or individual value.
-They're especially useful using conditional logic, in conjunction with WHERE or JOIN clauses, 
-or in the WHEN portion of a CASE statement.
+	-- To get the date of the first order ever, run the MIN function on the occurred_at column in the orders table: 
+	SELECT MIN(occurred_at) AS min
+	FROM orders;
 
-Question: Return only orders that occurred in the same month as the company's first order ever. */
+	-- To get the month (and year) of the first order ever, use DATE_TRUNC to truncate the results:
+	SELECT DATE_TRUNC('month', MIN(occurred_at)) AS min_month
+	FROM orders;
 
-SELECT *
-FROM orders;
-
-/* 1. To get the date of the first order, you can write a subquery with a MIN function. */
-
-SELECT MIN(occurred_at) AS min
-FROM orders;
-
-/* DATE_TRUNC is added below to get the month. */
-
-SELECT DATE_TRUNC('month', MIN(occurred_at)) AS min_month
-FROM orders;
-
-/* Finally, let's write an outer query that uses this to filter the orders table
- and sorts by the occurred_at column. */
-
-SELECT *
-FROM orders
-WHERE DATE_TRUNC('month', occurred_at) =
-	(SELECT DATE_TRUNC('month', MIN(occurred_at)) AS min_month
-	FROM orders)
-	ORDER BY occurred_at;
-
-/* This query works because the result of the subquery is only one cell. 
-Most conditional logic will work with subqueries containing one-cell results. 
-
-IN is the only type of conditonal logic that will work when the inner query
-contains multiple results. 
+	/* Now wrap the truncated results in parentheses, and place as a subquery inside the WHERE clause of an outer query. This works because the result of the subquery is only one cell.
+	The original orders table is filtered down to include only rows that also have the same order month (and year) as the month (and year) of the the first order ever: */
+	SELECT *
+	FROM orders
+	WHERE DATE_TRUNC('month', occurred_at) =
+		(SELECT DATE_TRUNC('month', MIN(occurred_at)) AS min_month
+		FROM orders)
+		ORDER BY occurred_at;
 
 
-Now let's try using the results of the previous query to also find the average 
-for each type of paper qty in the month of the first order and the total amount 
-spent on all orders in the month of the first order. */
+-- Find the average type of paper qty in the month of the first order and the total amount.
 
+/* This uses the same process as outlined above. But instead of selecting everything from the orders table, the average quantity for each paper type 
+and the total amount spent in dollars is returned across all of the remaining rows: */ 
 SELECT AVG(gloss_qty) avg_gloss_qty,
 	AVG(standard_qty) avg_standard_qty,
 	AVG (poster_qty) avg_poster_qty,
@@ -145,12 +105,75 @@ FROM (SELECT *
 		ORDER BY occurred_at) sub;
 
 
-/* 4.9 Quiz: Subquery Mania
---------------------------------
 
-Question 1: Provide the name of the sales_rep in each region with the 
-largest amount of total_amt_usd sales. */
+-- 5.9 Quiz: Subquery Mania --
 
+-- 1. Provide the name of the sales_rep in each region with the largest amount of total_amt_usd sales. --
+
+	-- Returns each sales rep, their region, and the total sum of sales associated with each sales rep and region combination: 
+	SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
+	FROM sales_reps s
+	JOIN accounts a
+	ON a.sales_rep_id = s.id
+	JOIN orders o
+	ON o.account_id = a.id
+	JOIN region r
+	ON r.id = s.region_id
+	GROUP BY 1,2
+	ORDER BY 3 DESC;
+	
+	/* Previous query becomes a subquery aliased "t1" and is placed in the FROM clause of the outer query. The highest total sum of sales associated with each region, 
+	and the associated region name, is pulled from the t1 results into the outer query:
+	Note that the rep_name column is not pulled from the subquery. That's because aggregations occur across all the columns in the SELECT statment. 
+	That means also including the sales_rep column in the outer query would would just return all the entries from t1, because each sales_rep name only occurs once. */
+
+	SELECT region_name, MAX(total_amt) total_amt
+        FROM(SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
+                FROM sales_reps s
+                JOIN accounts a
+                ON a.sales_rep_id = s.id
+                JOIN orders o
+                ON o.account_id = a.id
+                JOIN region r
+                ON r.id = s.region_id
+                GROUP BY 1, 2) t1
+        GROUP BY 1;
+
+
+	/* Those results become a second subquery, aliased "t2", which are placed in the FROM clause of another outer query. In this outer query, we also want to pull the rep_names from the original "t1" so 
+	we can match them with highest total sales for each region, and the region name, found in "t2". This means this new outer query must be JOINed with the original "t1" table to restore this column. A 
+	duplicate of the original "t1" subquery is created and aliased "t3". The "t3" subquery is then INNER JOINed with the new outer query (containing both suqueries "t1" and "t2") where both region_name AND 
+	the total sum of sales for that region match between both tables. Finally, all columns associated with the results are returned: each unique region name, the highest sum of sales found for that unique
+	region, and the sales rep_name associated with that sum of sales for that region. */
+
+	SELECT t3.rep_name, t3.region_name, t3.total_amt
+	FROM(SELECT region_name, MAX(total_amt) total_amt
+		FROM(SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
+			FROM sales_reps s
+			JOIN accounts a
+			ON a.sales_rep_id = s.id
+			JOIN orders o
+			ON o.account_id = a.id
+			JOIN region r
+			ON r.id = s.region_id
+			GROUP BY 1, 2) t1
+		GROUP BY 1) t2
+	JOIN (SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
+		FROM sales_reps s
+		JOIN accounts a
+		ON a.sales_rep_id = s.id
+		JOIN orders o
+		ON o.account_id = a.id
+		JOIN region r
+		ON r.id = s.region_id
+		GROUP BY 1,2
+		ORDER BY 3 DESC) t3
+	ON t3.region_name = t2.region_name AND t3.total_amt = t2.total_amt;
+-- Table names are not defined for columns in "t2" because the inner query has already fully run, so these variables are already defined. 
+	
+
+
+-- Provide the name of the sales_rep in each region with the largest amount of total_amt_usd sales. --
 SELECT t3.rep, t2.region, t2.max_sales
 FROM (SELECT region, MAX(total_rep_sales) max_sales
 		FROM 
@@ -176,23 +199,6 @@ JOIN
 	GROUP BY 1,2
 	ORDER BY 3 DESC) t3
 ON t3.region = t2.region AND t3.total_rep_sales = t2.max_sales;
-
-/* GROUP BY is not needed in the outer query because all aggregations were
-already performed in the inner queries.
-
-Table names are not defined for columns in t2 because the inner query 
-has already fully run, so these variables are already defined. 
-
-rep name is not returned to t2 because this would group results so they're
-totals unique for each rep IN each region - you'd just get all the same rows 
-from t1 back again, because sales rep names are already aggregated to appear 
-only once there.
-
-	This is also t2 had to be joined with a second copy of t1 - 
-	to give you back the sales rep name associated with the Maxs
-	for each region.
-*/ 
-
 
 
 /* Question 2: For the region with the largest (sum) of sales total_amt_usd, 
@@ -297,171 +303,11 @@ FROM (SELECT a.name, AVG(total_amt_usd) above_avg
 	 )
 
 
-
--------------------------------------------------------------------------------------------
-
-
--- Subqueries (4.3) --
-
-SELECT channel,
-	AVG(event_count) AS avg_event_count
-FROM
-(SELECT DATE_TRUNC('day', occurred_at) AS day,
-	channel,
-	COUNT(*) AS event_count
-FROM web_events
-GROUP BY 1,2) sub
-GROUP BY 1
-ORDER BY 2 DESC;
--- Returns the average number of events for each day for each channel.
-	-- The subquery provides the the first table: the number of events for each channel on each day.
-	-- The outer query runs across the result set of the inner query to average these values together, in a second query.
--- The inner query has to be able to run on it's own; the inner query acts as one table in the FROM clause of the outer query.
-
-SELECT COUNT(*) num_events, channel, DATE_PART('day', occurred_at) AS day
-FROM web_events
-GROUP BY 2,3
-ORDER BY day;
--- Counts the total number of events that occurred on each day for each channel, ordered by day number.
-
-SELECT DATE_TRUNC('day',occurred_at) AS day,
-       channel, COUNT(*) as events
-FROM web_events
-GROUP BY 1,2
-ORDER BY 3 DESC;
--- Counts the total number of events that occurred on each day for each channel - sorted by day and channel combinations with with the greatest total number events to day and channel combinations with the least total number of events.
-	-- Same as previous query, but uses DATE_TRUNC rather than DATE_PART (and slightly different syntax - from solutions page).
-SELECT *
-FROM (SELECT DATE_TRUNC('day',occurred_at) AS day,
-                channel, COUNT(*) as events
-          FROM web_events 
-          GROUP BY 1,2
-          ORDER BY 3 DESC) sub;
--- This query simply returns all the data from the subquery. 
-	-- wraps subquery in parenthesis and sticks in the FROM clause of the outer query.
-	-- Gives the subquery an alias, "sub"
-	-- includes a * in outer SELECT statement 
-
-SELECT channel, AVG(events) AS average_events
-FROM (SELECT DATE_TRUNC('day',occurred_at) AS day,
-                channel, COUNT(*) as events
-         FROM web_events 
-         GROUP BY 1,2) sub
-GROUP BY channel
-ORDER BY 2 DESC;
--- Shows the average number of events a day for each channel.
-	-- Since the subquery breaks it out by day, this is giving you the average number of events by channel per day. 
-
-
--- Formatting Subqueries (4.5) --
-
-SELECT *
-FROM (SELECT DATE_TRUNC('day',occurred_at) AS day,
-                channel, COUNT(*) as events
-      FROM web_events 
-      GROUP BY 1,2
-      ORDER BY 3 DESC) sub;
--- Formatting SQL will help you understand your code better when you return to it.
--- When using subqueries, it's important to provide some way to easily determine which parts of the query will be executed together; 
-	-- Most people do this by indenting the subquery in some way
-	-- Helpful line breaks can also make it easier to read
-
-SELECT *
-FROM (SELECT DATE_TRUNC('day',occurred_at) AS day,
-                channel, COUNT(*) as events
-      FROM web_events 
-      GROUP BY 1,2
-      ORDER BY 3 DESC) sub
-GROUP BY day, channel, events
-ORDER BY 2 DESC;
--- Statements part of the same subquery (or query) should be indented to the same levels.
-	-- This helps you to easily determine which parts of the query will be executed together.
-
-SELECT DATE_TRUNC('month', MIN(occurred_at)) 
-FROM orders;
--- Pulls the first month/year combo from the orders table.
-
-
-SELECT *
-FROM orders
-WHERE DATE_TRUNC('month', occurred_at)=
-(SELECT DATE_TRUNC('month', MIN(occurred_at)) AS min_month
-	FROM orders)
-ORDER BY occurred_at;
--- Returns all orders occurring in the same month as the company's first order ever. 
-	-- Subquery returns the order month of the company's first order ever.
-	-- Outer query then uses the subquery results (the first order month) to filter all orders in the orders table, ordering from earliest to latest order date within that timeframe.
-
-SELECT AVG(standard_qty) standard_avg,
-            AVG(gloss_qty) gloss_avg,
-            AVG(poster_qty) poster_avg,
-            SUM(total_amt_usd) total_spent_all
-FROM orders 
-WHERE DATE_TRUNC('month', occurred_at) =
-(SELECT MIN(DATE_TRUNC('month', occurred_at)) first_order_month
-FROM orders)
--- Finds only the orders that took place in the same month and year as the first order, and then pulls the average for each type of paper qty in this month; includes the total amount spent on all orders during this month as well. 
-
+----------------------------------------
 
 -- Subquery Mania (4.9) -- 
 	
--- 1. Provides the name of the sales_rep in each region with the largest amount of total_amt_usd sales. --
-	-- Step 1 --
-	SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
-	FROM sales_reps s
-	JOIN accounts a
-	ON a.sales_rep_id = s.id
-	JOIN orders o
-	ON o.account_id = a.id
-	JOIN region r
-	ON r.id = s.region_id
-	GROUP BY 1,2
-	ORDER BY 3 DESC;
-	-- Returns the total sales associated with each sales_rep, along with their names and region. --
 
-	-- Step 2 --
-	SELECT region_name, MAX(total_amt) total_amt
-        FROM(SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
-                FROM sales_reps s
-                JOIN accounts a
-                ON a.sales_rep_id = s.id
-                JOIN orders o
-                ON o.account_id = a.id
-                JOIN region r
-                ON r.id = s.region_id
-                GROUP BY 1, 2) t1
-        GROUP BY 1;
-	-- Outer query pulls only the maximum total sales for each region from the previous results. --
-	-- sales_rep is NOT pulled in this outer query, because it would group results by unique sales_rep again - which would return all the entries that we filtered out. -- 
-		-- each sales_rep is only included one time with their maximum total sales in the first query, so they would all be considered maxs in the second query.
-
-	-- Step 3: Final Solution --
-	SELECT t3.rep_name, t3.region_name, t3.total_amt
-	FROM(SELECT region_name, MAX(total_amt) total_amt
-		FROM(SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
-			FROM sales_reps s
-			JOIN accounts a
-			ON a.sales_rep_id = s.id
-			JOIN orders o
-			ON o.account_id = a.id
-			JOIN region r
-			ON r.id = s.region_id
-			GROUP BY 1, 2) t1
-		GROUP BY 1) t2
-	JOIN (SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
-		FROM sales_reps s
-		JOIN accounts a
-		ON a.sales_rep_id = s.id
-		JOIN orders o
-		ON o.account_id = a.id
-		JOIN region r
-		ON r.id = s.region_id
-		GROUP BY 1,2
-		ORDER BY 3 DESC) t3
-	ON t3.region_name = t2.region_name AND t3.total_amt = t2.total_amt;
-	-- Is matching the results from the first and second query (t2) back to the results of the first table (t3 - essentially a second version of t1), 
-		-- We are joining where the regions match AND the Max sales in t2 are equal to rows in t3; this will also pull the representatives associated with that max sale for that region.
-	
 
 
 -- 2. Finds how many total orders were placed for the region with the largest sales. --
