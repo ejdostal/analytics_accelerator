@@ -1,5 +1,9 @@
 /* SQL Advanced JOINS & Performance Tuning:
 
+Most of the work in this lesson is covering edge cases. You won't use these functions daily, but when you need them,
+you'll be glad that you learned them. 
+
+
 JOINS:
 ------------------------------------------------
 - INNER JOIN - rows for which the join condition is matched in both tables.
@@ -73,10 +77,12 @@ Query runtime is also dependent on things you can't control related to the datab
 2. Database software and optimization 
   - different databases vary in speed for a given task. For example, Postgres is optimized to read and write new rows quickly, while Redshift 
   is optimized to perform fast aggregations. If you know the system you're using using, you can work within its bounds to make your queries 
-  more efficient.
+  more efficient. */
 
 
---- 8.3  FULL OUTER JOIN  ---
+--- 8.3  FULL OUTER JOIN 
+
+![Inner Join]('/Users/Erica/Documents/GitHub Repos/sql_udacity_queries_Github/analytics_accelerator/Images/8.2 - INNER JOIN.png') 
 
 Shows each account who has a sales rep and each sales rep that has an account (all of the columns in these returned rows will be full)
 but also each account that does not have a sales rep and each sales rep that does not have an account (some of the columns in these returned rows will be empty) */
@@ -262,17 +268,17 @@ ORDER BY 2 DESC;
 /* -- 8.15 Performance Tuning ---
 
 - Filter the data to include only the observations you need. This can dramatically improve query speed. 
-- You can also always perform exploratory analysis on a subset of data, refine your work into a final query, then remove the limitation and run your work across the entire data set.
+- Try performing exploratory analysis on a subset of data, refine your work into a final query, then 
+remove the limitation and run your work across the entire data set. */
 
-It's also worth noting that LIMIT doesn't work quite the same with speeding up aggregations: */
-
--- Query: -- 
 SELECT *
 FROM orders
 WHERE occurred_at >= '2016-01-01'
 AND occurred_at < '2016-07-01'
+-- If you have time series data, limiting to a small time window can make your queries run more quickly.
 
--- Test query - with a LIMIT in the Outer Query: --
+
+-- It's worth noting that LIMIT doesn't work quite the same with speeding up aggregation performance:
 SELECT acccount_id,
   SUM(poster_qty) AS sum_poster_qty
 FROM orders
@@ -280,9 +286,10 @@ WHERE occurred_at >= '2016-01-01'
 AND occurred_at < '2016-07-01'
 GROUP BY 1
 LIMIT 10;
-/* This won't speed up your aggregations much - that's because the most "expensive" parts of the query (aggregations) are performed FIRST, and THEN the result set is limited.
+/* Placing a limit on the outer query won't really speed this query up. That's because the most "expensive" parts of the 
+query (the aggregations) are performed FIRST, and THEN the result set is limited is limited 10, not the other way around. */
 
-Test query - with a LIMIT in the Inner Query: */
+
 SELECT account_id, 
   SUM(poster_qty) AS sum_poster_qty
 FROM (
@@ -292,15 +299,57 @@ FROM (
 WHERE occurred_at >= '2016-01-01'
 AND occurred_at < '2016-07-01'
 GROUP BY 1; 
-/* 
-- Limiting the data set BEFORE performing the aggregation to speed up performance, using a subquery or CTE, can significantly speed up performance.
-- When working with subqueries, limiting the amount of data you're working with in the place where it will be executed first will have the maximum impact on query run time.
-- Keep in mind, that applying a limit to a sub query will dramatically alter your results. So you should use it to TEST query logic, but NOT to get actual results.
-*/
+
+/* Placing a limit of the inner query (a subquery or CTE), however, can significantly speed up performance.
+- Limit the amount of data you're working with in the subquery or CTE that will be executed FIRST to have maximum impact on query run time.
+- Keep in mind, though, applying a limit to a sub query will dramatically alter your results. So you should use only use this technique
+ to TEST query logic - NOT to get actual findings. 
+
+
+Making your JOINs less complicated will also speed up your queries - you can make your JOINs less complicated by reducing the number of rows that are evaluated during the JOIN.
+To have maximum impact of performance, it's better to reduce table sizes before joining them. */
+
+-- Original query --
+SELECT
+  accounts. name,
+  COUNT (*) AS web_events
+FROM accounts
+JOIN web_events events
+ON events.accounts_id = accounts.id
+GROUP BY 1 
+ORDER BY 2 DESC;
+
+-- Same query, but a version that reduces the number of rows that evaluated during the JOIN by peforming the aggregation on the web_events table FIRST before joining it with the accounts table. 
+SELECT
+a. name,
+sub.web_events
+FROM (
+  SELECT
+  account_id,
+  COUNT (*) AS web_events
+  FROM web_events events
+  ORDER BY 1 
+) sub
+FROM accounts a 
+ON a.id = sub.acccount_id
+ORDER BY 2 DESC;
+-- When you do this, make sure what you're doing is still logically consistent - you should worry about the accuracy of your work BEFORE worrying about run speed.
 
 
 
- 
+/* Add EXPLAIN at the beginning of any working query to get a sense of how long it will take. It's not completely accurate, but it's a useful tool. This returns
+a Query Plan. A Query Plan shows the order in which the query will be executed, with the first action performed at the bottom. A measure of "cost" will be listed 
+next to the number rows. Higher numbers mean longer running time.  
 
+1. Run EXPLAIN on a query.
+2. Modify the steps that are expensive.
+3. Then run EXPLAIN again to see if the cost is reduced. */
+
+EXPLAIN
+SELECT *
+FROM web_events
+WHERE occurred_at >= '2016-01-01'
+AND occurred_at < '2016-02-01'
+LIMIT 100
 
 
