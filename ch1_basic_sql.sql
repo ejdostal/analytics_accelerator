@@ -5,8 +5,8 @@
 /*
 - SELECT indicates which column(s) you want to be given the data for.
 - FROM specifies from which table(s) you want to select the columns. Notice the columns need to exist in this table.
-- If you want to be provided with the data from all columns in the table, you use "*".  
-*/
+- If you want to be provided with the data from all columns in the table, you use "*"  */
+
 SELECT * 
 FROM orders  
 -- shows every row in the orders table, showing all available columns --
@@ -23,8 +23,7 @@ FROM orders;
   - In Postgres, if you have spaces in column or table names, you need to refer to these columns/tables with double quotes around them (Ex: FROM "Table Name" as opposed to FROM table_name). 
   - In other environments, you might see this as square brackets instead (Ex: FROM [Table Name]). 
 - Put a semicolon at the end of each statement. Depending on your SQL environment, your query may need a semicolon at the end to execute.
-- If you environment allows it, it will also allow you to run multiple queries at once. 
-*/ 
+- If you environment allows it, it will also allow you to run multiple queries at once.  */ 
 
 
 -- LIMIT and ORDER BY (1.15) --
@@ -40,8 +39,8 @@ ORDER BY: sorts results by the data in any column
 - SQL queries only sort data temporarily, unlike sorting a spreadsheet by a column in Excel or Google Sheets which permanently alters the data until you change or undo it.
 - you can also use ORDER BY over multiple columns to achieve results. The sorting with happen in the order that you specify the columns.
 - Ex. ORDER BY account_id, total_amount_usd DESC; 
-- This orders results by account id (from smallest to largest), then records within each account are ordered from largest total_amount_usd to smallest. 
-*/
+- This orders results by account id (from smallest to largest), then records within each account are ordered from largest total_amount_usd to smallest.  */
+
 SELECT *
 FROM orders
 LIMIT 10; 
@@ -96,8 +95,8 @@ The secondary sorting by account ID will be difficult to see here, since only if
 /* 
 - WHERE filters your results based on a set criteria; a "subset" of the table
 - When using WHERE with non-numeric data fields, LIKE, NOT, or IN operators are often used.
-- SQL requires single quotes around text values. 
-*/
+- SQL requires single quotes around text values. */
+
 SELECT *
 FROM orders
 WHERE gloss_amt_usd >= 1000
@@ -140,8 +139,8 @@ LIMIT 10;
 Use LIKE within the WHERE clause.
 - requires the use of wildcards (ex. % represents any number of characters)
 - useful in any case where you have a lot of similar, but slightly different, values in a column.
-- uppercase and lowercase letters are not the same in a string (ex. Searching for 'T' is not the same as searching for 't'.)
-*/
+- uppercase and lowercase letters are not the same in a string (ex. Searching for 'T' is not the same as searching for 't'.) */
+
 SELECT *
 FROM demo.web_events_full
 WHERE referrer_url LIKE '%google%';
@@ -169,8 +168,8 @@ Use IN within the WHERE clause.
 - allows you to check conditions for multiple column values within the same query 
 - can use IN with both numeric and text columns
 - you could also use OR operator to perform these tasks, but the IN operator is cleaner
-- In most SQL environments, you can use single or double quotation marks around text values - although you may NEED to use double quotation marks if the text itself contains an apostrophe. --
-*/
+- In most SQL environments, you can use single or double quotation marks around text values - although you may NEED to use double quotation marks if the text itself contains an apostrophe.   */
+
 SELECT *
 FROM demo.orders
 WHERE account_id IN (1001, 1021);
@@ -202,8 +201,8 @@ ORDER BY sales_rep_id;
 /* 
 Use NOT with LIKE, IN and similar operators within the WHERE clause.
 - By specifying NOT LIKE or NOT IN, we can grab all of the rows that do not meet a particular criteria.
-- NOT provides the inverse results for IN.
-*/
+- NOT provides the inverse results for IN. */
+
 SELECT sales_rep_id,name
 FROM demo.accounts
 WHERE sales_rep_id NOT IN (321500, 321570)
@@ -235,8 +234,8 @@ AND: use AND within the WHERE clause.
 - BETWEEN is inclusive, which means that the end points of BETWEEN statements are included in final results.
 - BETWEEN assumes the time is at 00:00:00 (i.e. midnight) for dates.
 - For that reason, you'll want to set the last endpoint one day later than the actual date. 
-- Ex. To find all dates in 2016, you'd set it as date BETWEEN '2016-01-01' AND '2017-01-01' - finding all dates between midnight on Jan 1st 2016 and midnight on Jan 1st 2017.
-*/
+- Ex. To find all dates in 2016, you'd set it as date BETWEEN '2016-01-01' AND '2017-01-01' - finding all dates between midnight on Jan 1st 2016 and midnight on Jan 1st 2017. */
+
 SELECT *
 FROM orders
 WHERE standard_qty > 1000 AND poster_qty = 0 AND gloss_qty = 0;
@@ -270,8 +269,8 @@ Use OR within the WHERE clause.
 - also used to consider more than one column at a time; you may link as many statements as you would like to consider at the same time.
 - OR works with arithmetic operators (+, *, -, /).
 - LIKE, IN, NOT, AND, and BETWEEN logic can be linked using the OR operator. 
-- When combining multiple of these operations, you frequently might need to use parentheses to assure that the logic you want to perform is being executed correctly.
-*/
+- When combining multiple of these operations, you frequently might need to use parentheses to assure that the logic you want to perform is being executed correctly. */
+
 SELECT account_id, occurred_at, standard_qty, gloss_qty, poster_qty
 FROM demo.orders
 WHERE standard_qty = 0 OR glossy_qty = 0 OR poster_qty = 0;
