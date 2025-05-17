@@ -1,81 +1,13 @@
-/*  Basic SQL:
-
-SELECT: chooses the columns to show in the output. 
-- To see all columns, use *.
-- when using JOINs, SELECT also needs to the table every column comes from. 
-    - "TableA. " gives us all the columns from that table in the output.
-    - "TableA.ColumnNameC" gives us that specific column from that specific table in the output. 
-
-FROM: choose the tables you're pulling data from.
-
-WHERE: filters your results based on a set criteria; a "subset" of the table
-- When using WHERE with non-numeric data fields, LIKE, NOT, or IN operators are often used.
-- SQL requires single quotes around text values. 
-
-    LIKE: use LIKE within the WHERE clause.
-    - requires the use of wildcards (ex. % represents any number of characters)
-    - useful in any case where you have a lot of similar, but slightly different, values in a column.
-    - uppercase and lowercase letters are not the same in a string (ex. Searching for 'T' is not the same as searching for 't'.)
-
-    IN: use IN within the WHERE clause.
-    - allows you to check conditions for multiple column values within the same query 
-    - can use IN with both numeric and text columns
-    - you could also use OR operator to perform these tasks, but the IN operator is cleaner
-    - In most SQL environments, you can use single or double quotation marks around text values - although you may NEED to use double quotation marks if the text itself contains an apostrophe. --
-
-    NOT: use NOT with LIKE, IN and similar operators within the WHERE clause.
-    - By specifying NOT LIKE or NOT IN, we can grab all of the rows that do not meet a particular criteria.
-    - NOT provides the inverse results for IN.
-
-    AND: use AND within the WHERE clause.
-    - selects rows that satisfy both of the conditions
-    - used to consider more than one column at a time; you may link as many statements as you would like to consider at the same time.
-    - Each time you link a new statement with an AND, you need to state the column of interest independently, even when referring to the same column.
-    - AND works with arithmetic operators (+, *, -, /).
-    - LIKE, IN, and NOT operators can be linked using the AND operator. 
-
-    BETWEEN:
-    - When using the same column for different parts of an AND statement, BETWEEN is often a cleaner replacement.
-    AND: WHERE column >= 6 AND column <=10
-    BETWEEN: WHERE column BETWEEN 6 AND 10 --> cleaner
-    - BETWEEN is inclusive, which means that the end points of BETWEEN statements are included in final results.
-    - BETWEEN assumes the time is at 00:00:00 (i.e. midnight) for dates.
-    - For that reason, you'll want to set the last endpoint one day later than the actual date. 
-    - Ex. To find all dates in 2016, you'd set it as date BETWEEN '2016-01-01' AND '2017-01-01' - finding all dates between midnight on Jan 1st 2016 and midnight on Jan 1st 2017.
-
-    OR: use OR within the WHERE clause.
-    - works similarly to AND; but selects rows that satisfy either of the conditions.
-    - also used to consider more than one column at a time; you may link as many statements as you would like to consider at the same time.
-    - OR works with arithmetic operators (+, *, -, /).
-    - LIKE, IN, NOT, AND, and BETWEEN logic can be linked using the OR operator. 
-    - When combining multiple of these operations, you frequently might need to use parentheses to assure that the logic you want to perform is being executed correctly.
-
-ORDER BY: sorts results by the data in any column
-- useful when you want to sort orders by date, for example
-- the default is to sort in Ascending order: A to Z, lowest to highest, or earliest to latest. 
-- DESC can be added after the column in your ORDER BY statement to flip the sort. 
-- SQL queries only sort data temporarily, unlike sorting a spreadsheet by a column in Excel or Google Sheets which permanently alters the data until you change or undo it.
-- you can also use ORDER BY over multiple columns to achieve results. The sorting with happen in the order that you specify the columns.
-- Ex. ORDER BY account_id, total_amount_usd DESC; 
-- This orders results by account id (from smallest to largest), then records within each account are ordered from largest total_amount_usd to smallest. 
-
-LIMIT: limits results to the first few rows in the table.
-- useful when you want to see just the first few rows of a table. This can be much faster for loading than if we load the entire dataset. 
-- the LIMIT command is always the very last part of a query. 
-
-Derived columns - A new column created by manipulating existing columns in the database. 
-
-Best Practice:
-
-- Write SQL COMMANDS in all uppercase letters, keep everything else in your query lowercase.
-- Avoid using spaces in table names and column names. 
-  - In Postgres, if you have spaces in column or table names, you need to refer to these columns/tables with double quotes around them (Ex: FROM "Table Name" as opposed to FROM table_name). 
-  - In other environments, you might see this as square brackets instead (Ex: FROM [Table Name]). 
-- Put a semicolon at the end of each statement. Depending on your SQL environment, your query may need a semicolon at the end to execute.
-If you environment allows it, it will also allow you to run multiple queries at once. */ 
-
+-- Ch 1: Basic SQL -- 
+-----------------------
 
 -- SELECT and FROM (1.11) --
+/*
+- SELECT indicates which column(s) you want to be given the data for.
+- FROM specifies from which table(s) you want to select the columns. Notice the columns need to exist in this table.
+- If you want to be provided with the data from all columns in the table, you use "*".  
+*/
+
 SELECT * 
 FROM orders  
 -- shows every row in the orders table, showing all available columns --
@@ -85,7 +17,33 @@ FROM orders;
 -- shows data from just these 3 columns in the orders table. --
 
 
+-- Formatting Best Practices (1.14) --
+/* 
+- Write SQL COMMANDS in all uppercase letters, keep everything else in your query lowercase.
+- Avoid using spaces in table names and column names. 
+  - In Postgres, if you have spaces in column or table names, you need to refer to these columns/tables with double quotes around them (Ex: FROM "Table Name" as opposed to FROM table_name). 
+  - In other environments, you might see this as square brackets instead (Ex: FROM [Table Name]). 
+- Put a semicolon at the end of each statement. Depending on your SQL environment, your query may need a semicolon at the end to execute.
+- If you environment allows it, it will also allow you to run multiple queries at once. 
+*/ 
+
+
 -- LIMIT and ORDER BY (1.15) --
+/*
+- LIMIT: limits results to the first few rows in the table.
+- useful when you want to see just the first few rows of a table. This can be much faster for loading than if we load the entire dataset. 
+- the LIMIT command is always the very last part of a query. 
+
+ORDER BY: sorts results by the data in any column
+- useful when you want to sort orders by date, for example
+- the default is to sort in Ascending order: A to Z, lowest to highest, or earliest to latest. 
+- DESC can be added after the column in your ORDER BY statement to flip the sort. 
+- SQL queries only sort data temporarily, unlike sorting a spreadsheet by a column in Excel or Google Sheets which permanently alters the data until you change or undo it.
+- you can also use ORDER BY over multiple columns to achieve results. The sorting with happen in the order that you specify the columns.
+- Ex. ORDER BY account_id, total_amount_usd DESC; 
+- This orders results by account id (from smallest to largest), then records within each account are ordered from largest total_amount_usd to smallest. 
+*/
+
 SELECT *
 FROM orders
 LIMIT 10; 
@@ -137,6 +95,12 @@ The secondary sorting by account ID will be difficult to see here, since only if
 
 
 --- WHERE (1.24) ---
+/* 
+- WHERE filters your results based on a set criteria; a "subset" of the table
+- When using WHERE with non-numeric data fields, LIKE, NOT, or IN operators are often used.
+- SQL requires single quotes around text values. 
+*/
+
 SELECT *
 FROM orders
 WHERE gloss_amt_usd >= 1000
@@ -156,6 +120,7 @@ WHERE name = 'Exxon Mobil';
 
 
 -- Arithmetic Operators (1.30) --
+
 SELECT id, (standard_amt_usd/total_amt_usd)*100 AS std_percent, total_amt_usd
 FROM orders
 LIMIT 10; 
@@ -174,6 +139,13 @@ LIMIT 10;
 
 
 -- LIKE (1.34) --
+/*
+Use LIKE within the WHERE clause.
+- requires the use of wildcards (ex. % represents any number of characters)
+- useful in any case where you have a lot of similar, but slightly different, values in a column.
+- uppercase and lowercase letters are not the same in a string (ex. Searching for 'T' is not the same as searching for 't'.)
+*/
+
 SELECT *
 FROM demo.web_events_full
 WHERE referrer_url LIKE '%google%';
@@ -196,6 +168,14 @@ WHERE name LIKE '%s';
 
 
 -- IN (1.37) --
+/* 
+Use IN within the WHERE clause.
+- allows you to check conditions for multiple column values within the same query 
+- can use IN with both numeric and text columns
+- you could also use OR operator to perform these tasks, but the IN operator is cleaner
+- In most SQL environments, you can use single or double quotation marks around text values - although you may NEED to use double quotation marks if the text itself contains an apostrophe. --
+*/
+
 SELECT *
 FROM demo.orders
 WHERE account_id IN (1001, 1021);
@@ -224,6 +204,12 @@ ORDER BY sales_rep_id;
 
 
 -- NOT (1.40) --
+/* 
+Use NOT with LIKE, IN and similar operators within the WHERE clause.
+- By specifying NOT LIKE or NOT IN, we can grab all of the rows that do not meet a particular criteria.
+- NOT provides the inverse results for IN.
+*/
+
 SELECT sales_rep_id,name
 FROM demo.accounts
 WHERE sales_rep_id NOT IN (321500, 321570)
@@ -240,6 +226,26 @@ ORDER BY occurred_at DESC
 
 
 -- AND and BETWEEN (1.43) --  
+/* 
+AND: use AND within the WHERE clause.
+- selects rows that satisfy both of the conditions
+- used to consider more than one column at a time; you may link as many statements as you would like to consider at the same time.
+- Each time you link a new statement with an AND, you need to state the column of interest independently, even when referring to the same column.
+- AND works with arithmetic operators (+, *, -, /).
+- LIKE, IN, and NOT operators can be linked using the AND operator. 
+
+ BETWEEN:
+- When using the same column for different parts of an AND statement, BETWEEN is often a cleaner replacement. 
+    Ex:
+    AND: WHERE column >= 6 AND column <=10
+    BETWEEN: WHERE column BETWEEN 6 AND 10 --> cleaner
+
+- BETWEEN is inclusive, which means that the end points of BETWEEN statements are included in final results.
+- BETWEEN assumes the time is at 00:00:00 (i.e. midnight) for dates.
+- For that reason, you'll want to set the last endpoint one day later than the actual date. 
+- Ex. To find all dates in 2016, you'd set it as date BETWEEN '2016-01-01' AND '2017-01-01' - finding all dates between midnight on Jan 1st 2016 and midnight on Jan 1st 2017.
+*/
+
 SELECT *
 FROM orders
 WHERE standard_qty > 1000 AND poster_qty = 0 AND gloss_qty = 0;
@@ -267,6 +273,15 @@ ORDER BY occurred_at DESC;
 
 
 -- OR (1.46) --
+/* 
+Use OR within the WHERE clause.
+- works similarly to AND; but selects rows that satisfy either of the conditions.
+- also used to consider more than one column at a time; you may link as many statements as you would like to consider at the same time.
+- OR works with arithmetic operators (+, *, -, /).
+- LIKE, IN, NOT, AND, and BETWEEN logic can be linked using the OR operator. 
+- When combining multiple of these operations, you frequently might need to use parentheses to assure that the logic you want to perform is being executed correctly.
+*/
+
 SELECT account_id, occurred_at, standard_qty, gloss_qty, poster_qty
 FROM demo.orders
 WHERE standard_qty = 0 OR glossy_qty = 0 OR poster_qty = 0;
@@ -295,3 +310,11 @@ WHERE (name LIKE 'C%' OR name LIKE 'W%')
     AND ((primary_poc LIKE '%ana%' OR primary_poc LIKE '%Ana%')
     AND primary_poc NOT LIKE '%eana%');
 -- shows records where the company name starts with either "C" or "W" and the primary point of contact contains the string "ana" or "Ana", but does not contain the string "eana". --
+
+
+
+/* - when using JOINs, SELECT also needs to the table every column comes from. 
+- "TableA. " gives us all the columns from that table in the output.
+- "TableA.ColumnNameC" gives us that specific column from that specific table in the output. 
+
+Derived columns - A new column created by manipulating existing columns in the database. */
