@@ -7,7 +7,6 @@
 - FROM specifies from which table(s) you want to select the columns. Notice the columns need to exist in this table.
 - If you want to be provided with the data from all columns in the table, you use "*".  
 */
-
 SELECT * 
 FROM orders  
 -- shows every row in the orders table, showing all available columns --
@@ -43,7 +42,6 @@ ORDER BY: sorts results by the data in any column
 - Ex. ORDER BY account_id, total_amount_usd DESC; 
 - This orders results by account id (from smallest to largest), then records within each account are ordered from largest total_amount_usd to smallest. 
 */
-
 SELECT *
 FROM orders
 LIMIT 10; 
@@ -100,7 +98,6 @@ The secondary sorting by account ID will be difficult to see here, since only if
 - When using WHERE with non-numeric data fields, LIKE, NOT, or IN operators are often used.
 - SQL requires single quotes around text values. 
 */
-
 SELECT *
 FROM orders
 WHERE gloss_amt_usd >= 1000
@@ -145,7 +142,6 @@ Use LIKE within the WHERE clause.
 - useful in any case where you have a lot of similar, but slightly different, values in a column.
 - uppercase and lowercase letters are not the same in a string (ex. Searching for 'T' is not the same as searching for 't'.)
 */
-
 SELECT *
 FROM demo.web_events_full
 WHERE referrer_url LIKE '%google%';
@@ -175,7 +171,6 @@ Use IN within the WHERE clause.
 - you could also use OR operator to perform these tasks, but the IN operator is cleaner
 - In most SQL environments, you can use single or double quotation marks around text values - although you may NEED to use double quotation marks if the text itself contains an apostrophe. --
 */
-
 SELECT *
 FROM demo.orders
 WHERE account_id IN (1001, 1021);
@@ -209,7 +204,6 @@ Use NOT with LIKE, IN and similar operators within the WHERE clause.
 - By specifying NOT LIKE or NOT IN, we can grab all of the rows that do not meet a particular criteria.
 - NOT provides the inverse results for IN.
 */
-
 SELECT sales_rep_id,name
 FROM demo.accounts
 WHERE sales_rep_id NOT IN (321500, 321570)
@@ -233,19 +227,16 @@ AND: use AND within the WHERE clause.
 - Each time you link a new statement with an AND, you need to state the column of interest independently, even when referring to the same column.
 - AND works with arithmetic operators (+, *, -, /).
 - LIKE, IN, and NOT operators can be linked using the AND operator. 
-
  BETWEEN:
 - When using the same column for different parts of an AND statement, BETWEEN is often a cleaner replacement. 
     Ex:
     AND: WHERE column >= 6 AND column <=10
     BETWEEN: WHERE column BETWEEN 6 AND 10 --> cleaner
-
 - BETWEEN is inclusive, which means that the end points of BETWEEN statements are included in final results.
 - BETWEEN assumes the time is at 00:00:00 (i.e. midnight) for dates.
 - For that reason, you'll want to set the last endpoint one day later than the actual date. 
 - Ex. To find all dates in 2016, you'd set it as date BETWEEN '2016-01-01' AND '2017-01-01' - finding all dates between midnight on Jan 1st 2016 and midnight on Jan 1st 2017.
 */
-
 SELECT *
 FROM orders
 WHERE standard_qty > 1000 AND poster_qty = 0 AND gloss_qty = 0;
@@ -281,7 +272,6 @@ Use OR within the WHERE clause.
 - LIKE, IN, NOT, AND, and BETWEEN logic can be linked using the OR operator. 
 - When combining multiple of these operations, you frequently might need to use parentheses to assure that the logic you want to perform is being executed correctly.
 */
-
 SELECT account_id, occurred_at, standard_qty, gloss_qty, poster_qty
 FROM demo.orders
 WHERE standard_qty = 0 OR glossy_qty = 0 OR poster_qty = 0;
@@ -310,7 +300,6 @@ WHERE (name LIKE 'C%' OR name LIKE 'W%')
     AND ((primary_poc LIKE '%ana%' OR primary_poc LIKE '%Ana%')
     AND primary_poc NOT LIKE '%eana%');
 -- shows records where the company name starts with either "C" or "W" and the primary point of contact contains the string "ana" or "Ana", but does not contain the string "eana". --
-
 
 
 /* - when using JOINs, SELECT also needs to the table every column comes from. 
