@@ -1,78 +1,14 @@
-/* SQL Aggregations
+-- Ch. 4 SQL Aggregations --
+--------------------------------
 
-Aggregations: These functions operate down columns, not across rows.
-- An important thing to remember: aggregators only aggregate vertically - the values of a column. 
-- If you want to perform a calculation across rows, you would do this with simple arithmetic.
-- Use row-level output for early exploratory work, when searching your database to better understand the data.
-- Once you get a since of what the data looks like, aggregates become more helpful in answering your questions.
-
-    COUNT: Counts how many rows are in a table; Helps you to identify the number of Null values in any particular column. 
-        - COUNT ignores Nulls.
-        - This is why COUNT is used to find which rows that have missing data:
-            1. Find total rows in a table: The result produced by a COUNT(*) is typically equally to the number of rows in the table; it's very unusual to have a row that is entirely null. 
-            2. Identify the number of Null values in a particular column (or the specific number of rows in column that are not Null) ; COUNT(column_name)
-        - The difference between the COUNT(*) and the COUNT of the column is the total number of Nulls in that column.
-        - You can use COUNT on non-numerical columns.
-
-    SUM: Adds together all the values in a particular column
-        - You can only use SUM of numeric columns.
-        - SUM will ignore Nulls; it treats Nulls as 0. 
-
-    MIN / MAX: Return the lowest and highest values in a particular column. 
-        - Ignores Null values.
-        - Can be used to count numerical values (like COUNT)
-        - Depending on the column type, MIN will return the lowest number, earliest date, or non-numerical value as early in the alphabet as possible. 
-        - Depending on the column type, MAX will return the highest number, the latest date, or the non-numerical value closest alphabetically to “Z.”
-
-    Average: Returns the mean of the data; the sum of all the values in the column, divided by the number of values in the column; what can we expect to see on regular basis?
-       - Can only be used on numerical columns 
-        - Ignores Null values completely; Rows with Null values are NOT calculated in the numerator or the denominator when calculating the average. 
-            - If you want to count Nulls as 0, you'll need to take a SUM and divide it be the COUNT, rather than using the AVG function. 
-    - Note: the Median might be a more appropriate measure of center for data than AVG for data, but finding the Median happens to be a pretty difficult thing to get using SQL alone.
-
-GROUP BY: allows you to create segments that will aggregate independent from one another; in other words, it takes the sum of data limited to each account, rather than across the entire dataset.
-- Used to aggregate data within subsets of data (ex. grouping for different accounts, different regions, or different sales representatives.)
-- Any column in the SELECT statement that is not within an aggregator must be in the GROUP BY clause.
-- The GROUP BY always goes between WHERE and ORDER BY.
-- SQL evaluates the aggregations before the LIMIT clause, so you know all data is evaluated for aggregation.
-- If you don’t group by any columns, you’ll get a 1-row result; you're aggregating across the entire dataset.
-- If you group by a column with enough unique values that it exceeds the LIMIT number, the aggregates will be calculated, and then some rows will simply be omitted from the results.
-- Wherever there's a field in the SELECT statement that's not being aggregated, the query expects it to be in the GROUP BY clause; a column that's not aggregated and not in the GROUP BY will return an error.
-- If you want to segment your data into even more granular chunks, you can group by multiple columns.  
-- You can GROUP BY multiple columns at once. This is often useful to aggregate across a number of different segments.
-- GROUP BY and ORDER BY can be used with multiple columns in the same query. 
-- The order in the ORDER BY determines which column is ordered on first.  
-- You can order DESC for any column in your ORDER BY.
-- The order of column names in your GROUP BY clause doesn’t matter—the results will be the same regardless. 
-- As with ORDER BY, you can substitute numbers for column names in the GROUP BY clause. 
-    - It’s generally recommended to do this only when you’re grouping many columns, or if something else is causing the text in the GROUP BY clause to be excessively long.
-
-DISTINCT:
-- always used in SELECT statements
-- provides the unique rows for ALL columns written in the SELECT statement (to do this for all columns, use it only once, immediately after SELECT)
-- NOTE: DISTINCT can slow your queries down quite a bit, particularly in aggregations.
-- if you want to group columns but DON'T need to include aggregations, use DISTINCT instead of GROUP BY.
-
-HAVING:
-- anytime you want to perform a WHERE on an element of your query containing an aggregate, you have to using HAVING instead
-- HAVING is like WHERE, but it works on logical statements involving aggregations.
-- the WHERE clause doesn't allow you to filter on aggregate columns
-- a clean way to filter a query that has been aggregated 
-- HAVING appears after the GROUP BY clause, but before the ORDER BY clause.
-- commonly done using subqueries
-
-- Only useful with aggregates when grouping columns; if there's no grouping, the output is across the entire dataset so its only one line anyway.
-    - WHERE subsets the returned data based on a logical condition.
-    - WHERE appears after the FROM, JOIN, and ON clauses, but before GROUP BY.
-
-DATE_TRUNC:
-
-
-DATE PART:    
-*/ 
-
-
--- NULLS (3.3) --
+-- NULLS (4.3) --
+/*  
+Nulls: a datatype that specifies where data does not exist.
+- Nulls are often ignored in aggregation functions.
+- When identifying NULLs in a WHERE clause, we write IS NULL or IS NOT NULL. (We don't use =, because NULL isn't considered a value in SQL. Rather, it is a property of the data.)
+- NULLs frequently occur when performing a LEFT or RIGHT JOIN. 
+- NULLs can also occur from simply missing data in our database
+- Use ISNULL or IS NOT NULL to SHOW all the rows in a specific column for which their is or isn't Null values. */
 
 SELECT *
 FROM accounts 
@@ -86,7 +22,21 @@ WHERE primary_poc IS NOT NULL;
 -- Finds the inverse of the query above; Returns all rows for which there ARE values in the primary point of contact field. --
 
 
--- COUNT (3.4) --
+-- COUNT (4.4) --
+/*
+Aggregations: These functions operate down columns, not across rows.
+- An important thing to remember: aggregators only aggregate vertically - the values of a column. 
+- If you want to perform a calculation across rows, you would do this with simple arithmetic.
+- Use row-level output for early exploratory work, when searching your database to better understand the data.
+- Once you get a since of what the data looks like, aggregates become more helpful in answering your questions.
+
+COUNT: Counts how many rows are in a table; Helps you to identify the number of Null values in any particular column. 
+- COUNT ignores Nulls.
+- This is why COUNT is used to find which rows that have missing data:
+1. Find total rows in a table: The result produced by a COUNT(*) is typically equally to the number of rows in the table; it's very unusual to have a row that is entirely null. 
+2. Identify the number of Null values in a particular column (or the specific number of rows in column that are not Null) ; COUNT(column_name)
+- The difference between the COUNT(*) and the COUNT of the column is the total number of Nulls in that column.
+- You can use COUNT on non-numerical columns. */
 
 SELECT *
 FROM orders
@@ -126,7 +76,11 @@ WHERE primary_poc IS NULL;
     -- Note that the COUNT function can also be used on non-numerical columns.
 
 
--- SUM (3.6) --
+-- SUM (4.6) --
+/* 
+SUM adds together all the values in a particular column
+- You can only use SUM of numeric columns.
+- SUM will ignore Nulls; it treats Nulls as 0. */
 
 SELECT SUM(standard_qty) AS standard,
 SUM(gloss_qty) AS gloss,
@@ -159,7 +113,13 @@ FROM orders;
     -- Though the price (standard_amt_usd) and standard paper quantity ordered (standard_qty) varies from one order to the next, this ratio is across all of the sales made in the orders table. --
 
 
--- MIN and MAX (3.9) --
+-- MIN and MAX (4.9) --
+/* 
+MIN / MAX return the lowest and highest values in a particular column. 
+- Ignores Null values.
+- Can be used to count numerical values (like COUNT)
+- Depending on the column type, MIN will return the lowest number, earliest date, or non-numerical value as early in the alphabet as possible. 
+- Depending on the column type, MAX will return the highest number, the latest date, or the non-numerical value closest alphabetically to “Z.” */
 
 SELECT MIN(standard_qty) AS standard_min,
     MIN(gloss_qty) AS gloss_min,
@@ -176,7 +136,13 @@ FROM orders;
 -- Depending on the column type, MAX will return the highest number, the latest date, or the non-numerical value closest alphabetically to “Z.”
 
 
--- AVG (3.10) --
+-- AVG (4.10) --
+/* 
+Average: Returns the mean of the data; the sum of all the values in the column, divided by the number of values in the column; what can we expect to see on regular basis?
+- Can only be used on numerical columns 
+- Ignores Null values completely; Rows with Null values are NOT calculated in the numerator or the denominator when calculating the average. 
+- If you want to count Nulls as 0, you'll need to take a SUM and divide it be the COUNT, rather than using the AVG function. 
+- Note: the Median might be a more appropriate measure of center for data than AVG for data, but finding the Median happens to be a pretty difficult thing to get using SQL alone. */
 
 SELECT AVG(standard_qty) AS standard_avg,
     AVG(gloss_qty) AS gloss_avg,
@@ -228,7 +194,16 @@ LIMIT 2;
     -- Note, this is more advanced than the topics we have covered thus far to build a general solution, but we can hard code a solution in the above way. --
 
 
--- GROUP BY: one column (3.13) -- 
+-- GROUP BY: one column (4.13) -- 
+/* 
+GROUP BY: allows you to create segments that will aggregate independent from one another; in other words, it takes the sum of data limited to each account, rather than across the entire dataset.
+- Used to aggregate data within subsets of data (ex. grouping for different accounts, different regions, or different sales representatives.)
+- Any column in the SELECT statement that is not within an aggregator must be in the GROUP BY clause.
+- The GROUP BY always goes between WHERE and ORDER BY.
+- SQL evaluates the aggregations before the LIMIT clause, so you know all data is evaluated for aggregation.
+- If you don’t group by any columns, you’ll get a 1-row result; you're aggregating across the entire dataset.
+- If you group by a column with enough unique values that it exceeds the LIMIT number, the aggregates will be calculated, and then some rows will simply be omitted from the results.
+- Wherever there's a field in the SELECT statement that's not being aggregated, the query expects it to be in the GROUP BY clause; a column that's not aggregated and not in the GROUP BY will return an error. */
 
 SELECT account_id,
     SUM(standard_qty) AS standard_sum,
@@ -303,7 +278,16 @@ ORDER BY num_reps;
 -- Finds the total number of sales reps associated with each region, order by regions with the fewest representatives to those with the most. 
 
 
--- GROUP BY: multiple columns (3.16) --
+-- GROUP BY: multiple columns (4.16) --
+/* 
+- If you want to segment your data into even more granular chunks, you can group by multiple columns.  
+- You can GROUP BY multiple columns at once. This is often useful to aggregate across a number of different segments.
+- GROUP BY and ORDER BY can be used with multiple columns in the same query. 
+- The order in the ORDER BY determines which column is ordered on first.  
+- You can order DESC for any column in your ORDER BY.
+- The order of column names in your GROUP BY clause doesn’t matter—the results will be the same regardless. 
+- As with ORDER BY, you can substitute numbers for column names in the GROUP BY clause. 
+    - It’s generally recommended to do this only when you’re grouping many columns, or if something else is causing the text in the GROUP BY clause to be excessively long. */
 
 SELECT account_id,
     channel,
@@ -360,6 +344,11 @@ ORDER BY num_events DESC;
 
 
 -- DISTINCT (3.19) --
+/* 
+DISTINCT is always used in SELECT statements.
+- provides the unique rows for ALL columns written in the SELECT statement (to do this for all columns, use it only once, immediately after SELECT)
+- NOTE: DISTINCT can slow your queries down quite a bit, particularly in aggregations.
+- if you want to group columns but DON'T need to include aggregations, use DISTINCT instead of GROUP BY.  */
 
 -- Comparison between when to use GROUP BY vs when to use DISTINCT. ---
 SELECT account_id,
@@ -415,7 +404,17 @@ ORDER BY account_id
     -- ex. returns 50 results; Confirms that all of the sales reps are accounted for in the first query. 
 
 
--- HAVING (3.22) --
+-- HAVING (4.22) --
+/*
+Anytime you want to perform a WHERE on an element of your query containing an aggregate, you have to using HAVING instead
+- HAVING is like WHERE, but it works on logical statements involving aggregations.
+- the WHERE clause doesn't allow you to filter on aggregate columns
+- a clean way to filter a query that has been aggregated 
+- HAVING appears after the GROUP BY clause, but before the ORDER BY clause.
+- commonly done using subqueries
+- Only useful with aggregates when grouping columns; if there's no grouping, the output is across the entire dataset so its only one line anyway.
+- WHERE subsets the returned data based on a logical condition.
+- WHERE appears after the FROM, JOIN, and ON clauses, but before GROUP BY.  */ 
 
     SELECT account_id, 
         SUM(total_amt_usd) AS sum_total_amt_usd
@@ -522,7 +521,7 @@ LIMIT 10;
 -- Returns the top 10 channels most frequently used by most accounts (ex. all of the top 10 are for the direct channel).
 
 
--- DATE Functions (3.25) --
+-- DATE Functions (4.25) --
 
 -- Why we have to use date functions to aggregate with dates. --
     SELECT occurred_at,
@@ -550,7 +549,6 @@ ORDER BY 2 DESC;
     -- DATE_PART Pulls out only the day of the week for each occurence date; 'dow' pulls the day of the week with 0 as Sunday and 6 as Saturday.
     -- The 1 and 2 here identify these columns in the SELECT statement
 -- After aggregation, the query groups each dow by the total sum of sales across all orders, ordered from day of the week with the largest total sales to the day of the week with the least. 
-
 
 SELECT DATE_PART('year', occurred_at) AS year,
 SUM(total_amt_usd) total_sales
@@ -603,7 +601,7 @@ LIMIT 1;
 -- Filters results down to just the accounts with a name of "Walmart", and orders from largest total sales made in a month to least total sales made; limits to the first result (the greatest total). 
 
 
--- CASE (3.29) -- 
+-- CASE (4.29) -- 
 
 -- How to get around problems with division by 0, using CASE. --
     SELECT id, account_id, standard_amt_usd/standard_qty AS unit_price
@@ -619,7 +617,7 @@ LIMIT 1;
         -- ex. the results show that we essentially charge all of our accounts 4.99 for standard paper; It makes sense this doesn't fluctuate.
 
 
--- CASE and Aggregations (3.30) -- 
+-- CASE and Aggregations (4.30) -- 
 
 -- When to use CASE vs. when to use WHERE. --
     SELECT CASE WHEN total > 500 THEN 'Over 500'
@@ -635,7 +633,6 @@ LIMIT 1;
     FROM orders
     WHERE total > 500;
     -- getting the same information using a WHERE clause means only being able to get one set of data from the CASE at a time.
-
 
 SELECT account_id, total_amt_usd,
 CASE WHEN total_amt_usd >= 3000 THEN 'Large'
