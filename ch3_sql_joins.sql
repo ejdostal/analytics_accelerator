@@ -1,59 +1,19 @@
-/* SQL Joins
+-- Ch 3: SQL Joins --
+------------------------------
 
-JOIN clauses: allows us to pull data from more than one table at a time. 
-    - Joining tables gives you access to each of the tables in the SELECT statement through the table name, a ".", and the column name you want to pull from that table.
-    - To join two tables, list them in the FROM and JOIN clauses.
-    - The table in the FROM statement is the Left table (and the first table from which your pulling data); the one in the JOIN statement is the Right table.
-    
-        ON: specifies the column on which you'd like to merge the two tables together; in the ON, we always have the primary key (PK) equal to the foreign key (FK)
-               - A Primary key (PK) exists in every table and is a unique column for each row; Primary keys are unique for every row in a table; It is common for the primary key (PK) to be the first column in our tables in most databases. 
-               - A Foreign key (FK) is a column in one table that is a primary key in another table; Each FK links to a primary key in another table; Foreign keys are what allow rows in a join to be non-unique.
-    
-        Aliases: Give table names aliases when performing joins. (This can save you a lot of typing)
-            - The alias for a table is created in the FROM or JOIN clauses; use the alias to replace the table name throughout the rest of the query. 
-            - You can alias tables and columns using AS or not using it.
-            - Frequently an alias is just the first letter of the table name
-            - As with column names, the best practice is for aliases to be all lowercase letters, and to use underscores instead of spaces. 
-            - If you have two or more columns in your SELECT that have the same name after the table name (ex. accounts.name, sales_reps.name) you will NEED to alias them; otherwise it will only show ONE of those columns. 
-    
-    JOIN (inner join): an INNER JOIN only pulls data that exists in both tables.
-        * Table Order - The results of inner join are the same whichever order you stick the tables in the FROM and JOIN clauses.
-        * Filtering - Where you filter a table (in the ON clause or in the WHERE) clause doesn't matter; that because unmatched rows in both tables are dropped anyways.
+-- (INNER) JOIN (3.3) --
+/* 
+JOINs allows us to pull data from more than one table at a time. 
+- Joining tables gives you access to each of the tables in the SELECT statement through the table name, a ".", and the column name you want to pull from that table.
+- To join two tables, list them in the FROM and JOIN clauses.
+- The table in the FROM statement is the Left table (and the first table from which your pulling data); the one in the JOIN statement is the Right table. 
+ON specifies the column on which you'd like to merge the two tables together; in the ON, we always have the primary key (PK) equal to the foreign key (FK)
+- A Primary key (PK) exists in every table and is a unique column for each row; Primary keys are unique for every row in a table; It is common for the primary key (PK) to be the first column in our tables in most databases. 
+- A Foreign key (FK) is a column in one table that is a primary key in another table; Each FK links to a primary key in another table; Foreign keys are what allow rows in a join to be non-unique. 
+(INNER) JOINs only pull data that exists in both tables.
+- Table Order - The results of inner join are the same whichever order you stick the tables in the FROM and JOIN clauses.
+-Filtering - Where you filter a table (in the ON clause or in the WHERE) clause doesn't matter; that because unmatched rows in both tables are dropped anyways.  */
         
-    *** LEFT JOIN, RIGHT JOIN, and FULL OUTER JOIN are all considered Outer Joins.
-        - If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
-        - Each of these new JOIN statements pulls all the same rows as an INNER JOIN, but they also potentially pull some additional rows; The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
-        - If there is not matching information in the JOINed table, then you will have columns with empty cells; any cells without data are considered NULL. 
-    
-    LEFT JOIN (LEFT OUTER JOIN): pulls all the data tht exists in both tables, as well as all of the rows from the table in the FROM, even if they do not exist in the JOIN statement.
-        * Table Order - The results of a left join can change depending on the order you stick the tables in FROM and JOIN clauses.
-        * Prefiltering vs. Postfiltering - When the database executes the query, it executes the join and everything in the ON clause first, building a new result set; THEN that new result set is filtered using the WHERE clause. 
-            - You can prefilter data BEFORE the join occurs by using logic in the ON clause instead of in WHERE.
-                - This is like joining the FROM table with a different table in LEFT JOIN - one that only includes a subset of the rows in the original table.
-            - If you choose to keep the filter logic in the WHERE clause,the results are filtered AFTER the join occurs.               
-    
-    RIGHT JOIN (RIGHT OUTER JOIN): pulls all the data that exists in both tables, as well as all of the rows from the table in the JOIN even if they do not exist in the FROM statement. 
-         - A LEFT JOIN and RIGHT JOIN do the same thing if we change the tables that are in the FROM and JOIN statements.
-         - Rows in the Right table that Don't match the rows in the Left table, will still be included at the bottom of the results.
-             - Because they Don't match with the Left table, these columns from the Left table will contain no data (Nulls) for these rows.
-    
-    OUTER JOIN: (FULL OUTER JOIN) This will return the inner join result set, as well as any unmatched rows from either of the two tables being joined.
-            - Again, this returns rows that do not match one another from the two tables. 
-            - The use cases for a full outer join are very rare.
-        
-    Advanced JOINs - a few other advanced JOINS that are used in very specific use cases: UNION and UNION ALL, CROSS JOIN, and SELF JOIN.
-        - It's useful to be aware that they exist. 
-
-Nulls: a datatype that specifies where data does not exist.
-    - Nulls are often ignored in aggregation functions.
-    - When identifying NULLs in a WHERE clause, we write IS NULL or IS NOT NULL. (We don't use =, because NULL isn't considered a value in SQL. Rather, it is a property of the data.)
-    - NULLs frequently occur when performing a LEFT or RIGHT JOIN. 
-    - NULLs can also occur from simply missing data in our database
-- Use ISNULL or IS NOT NULL to SHOW all the rows in a specific column for which their is or isn't Null values.
-
-*/ 
-
--- JOIN (2.3) --
 SELECT orders.*,
     accounts.*
 FROM accounts
@@ -129,6 +89,14 @@ ON accounts.id = orders.account_id;
 
 
 -- Aliases in JOINS (2.10) --  
+/* 
+We give table names Aliases when performing joins. (This can save you a lot of typing)
+- The alias for a table is created in the FROM or JOIN clauses; use the alias to replace the table name throughout the rest of the query. 
+- You can alias tables and columns using AS or not using it.
+- Frequently an alias is just the first letter of the table name
+- As with column names, the best practice is for aliases to be all lowercase letters, and to use underscores instead of spaces. 
+- If you have two or more columns in your SELECT that have the same name after the table name (ex. accounts.name, sales_reps.name) you will NEED to alias them; otherwise it will only show ONE of those columns. */ 
+
 SELECT o.*,
 a.*
 FROM orders o
@@ -165,7 +133,13 @@ ON o.account_id = a.id;
 -- "0.01" is added to the total column in the unit_price calculation to avoid division by zero (A few accounts have 0 for total). --
 
 
--- LEFT JOIN & RIGHT JOIN (2.14) --
+-- OUTER JOINS (2.14) --
+/* 
+LEFT JOIN, RIGHT JOIN, and FULL OUTER JOIN are all considered "Outer Joins".
+- If we want to include data that doesn't exist in both tables, but only in one of the two tables we are using in our Join statement, we might use one of these joins.
+- Each of these new JOIN statements pulls all the same rows as an INNER JOIN, but they also potentially pull some additional rows; The results of an Outer Join will always have at least as many rows as an inner join if they have the same logic in the ON clause.
+- If there is not matching information in the JOINed table, then you will have columns with empty cells; any cells without data are considered NULL. */
+
 SELECT a.id, a.name, o.total
 FROM orders o
 JOIN accounts a
@@ -214,7 +188,16 @@ ON c.countryid = s.countryid;
 -- Also a LEFT JOIN, but State is now the Left Table and Country is now the Right Table --
 -- In this query, any rows with unmatched country ids remaining in the State table (Left Table) now appear the bottom of the results instead; Country table columns in these rows are Null. --
 
--- LEFT JOIN and Filtering (2.18) --
+
+-- LEFT JOINs and Filtering (2.18) --
+/* 
+LEFT JOIN (LEFT OUTER JOIN): pulls all the data tht exists in both tables, as well as all of the rows from the table in the FROM, even if they do not exist in the JOIN statement.
+* Table Order - The results of a left join can change depending on the order you stick the tables in FROM and JOIN clauses.
+* Prefiltering vs. Postfiltering - When the database executes the query, it executes the join and everything in the ON clause first, building a new result set; THEN that new result set is filtered using the WHERE clause. 
+- You can prefilter data BEFORE the join occurs by using logic in the ON clause instead of in WHERE.
+- This is like joining the FROM table with a different table in LEFT JOIN - one that only includes a subset of the rows in the original table.
+- If you choose to keep the filter logic in the WHERE clause,the results are filtered AFTER the join occurs. */
+
 SELECT orders.*,
 accounts.*
 FROM orders
@@ -322,3 +305,19 @@ JOIN accounts a
 ON o.account_id = a.id
 AND o.occurred_at BETWEEN '2015-01-01' AND '2016-01-01';
 -- Finds all the orders that occurred in 2015. --
+
+    
+/* RIGHT JOIN (RIGHT OUTER JOIN): pulls all the data that exists in both tables, as well as all of the rows from the table in the JOIN even if they do not exist in the FROM statement. 
+- A LEFT JOIN and RIGHT JOIN do the same thing if we change the tables that are in the FROM and JOIN statements.
+- Rows in the Right table that Don't match the rows in the Left table, will still be included at the bottom of the results.
+- Because they Don't match with the Left table, these columns from the Left table will contain no data (Nulls) for these rows.
+    
+OUTER JOIN: (FULL OUTER JOIN) This will return the inner join result set, as well as any unmatched rows from either of the two tables being joined.
+- Again, this returns rows that do not match one another from the two tables. 
+- The use cases for a full outer join are very rare.
+        
+Advanced JOINs - a few other advanced JOINS that are used in very specific use cases: UNION and UNION ALL, CROSS JOIN, and SELF JOIN.
+- It's useful to be aware that they exist. */
+
+
+
