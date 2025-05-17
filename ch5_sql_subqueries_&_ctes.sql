@@ -1,116 +1,109 @@
+
+-- Ch 5: SQL Subqueries & CTEs --
 /*
--- SQL Subqueries & CTEs --
+- Subqueries are also known as inner queries or nested queries. 
+- Whenever we need to use existing tables to create a new table that we then want to query again, this is an indication that we will need to use some sort of subquery.
+- Statements part of the same subquery (or query) should be indented to the same levels. This helps you to easily determine which parts of the query will be executed together.
+- Subqueries are required to have aliases, which are added after the parentheses (the same way you would add an alias to a table).  
+- Many SQL editors share an  ability to highlight a portion of the query and then run only that portion. This is especially helpful when making changes 
+to an inner query. You can make the change, then quickly change the inner queries output to make sure it looks correct before running the outer query again.     */
 
-Subqueries are also known as inner queries or nested queries. Whenever we need to use existing tables to create a new 
-table that we then want to query again, this is an indication that we will need to use some sort of subquery.
 
-Statements part of the same subquery (or query) should be indented to the same levels. This helps you to easily determine which parts of the query will be executed together. */ 
+-- Subqueries (5.2) --
 
--- 5.2 Subqueries - Part 1 --
+-- Which channels send the most traffic per day on average? --
 
--- Which channels send the most traffic per day on average? 
-
-	-- Counts up all the events by each channel for each day.
 	SELECT DATE_TRUNC('day', occurred_at) AS day,
-		channel, 
-		COUNT(*) AS event_count
+	channel, 
+	COUNT(*) AS event_count
 	FROM web_events
 	GROUP BY 1,2
 	ORDER BY 1;
+	-- a. Counts up all the events in each channel on each day.
+	-- First, the inner query runs. 
+	-- The inner query must run on it's own as the database will treat it as an independent query.
 
-	/* Pulls all results from the subquery into the outer query. Subqueries are required to have aliases, 
-	which are added after the parentheses (the same way you would add an alias to a table). */
 	SELECT *
 	FROM
 	(SELECT DATE_TRUNC('day', occurred_at) AS day,
-			channel, 
-			COUNT(*) AS event_count
+		channel, 
+		COUNT(*) AS event_count
 		FROM web_events
 		GROUP BY 1,2
 		ORDER BY 1) sub
-
-	/* Averages events per each channel (using the event_count column created in the subquery). Since we broke out 
-	by day earlier, this this gives you an average per day. We add a GROUP BY and ORDER BY statement to outer query. 
-	Since we reorder on the final aggregation in outer query anyway, we removethe ORDER BY statement in the subquery 
-	to keep things clean: */
+	-- b. Selects all the data from the "sub" subquery.
+	-- Once your inner query is complete, the rest of the query (the outer query) runs across the result set created by the inner query.
 
 	SELECT channel
 	FROM AVG (event_count) AS avg_event_count
-	(SELECT DATE_TRUNC('day', occurred_at) AS day,
-			channel, 
-			COUNT(*) AS event_count
+		(SELECT DATE_TRUNC('day', occurred_at) AS day,
+		channel, 
+		COUNT(*) AS event_count
 		FROM web_events
 		GROUP BY 1,2
-	) sub 
+		) sub 
 	GROUP BY 1
 	ORDER BY 2 DESC
-
-/* To summarize, this is how the new query runs:
-	1. First, the inner query runs. The inner query must run on it's own as the database will treat it as an independent query.
-	2. Once your inner query is complete, the rest of the query (the outer query) runs across the result set created by the inner query.
-
-	Note: A nice feature that many SQL editors share is the ability to highlight a portion 
-	of the query and run only that portion. This is especially helpful when making changes 
-	to an inner query.
+	-- c. Gives a table showing the average number of events a day for each channel (answer).
+	-- Since we broke out by day earlier in the subquery, this this gives you an average per day.
 
 
--- 5.6: Subqueries - Part 2 --
-
-- In the first subquery you wrote, you created a table that you could then query again in the FROM statement. Subqueries are especially useful using conditional logic, 
-in conjunction with WHERE or JOIN clauses, and in the WHEN portion of a CASE statement. Most conditional logic will work with subqueries containing one-cell results. IN is 
-the only type of conditonal logic that will work when the inner query contains multiple results. 
-
-Note: Don't include an alias when you write a subquery in a conditional statement. That's because the subquery is being treated here as an individual value - (or set of values in the IN case) 
-rather than as a table.
-
-Subqueries can essentially be used anywhere you might use a table name, column name, or individual value:
-- If the subquery returns a SINGLE value, you can use it in a logical statement like WHERE, HAVING, or even SELECT - in the WHEN portion of a CASE statement.
-- If the subquery returns an entire COLUMN, IN would need to be used to perform a logical argument. 
-- If the subquery returns an entire TABLE, then you must use an ALIAS for the table, and perform additional logic on the entire table. */
+-- Subquery Formatting (5.5) --
+/* 
+- The important thing to remember when using subqueries is to provide some way for the reader to easily determine 
+which parts of the query will be executed together. Most people do this by indenting the subquery in some way 
+-  Make sure that parts of the query that run together are indented to the same level. */
 
 
--- Return only orders that occurred in the same month as the company's first order ever. 
+-- Subqueries - Part 2 (5.6) --
+/* 
+- Subqueries can essentially be used anywhere you might use a table name, column name, or individual value.
+	- Use a subquery in the FROM clause to create a table and then query again from the results of that table.
+	- If you are only returning a single value, you can use a subquery in a logical statement like WHERE, HAVING, or even SELECT - the value could be nested within a CASE statement in the WHEN portion.
+	- If the subquery returns an entire column, IN would need to be used to perform a logical argument. 
+- You should NOT include an alias when you write a subquery in a conditional statement. This is because the subquery is treated as an individual value (or set of values in the IN case) rather than as a table.
+- You should include an alias when you write a subquery that returns an entire table. Then you'll need to perform additional logic on that table. 
+- Subqueries are especially useful using conditional logic, in conjunction with WHERE or JOIN clauses, and in the WHEN portion of a CASE statement. */
 
-	-- To get the date of the first order ever, run the MIN function on the occurred_at column in the orders table: 
+-- Return only orders that occurred in the same month as the company's first order ever. --
+
 	SELECT MIN(occurred_at) AS min
 	FROM orders;
-
-	-- To get the month (and year) of the first order ever, use DATE_TRUNC to truncate the results:
+	-- a. Gets the date of the first order ever.
+		
 	SELECT DATE_TRUNC('month', MIN(occurred_at)) AS min_month
 	FROM orders;
+	-- b. Gets the month (and year) of the first order ever.
 
-	/* Now wrap the truncated results in parentheses, and place as a subquery inside the WHERE clause of an outer query. This works because the result of the subquery is only one cell.
-	The original orders table is filtered down to include only rows that also have the same order month (and year) as the month (and year) of the the first order ever: */
 	SELECT *
 	FROM orders
 	WHERE DATE_TRUNC('month', occurred_at) =
 		(SELECT DATE_TRUNC('month', MIN(occurred_at)) AS min_month
 		FROM orders)
-		ORDER BY occurred_at;
+	ORDER BY occurred_at;
+	-- c. Outer query uses the month (and year) returned by the subquery to filter the results of the orders table (answer).
+	-- Most conditional logic will work with subqueries containing one-cell results. 
+	-- IN is the only type of conditonal logic that will work when the inner query contains multiple results. 
+
+-- Find the average qunatity sold for each paper type during the same month (and year) as the very first order. --
+
+	SELECT AVG(gloss_qty) avg_gloss_qty,
+		AVG(standard_qty) avg_standard_qty,
+		AVG (poster_qty) avg_poster_qty,
+		SUM(total_amt_usd) total_spent
+	FROM (SELECT *
+		FROM orders
+		WHERE DATE_TRUNC('month', occurred_at) =
+			(SELECT DATE_TRUNC('month', MIN(occurred_at)) AS min_month
+			FROM orders)
+			ORDER BY occurred_at) sub;
+-- c. Averages the quantities sold of each paper type during the same month (and year) of the very first order ever (answer).
 
 
--- Find the average type of paper qty in the month of the first order and the total amount.
+-- Subquery Mania (5.9) --
 
-/* This uses the same process as outlined above. But instead of selecting everything from the orders table, the average quantity for each paper type 
-and the total amount spent in dollars is returned across all of the remaining rows: */ 
-SELECT AVG(gloss_qty) avg_gloss_qty,
-	AVG(standard_qty) avg_standard_qty,
-	AVG (poster_qty) avg_poster_qty,
-	SUM(total_amt_usd) total_spent
-FROM (SELECT *
-	FROM orders
-	WHERE DATE_TRUNC('month', occurred_at) =
-		(SELECT DATE_TRUNC('month', MIN(occurred_at)) AS min_month
-		FROM orders)
-		ORDER BY occurred_at) sub;
+-- Provide the name of the sales representative in each region that has the largest amount of total sales. --
 
-
-
--- 5.9 Quiz: Subquery Mania --
-
--- 1. Provide the name of the sales_rep in each region with the largest amount of total_amt_usd sales. --
-
-	-- Returns each sales rep, their region, and the total sum of sales associated with each sales rep and region combination: 
 	SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
 	FROM sales_reps s
 	JOIN accounts a
@@ -121,30 +114,25 @@ FROM (SELECT *
 	ON r.id = s.region_id
 	GROUP BY 1,2
 	ORDER BY 3 DESC;
-	
-	/* Previous query becomes a subquery aliased "t1" and is placed in the FROM clause of the outer query. The highest total sum of sales associated with each region, 
-	and the associated region name, is pulled from the t1 results into the outer query:
-	Note that the rep_name column is not pulled from the subquery. That's because aggregations occur across all the columns in the SELECT statment. 
-	That means also including the sales_rep column in the outer query would would just return all the entries from t1, because each sales_rep name only occurs once. */
+	-- a. Returns each sales rep name, region, and the total sum of sales associated with that sales rep in that region.
 
 	SELECT region_name, MAX(total_amt) total_amt
-        FROM(SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
-                FROM sales_reps s
-                JOIN accounts a
-                ON a.sales_rep_id = s.id
-                JOIN orders o
-                ON o.account_id = a.id
-                JOIN region r
-                ON r.id = s.region_id
-                GROUP BY 1, 2) t1
-        GROUP BY 1;
-
-
-	/* Those results become a second subquery, aliased "t2", which are placed in the FROM clause of another outer query. In this outer query, we also want to pull the rep_names from the original "t1" so 
-	we can match them with highest total sales for each region, and the region name, found in "t2". This means this new outer query must be JOINed with the original "t1" table to restore this column. A 
-	duplicate of the original "t1" subquery is created and aliased "t3". The "t3" subquery is then INNER JOINed with the new outer query (containing both suqueries "t1" and "t2") where both region_name AND 
-	the total sum of sales for that region match between both tables. Finally, all columns associated with the results are returned: each unique region name, the highest sum of sales found for that unique
-	region, and the sales rep_name associated with that sum of sales for that region. */
+    FROM(SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
+		FROM sales_reps s
+		JOIN accounts a
+		ON a.sales_rep_id = s.id
+		JOIN orders o
+		ON o.account_id = a.id
+		JOIN region r
+		ON r.id = s.region_id
+		GROUP BY 1, 2
+		) t1
+	GROUP BY 1;
+	/*
+	b. Outer query pulls the results of the previous query (t1) using the FROM clause. Only the region name and the max amount of total sales per region (found in the total_amt column in the t1 table) are returned (4 results for 4 regions).
+	- Notice how the sales rep name isn't pulled here. That's because each sales rep name is unique in the t1 table (it only appears once).
+	- Including sales rep name in the grouping would just return the max amount of total sales associated with EVERY sales rep name within EVERY unique region - 
+	essentially returning ALL the values from t1 anyway. */
 
 	SELECT t3.rep_name, t3.region_name, t3.total_amt
 	FROM(SELECT region_name, MAX(total_amt) total_amt
@@ -169,150 +157,15 @@ FROM (SELECT *
 		GROUP BY 1,2
 		ORDER BY 3 DESC) t3
 	ON t3.region_name = t2.region_name AND t3.total_amt = t2.total_amt;
--- Table names are not defined for columns in "t2" because the inner query has already fully run, so these variables are already defined. 
-	
+	/*
+	c. Results from the previous outer query and subquery combined become "t2" and is pulled from in the FROM clause of an outer query. 
+	- The new outer query (with "t2" in the FROM clause) is then joined with a duplicate copy of the original t1 table (now named "t3"). Rows are only joined if region name AND total sum of sales match between both rows.
+	- The max sum of sales for each region and the corresponding region name are now pulled out again in the SELECT statement of the outer query from the results of "t2".
+	- The corresponding sales rep name associated with each of the max sales in each region is now also pulled back out, from the results of the JOIN between "t2" and "t3" (the duplicate of "t1"). 
+	- Table names are not defined for columns in "t2" because the inner query has already fully run, so these variables are already defined. */
 
+-- For the region with the largest (sum of) sales in USD, how many total (count) orders were placed? --
 
--- Provide the name of the sales_rep in each region with the largest amount of total_amt_usd sales. --
-SELECT t3.rep, t2.region, t2.max_sales
-FROM (SELECT region, MAX(total_rep_sales) max_sales
-		FROM 
-		(SELECT s.name rep, r.name region, SUM(o.total_amt_usd) total_rep_sales
-		FROM orders o
-		JOIN accounts a
-		ON o.account_id = a.id
-		JOIN sales_reps s
-		ON s.id = a.sales_rep_id
-		JOIN region r
-		ON r.id = s.region_id
-		GROUP BY 1,2) t1
-	GROUP BY 1) t2
-JOIN
-	(SELECT s.name rep, r.name region, SUM(o.total_amt_usd) total_rep_sales
-	FROM orders o
-	JOIN accounts a
-	ON o.account_id = a.id
-	JOIN sales_reps s
-	ON s.id = a.sales_rep_id
-	JOIN region r
-	ON r.id = s.region_id
-	GROUP BY 1,2
-	ORDER BY 3 DESC) t3
-ON t3.region = t2.region AND t3.total_rep_sales = t2.max_sales;
-
-
-/* Question 2: For the region with the largest (sum) of sales total_amt_usd, 
-how many total (count) orders were placed? */
-
-SELECT t1.region, SUM(o.total_amt_usd), COUNT(o.total_amt_usd) orders_count
-FROM orders o
-JOIN accounts a
-ON o.account_id = a.id
-JOIN sales_reps s
-ON s.id = a.sales_rep_id
-JOIN region r
-ON r.id = s.region_id
-HAVING SUM(o.total_amt_usd) = 
-
-SELECT r.name region, SUM(o.total_amt_usd), COUNT(o.total_amt_usd) orders_count
-FROM region r
-JOIN sales_reps s
-ON r.id = s.region_id
-JOIN accounts a
-ON a.sales_rep_id = s.id
-JOIN orders o
-ON a.id = o.account_id
-GROUP BY 1
-HAVING SUM(o.total_amt_usd) 
-	= (SELECT MAX(total_amt) 
-	   FROM (SELECT r.name region, SUM(o.total_amt_usd) total_amt 
-			FROM region r
-			JOIN sales_reps s
-			ON r.id = s.region_id
-			JOIN accounts a
-			ON a.sales_rep_id = s.id
-			JOIN orders o
-			ON a.id = o.account_id 
-			GROUP BY 1) sub);
-			
-
-/* Question 3: How many accounts had more total purchases than the account name 
-which has bought the most standard_qty paper throughout their lifetime as a customer? */
-
-SELECT COUNT(*)
-FROM (SELECT a.name
-	FROM accounts a
-	JOIN orders o
-	ON a.id = o.account_id
-	GROUP BY 1
-	HAVING SUM(o.total) > (SELECT total_purchases
-		FROM(SELECT a.name, SUM(o.standard_qty) standard_qty, SUM(o.total) total_purchases
-		   FROM orders o
-		   JOIN accounts a
-		   ON o.account_id = a.id
-		   GROUP BY 1
-		   ORDER BY 2 DESC
-		   LIMIT 1) t1 )
-	 ) t2;
-	
-
-/* Question 4: For the customer that spent the most (in total over their lifetime as a customer) total_amt_usd, 
-how many web_events did they have for each channel? */
-
-SELECT a.name, w.channel, COUNT(*) web_events_count
-FROM accounts a
-JOIN web_events w
-ON a.id = w.account_id 
-WHERE a.id = (SELECT id
-	FROM (SELECT a.id AS id, a.name, SUM(o.total_amt_usd) total_spent
-		FROM orders o
-		JOIN accounts a
-		ON a.id = o.account_id
-		GROUP BY 1, 2
-		ORDER BY 3 DESC
-		LIMIT 1))
-GROUP BY 1,2
-ORDER BY 3 DESC;
-
-
-/* Question 5:  What is the lifetime average amount spent in terms of total_amt_usd 
-for the top 10 total spending accounts? */
-
-SELECT AVG(total_spent)
-FROM (SELECT a.id, a.name, SUM(o.total_amt_usd) total_spent
-		FROM accounts a
-		JOIN orders o
-		ON o.account_id = a.id
-		GROUP BY 1,2
-		ORDER BY 3 DESC
-		LIMIT 10) t1;
-
-
-/* Question 6: What is the lifetime average amount spent in terms of total_amt_usd, 
-including only the companies that spent more per order, on average, than the average 
-of all orders. */
-
-SELECT AVG(above_avg)
-FROM (SELECT a.name, AVG(total_amt_usd) above_avg
-	FROM accounts a
-	JOIN orders o
-	ON a.id = o.account_id
-	GROUP BY 1
-	HAVING AVG(total_amt_usd) > (SELECT AVG(total_amt_usd) avg_spent_overall
-		FROM orders)
-	 )
-
-
-----------------------------------------
-
--- Subquery Mania (4.9) -- 
-	
-
-
-
--- 2. Finds how many total orders were placed for the region with the largest sales. --
-
-	-- Step 1 --
 	SELECT r.name region_name, SUM(o.total_amt_usd) total_amt
 	FROM sales_reps s
 	JOIN accounts a
@@ -322,22 +175,20 @@ FROM (SELECT a.name, AVG(total_amt_usd) above_avg
 	JOIN region r
 	ON r.id = s.region_id
 	GROUP BY r.name;
-	-- Finds the total sum of sales per region.
+	-- a. Finds the total sum of sales for each region.
 
-	-- Step 2 --
 	SELECT MAX(total_amt)
 	FROM (SELECT r.name region_name, SUM(o.total_amt_usd) total_amt
-	                FROM sales_reps s
-	                JOIN accounts a
-	                ON a.sales_rep_id = s.id
-	                JOIN orders o
-	                ON o.account_id = a.id
-	                JOIN region r
-	                ON r.id = s.region_id
-	                GROUP BY r.name) sub;
-	-- Selects the region whose total sum of sales is the maximum of all the regions sum of sales.
+		FROM sales_reps s
+		JOIN accounts a
+		ON a.sales_rep_id = s.id
+		JOIN orders o
+		ON o.account_id = a.id
+		JOIN region r
+		ON r.id = s.region_id
+		GROUP BY r.name) t1;
+	-- b. Pulls the highest value found the total_amt column from "t1" (previous query). (the highest total sales found out of all the regions)
 
-	-- Step 3: Final Solution --
 	SELECT r.name, COUNT(o.total) total_orders
 	FROM sales_reps s
 	JOIN accounts a
@@ -347,27 +198,23 @@ FROM (SELECT a.name, AVG(total_amt_usd) above_avg
 	JOIN region r
 	ON r.id = s.region_id
 	GROUP BY r.name
-	HAVING SUM(o.total_amt_usd) = (
-	         SELECT MAX(total_amt)
-	         FROM (SELECT r.name region_name, SUM(o.total_amt_usd) total_amt
-	                 FROM sales_reps s
-	                 JOIN accounts a
-	                 ON a.sales_rep_id = s.id
-	                 JOIN ord
-	                 ON o.account_id = a.id
-	                 JOIN region r
-	                 ON r.id = s.region_i
-	                 GROUP BY r.name) t1);
+	HAVING SUM(o.total_amt_usd) 
+	= (SELECT MAX(total_amt)
+		FROM (SELECT r.name region_name, SUM(o.total_amt_usd) total_amt
+				FROM sales_reps s
+				JOIN accounts a
+				ON a.sales_rep_id = s.id
+				JOIN ord
+				ON o.account_id = a.id
+				JOIN region r
+				ON r.id = s.region_id
+				GROUP BY r.name
+				) 
+		t1);
+	-- c. Returns the region name and total count of orders for the region that returned the highest sum of sales in "t1" (answer).
+			
+-- How many accounts had more total purchases than the account that bought the most standard_qty of paper during their lifetime as a customer? --
 
--- Returns the name and total orders placed for the region whose total sum of sales is the MAXIMUM of all regions total sums of sales.
--- t1: each region next to their total sum of sales (4 in total)
--- HAVING: filters down to only the row with highest sum of sales (from t1 results)
--- Outer query: returns the region name and count of total orders for the region with the highest sum of sales.
-
-
--- 3. Returns the number of accounts that had more total purchases than the account with the most standard_qty of paper purchased overall. --
-
-	-- Step 1 -- 
 	SELECT a.name account_name, SUM(o.standard_qty) total_std, SUM(o.total) total
 	FROM accounts a
 	JOIN orders o
@@ -375,45 +222,49 @@ FROM (SELECT a.name, AVG(total_amt_usd) above_avg
 	GROUP BY 1
 	ORDER BY 2 DESC
 	LIMIT 1;
-	-- Finds the account with the most standard_qty of paper purchased; also returns the total amount of paper that account purchased in general.
+	/*
+	a. Returns each account, the total quantity of standard paper they bought, and the total sum of their purchases across all paper types.
+	- Orders the resulting rows so the quantities of standard paper bought (and their associated information) are ordered from highest to lowest.
+	- Limits the results returned to only the first row (the max total standard quantity of paper bought, that account name, and that accounts total sum of purchases). */
 
-	-- Step 2 -- 
 	SELECT a.name
 	FROM orders o
 	JOIN accounts a
 	ON a.id = o.account_id
 	GROUP BY 1
-	HAVING SUM(o.total) > (SELECT total 
-	                      FROM (SELECT a.name act_name, SUM(o.standard_qty) tot_std, SUM(o.total) total
-	                            FROM accounts a
-	                            JOIN orders o
-	                            ON o.account_id = a.id
-	                            GROUP BY 1
-	                            ORDER BY 2 DESC
-	                            LIMIT 1) sub);
-	-- Returns just the accounts with more total paper purchased in general than the account with the most standard_qty of paper purchased.
+	HAVING SUM(o.total) > 
+		(SELECT total 
+		FROM (SELECT a.name act_name, SUM(o.standard_qty) tot_std, SUM(o.total) total
+			FROM accounts a
+			JOIN orders o
+			ON o.account_id = a.id
+			GROUP BY 1
+			ORDER BY 2 DESC
+			LIMIT 1) 
+		t1);
+	-- b. Returns all account names from "t1" that have a total sum of purchases greater than then total sum of purchases oc the account that had purchased the most standard paper (qty).
 
-	-- Step 3: Final Solution --
 	SELECT COUNT(*)
 	FROM (SELECT a.name
-	          FROM orders o
-	          JOIN accounts a
-	          ON a.id = o.account_id
-	          GROUP BY 1
-	          HAVING SUM(o.total) > (SELECT total 
-	                      FROM (SELECT a.name act_name, SUM(o.standard_qty) tot_std, SUM(o.total) total
-	                            FROM accounts a
-	                            JOIN orders o
-	                            ON o.account_id = a.id
-	                            GROUP BY 1
-	                            ORDER BY 2 DESC
-	                            LIMIT 1) inner_tab)
-	                ) counter_tab;
-	-- Counts all the rows returned for accounts purchasing more total paper than the account that purchased the most total standard paper. 
+		FROM orders o
+		JOIN accounts a
+		ON a.id = o.account_id
+		GROUP BY 1
+		HAVING SUM(o.total) > 
+			(SELECT total 
+			FROM (SELECT a.name act_name, SUM(o.standard_qty) tot_std, SUM(o.total) total
+				FROM accounts a
+				JOIN orders o
+				ON o.account_id = a.id
+				GROUP BY 1
+				ORDER BY 2 DESC
+				LIMIT 1) 
+			t1)
+		) t2;
+	-- c. Counts all the accounts returned in "t2" (counts all accounts that had more total purchases across all paper types than the account buying the highest quantity of standard paper).
 
--- 4. Finds how many web events the customer who spent the most on orders had on each channel. --
+-- For the customer that spent the most (in total over their lifetime as a customer) total_amt_usd, how many web_events did they have for each channel? --
 
-	-- Step 1 -- 
 	SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
 	FROM orders o
 	JOIN accounts a
@@ -421,31 +272,34 @@ FROM (SELECT a.name, AVG(total_amt_usd) above_avg
 	GROUP BY a.id, a.name
 	ORDER BY 3 DESC
 	LIMIT 1;
-	--- Finds the customer with the most spent in lifetime value. 
+	/* 
+	a. Returns the account id, account name, and their respective total sum of sales in USD.
+	- Returns results in order of account with the largest total sum of sales to smallest.
+	- Limits rows to only the first row (the customers that spent the most in USD during their lifetime). */
 
-	-- Step 2: Final Solution --
 	SELECT a.name, w.channel, COUNT(*)
 	FROM accounts a
 	JOIN web_events w
 	ON a.id = w.account_id AND a.id =  (SELECT id
-	                        FROM (SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
-	                              FROM orders o
-	                              JOIN accounts a
-	                              ON a.id = o.account_id
-	                              GROUP BY a.id, a.name
-	                              ORDER BY 3 DESC
-	                              LIMIT 1) inner_table)
+	FROM (SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
+			FROM orders o
+			JOIN accounts a
+			ON a.id = o.account_id
+			GROUP BY a.id, a.name
+			ORDER BY 3 DESC
+			LIMIT 1) t1)
 	GROUP BY 1, 2
 	ORDER BY 3 DESC;
-	-- For the account with an account id equal to the one that spent the most on orders, the total number of web events per channel is calculated.
-		-- An ORDER BY was added for no real reason.
-		-- The account name was added to assure only one account was pulled.
+	/* 
+	c. References the row with the max total sum of sales from the previous query using "t1" in the FROM clause.
+	- Outer query joins the accounts table with the web_events table, combining rows only where account ids match between both tables AND those account ids are equal
+	to the account id found in "t1". (effectively returning web events only for the account with highest sum of sales)
+	- Resulting rows (representing different web events) are then counted and grouped by the channels they occurred in.
+	- The account name was added to the grouping in SELECT to help ensure that only one account was pulled. 
+	- In other words: for the account with an account id equal to the one that spent the most on orders, the total number of web events per channel is calculated. */
 
+-- What is the lifetime average amount spent in terms of total_amt_usd for the top 10 total spending accounts? --
 
-
--- 5. Finds the lifetime average amount spent (in total_amt_usd) for the top 10 total spending accounts. --
-
-	-- Step 1 -- 
 	SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
 	FROM orders o
 	JOIN accounts a
@@ -453,47 +307,45 @@ FROM (SELECT a.name, AVG(total_amt_usd) above_avg
 	GROUP BY a.id, a.name
 	ORDER BY 3 DESC
 	LIMIT 10;
-	-- First, we just want to find the top 10 accounts in terms of highest total_amt_usd.
+	-- a. Finds the total sum of sales in USD for each account, sorted from highest sum of sales to lowest; limited to just the first 10 rows. 
 
-	-- Step 2 -- 
 	SELECT AVG(tot_spent)
 	FROM (SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
-	        FROM orders o
-	        JOIN accounts a
-	        ON a.id = o.account_id
-	        GROUP BY a.id, a.name
-	        ORDER BY 3 DESC
-	        LIMIT 10) temp;
-	-- Now, we just want the average of these 10 amounts.
+		FROM orders o
+		JOIN accounts a
+		ON a.id = o.account_id
+		GROUP BY a.id, a.name
+		ORDER BY 3 DESC
+		LIMIT 10
+		) t1;
+	-- b. Selects the 10 rows returned from the previous query using "t1" and averages their total sums of sales from the tot_spent column in "t1". (answer)
 
+-- What is the lifetime average amount spent in terms of total_amt_usd, including only the companies that spent more per order, on average, than the average of all orders. --
 
--- 6. Finds the lifetime average amount spent (in total_amt_usd) just for the companies that spent more per order, on average, than the average of all orders. --
-
-	-- Step 1 --
 	SELECT AVG(o.total_amt_usd) avg_all 
 	FROM orders o 
-	-- First, we want to pull the average of all accounts in terms of total_amt_usd.
-	
-	-- Step 2 --
+	-- a. Averages the total sum of sales in USD for all orders in the orders table.
+
 	SELECT o.account_id, AVG(o.total_amt_usd) 
 	FROM orders o 
 	GROUP BY 1 
 	HAVING AVG(o.total_amt_usd) > 
-		(SELECT AVG(o.total_amt_usd) avg_all FROM orders o); 
-	-- Then, we want to only pull the accounts with more than this average amount.
+		(SELECT AVG(o.total_amt_usd) avg_all 
+		FROM orders o); 
+	/* b. Returns account id and the average sales in USD across for all of that account's orders, but only including accounts had a higher 
+	 average sales than the average sales in USD across all orders. */
 	
-	-- Step 3 --
 	SELECT AVG(avg_amt) 
 	FROM (SELECT o.account_id, AVG(o.total_amt_usd) avg_amt 
 		FROM orders o 
 		GROUP BY 1 
 		HAVING AVG(o.total_amt_usd) > 
-			(SELECT AVG(o.total_amt_usd) avg_all FROM orders o)) temp_table; 
+			(SELECT AVG(o.total_amt_usd) avg_all 
+			FROM orders o)) t1; 
+	/* c. The average sales for each of the top 10 accounts are then average to return the lifetime average of companies that spent more, on average, 
+	than the average sales in USD across all orders. */
 
-	-- Finally, we just want the average of these values. 
 
-
--------------------------------------------------------------------------------------------
 
 
 -- WITH (or CTE: Common Table Expressions) (4.11) --
