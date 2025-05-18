@@ -201,15 +201,15 @@ GROUP BY r.name
 HAVING SUM(o.total_amt_usd) 
 = (SELECT MAX(total_amt)
 	FROM (SELECT r.name region_name, SUM(o.total_amt_usd) total_amt
-			FROM sales_reps s
-			JOIN accounts a
-			ON a.sales_rep_id = s.id
-			JOIN ord
-			ON o.account_id = a.id
-			JOIN region r
-			ON r.id = s.region_id
-			GROUP BY r.name
-			) 
+		FROM sales_reps s
+		JOIN accounts a
+		ON a.sales_rep_id = s.id
+		JOIN ord
+		ON o.account_id = a.id
+		JOIN region r
+		ON r.id = s.region_id
+		GROUP BY r.name
+		) 
 	t1);
 -- c. Returns the region name and total count of orders for the region that returned the highest sum of sales in "t1" (answer).
 		
@@ -280,14 +280,16 @@ a. Returns the account id, account name, and their respective total sum of sales
 SELECT a.name, w.channel, COUNT(*)
 FROM accounts a
 JOIN web_events w
-ON a.id = w.account_id AND a.id =  (SELECT id
-FROM (SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
+ON a.id = w.account_id AND a.id =  
+	(SELECT id
+	FROM (SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
 		FROM orders o
 		JOIN accounts a
 		ON a.id = o.account_id
 		GROUP BY a.id, a.name
 		ORDER BY 3 DESC
-		LIMIT 1) t1)
+		LIMIT 1) 
+	t1)
 GROUP BY 1, 2
 ORDER BY 3 DESC;
 /* 
@@ -341,7 +343,8 @@ FROM (SELECT o.account_id, AVG(o.total_amt_usd) avg_amt
 	GROUP BY 1 
 	HAVING AVG(o.total_amt_usd) > 
 		(SELECT AVG(o.total_amt_usd) avg_all 
-		FROM orders o)) t1; 
+		FROM orders o)
+	) t1; 
 /* c. The average sales for each of the top 10 accounts are then average to return the lifetime average of companies that spent more, on average, 
 than the average sales in USD across all orders. */
 
@@ -360,8 +363,7 @@ and run the outer query multiple times quickly. */
 -- a. Subquery --
 SELECT channel,
 	AVG(event_count) AS avg_event_count
-FROM
-(SELECT DATE_TRUNC('day', occurred_at) AS day,
+FROM (SELECT DATE_TRUNC('day', occurred_at) AS day,
 	channel,
 	COUNT(*) AS event_count
 	FROM web_events
@@ -372,10 +374,10 @@ ORDER BY 2 DESC;
 -- One problem with subqueries is they can make your queries lengthy and difficult to read.
 
 -- b. CTE --
-WITH events AS ( SELECT DATE_TRUNC('day', occurred_at) AS day,
-	channel,
-	COUNT(*) AS event_count
-	FROM web_events
+WITH events AS (SELECT DATE_TRUNC('day', occurred_at) AS day,
+channel,
+COUNT(*) AS event_count
+FROM web_events
 GROUP BY 1,2)
 	
 SELECT channel,
@@ -395,16 +397,16 @@ ORDER BY 2 DESC;
 -- a. Subquery --
 SELECT channel, AVG(events) AS average_events
 FROM (SELECT DATE_TRUNC('day',occurred_at) AS day,
-             channel, COUNT(*) as events
-      FROM web_events 
-      GROUP BY 1,2) sub
+	channel, COUNT(*) as events
+	FROM web_events 
+	GROUP BY 1,2) sub
 GROUP BY channel
 ORDER BY 2 DESC;
 
 -- b. WITH (CTE) --
 WITH events AS (
 SELECT DATE_TRUNC('day',occurred_at) AS day,
-	 channel, COUNT(*) as events
+	channel, COUNT(*) as events
 FROM web_events 
 GROUP BY 1,2 )
 -- First, we pull the inner query. This is the part we put in the WITH statement. We are aliasing the table as "events." 
@@ -422,12 +424,12 @@ ORDER BY 2 DESC;
 -- When creating multiple tables using WITH, you add a comma after every table, except the last table leading to your final query:
 
 WITH table1 AS (
-          SELECT *
-          FROM web_events),
+SELECT *
+FROM web_events),
 
-     table2 AS (
-          SELECT *
-          FROM accounts)
+table2 AS (
+SELECT *
+FROM accounts)
 
 SELECT *
 FROM table1
@@ -437,22 +439,22 @@ ON table1.account_id = table2.id;
 -- Provide the name of the sales_rep in each region with the largest amount of total_amt_usd sales. --
 
 WITH t1 AS (
-	SELECT s.name rep, r.name region, SUM(o.total_amt_usd) sum_of_sales
-	FROM orders o
-	JOIN accounts a
-	ON o.account_id = a.id
-	JOIN sales_reps s
-	ON s.id = a.sales_rep_id
-	JOIN region r
-	ON r.id = s.region_id
-	GROUP BY 1,2),
-	-- "t1" returns the total sales (in USD) made by each sales representative in each region.
+SELECT s.name rep, r.name region, SUM(o.total_amt_usd) sum_of_sales
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+JOIN region r
+ON r.id = s.region_id
+GROUP BY 1,2),
+-- "t1" returns the total sales (in USD) made by each sales representative in each region.
 
 t2 AS (
-	SELECT region, MAX(sum_of_sales) max_sales
-	FROM t1
-	GROUP BY 1)
-	-- selects the that largest total sales found for each region from the "t1" table.
+SELECT region, MAX(sum_of_sales) max_sales
+FROM t1
+GROUP BY 1)
+-- selects the that largest total sales found for each region from the "t1" table.
 
 SELECT t1.rep, t1.region, t1.sum_of_sales
 FROM t1
@@ -464,20 +466,20 @@ ON t2.max_sales = t1.sum_of_sales AND t1.region = t2.region;
 -- For the region with the largest sales total_amt_usd, how many total orders were placed? --
 
 WITH t1 AS (
-	SELECT r.name region_name, SUM(o.total_amt_usd) total_amt
-	FROM sales_reps s
-	JOIN accounts a
-	ON a.sales_rep_id = s.id
-	JOIN orders o
-	ON o.account_id = a.id
-	JOIN region r
-	ON r.id = s.region_id
-	GROUP BY r.name), 
+SELECT r.name region_name, SUM(o.total_amt_usd) total_amt
+FROM sales_reps s
+JOIN accounts a
+ON a.sales_rep_id = s.id
+JOIN orders o
+ON o.account_id = a.id
+JOIN region r
+ON r.id = s.region_id
+GROUP BY r.name), 
 -- Returns the total sales (in USD) for each region. Table is aliased as "t1".
 
 t2 AS (
-	SELECT MAX(total_amt)
-	FROM t1)
+SELECT MAX(total_amt)
+FROM t1)
 -- Selects the largest total sales (in USD) found in the total_amt column of "t1".
 
 SELECT r.name, COUNT(o.total) total_orders
@@ -495,24 +497,24 @@ HAVING SUM(o.total_amt_usd) = (SELECT * FROM t2);
 -- For the account that purchased the most (in total over their lifetime as a customer) standard_qty paper, how many accounts still had more in total purchases? --
 
 WITH t1 AS (
-	SELECT a.name account, SUM(o.standard_qty) standard_qty, SUM(o.total) total_qty
-	FROM accounts a
-	JOIN orders o
-	ON a.id = o.account_id
-	GROUP BY 1
-	ORDER BY 2 DESC
-	LIMIT 1),
+SELECT a.name account, SUM(o.standard_qty) standard_qty, SUM(o.total) total_qty
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 1),
 -- Returns the account name, their total quantity of standard paper purchased, and their total quantity of all paper purchased.
 -- Orders the results from highest total quantity of standard paper purchased to least.
 -- Limits the results to only the first row. (the account that spent the most in total over their lifetime as a customer on standard paper.)
 
 t2 AS (
-	SELECT a.name
-	FROM accounts a
-	JOIN orders o
-	ON a.id = o.account_id
-	GROUP BY 1
-	HAVING SUM(o.total) > (SELECT total_qty FROM t1))
+SELECT a.name
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY 1
+HAVING SUM(o.total) > (SELECT total_qty FROM t1))
 -- Returns the account name for any account that greater had a greater total quantity of all paper types purchased than the account with the greatest quantity of standard paper purchases.
 
 SELECT COUNT(*)
@@ -522,13 +524,13 @@ FROM t2;
 -- For the customer that spent the most (in total over their lifetime as a customer) total_amt_usd, how many web_events did they have for each channel? --
 
 WITH t1 AS (
-	SELECT a.id id, a.name, SUM(o.total_amt_usd) tot_spent
-	FROM orders o
-	JOIN accounts a
-	ON a.id = o.account_id
-	GROUP BY a.id, a.name
-	ORDER BY 3 DESC
-	LIMIT 1)
+SELECT a.id id, a.name, SUM(o.total_amt_usd) tot_spent
+FROM orders o
+JOIN accounts a
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+ORDER BY 3 DESC
+LIMIT 1)
 -- Returns each account's id, name and total sum of sales (in USD).
 -- Orders the results so rows are listed from greatest total sales (in USD) to least.
 -- Limits resuts to only the first row. (the account that spent the most in USD over their lifetime as a customer)
@@ -545,13 +547,13 @@ a count of web events is listed by channel. */
 -- What is the lifetime average amount spent in terms of total_amt_usd for the top 10 total spending accounts? -- 
 
 WITH t1 AS (
-	SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
-	FROM orders o
-	JOIN accounts a
-	ON a.id = o.account_id
-	GROUP BY a.id, a.name
-	ORDER BY 3 DESC
-	LIMIT 10)
+SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
+FROM orders o
+JOIN accounts a
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+ORDER BY 3 DESC
+LIMIT 10)
 -- Returns the account id, account name and the total sales (in USD) spent by each account.
 -- Results are ordered from greatest total sales (in USD) to least.
 -- Limits results to only the first 10 rows. (the 10 top total spending accounts)
@@ -563,16 +565,16 @@ FROM t1;
 -- What is the lifetime average amount spent in terms of total_amt_usd, including only the companies that spent more per order, on average, than the average of all orders. --
 
 WITH t1 AS ( 
-	SELECT AVG(o.total_amt_usd) avg_all 
-	FROM orders o 
-	JOIN accounts a 
-	ON a.id = o.account_id),
+SELECT AVG(o.total_amt_usd) avg_all 
+FROM orders o 
+JOIN accounts a 
+ON a.id = o.account_id),
 -- Finds the average total (in USD) spent across all orders.
 
 t2 AS (SELECT o.account_id, AVG(o.total_amt_usd) avg_amt 
-	FROM orders o 
-	GROUP BY 1 
-	HAVING AVG(o.total_amt_usd) > (SELECT * FROM t1)) 
+FROM orders o 
+GROUP BY 1 
+HAVING AVG(o.total_amt_usd) > (SELECT * FROM t1)) 
 -- Averages the total spent in USD per order for each account id.
 -- Filters rows so only account ids with an average total spent per order greater than the average total spent across all orders is returned. 
 
