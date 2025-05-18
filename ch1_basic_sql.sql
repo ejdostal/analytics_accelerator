@@ -1,6 +1,5 @@
 -- Ch 1: Basic SQL -- 
 -----------------------
-
 -- SELECT and FROM (1.11) --
 /*
 - SELECT indicates which column(s) you want to be given the data for.
@@ -116,6 +115,11 @@ WHERE name = 'Exxon Mobil';
 
 
 -- Arithmetic Operators (1.30) --
+/* 
+Creating a new column that is a combination of existing columns is known as a derived column (or "calculated" or "computed" column). 
+Usually you want to give a name, or "alias," to your new column using the AS keyword. This derived column, and its alias, are generally 
+only temporary, existing just for the duration of your query. The next time you run a query and access this table, the new column will 
+not be there. */
 
 SELECT id, (standard_amt_usd/total_amt_usd)*100 AS std_percent, total_amt_usd
 FROM orders
@@ -299,10 +303,3 @@ WHERE (name LIKE 'C%' OR name LIKE 'W%')
     AND ((primary_poc LIKE '%ana%' OR primary_poc LIKE '%Ana%')
     AND primary_poc NOT LIKE '%eana%');
 -- shows records where the company name starts with either "C" or "W" and the primary point of contact contains the string "ana" or "Ana", but does not contain the string "eana". --
-
-
-/* - when using JOINs, SELECT also needs to the table every column comes from. 
-- "TableA. " gives us all the columns from that table in the output.
-- "TableA.ColumnNameC" gives us that specific column from that specific table in the output. 
-
-Derived columns - A new column created by manipulating existing columns in the database. */
