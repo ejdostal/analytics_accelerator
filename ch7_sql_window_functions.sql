@@ -1,149 +1,115 @@
-SELECT *
-FROM orders;
+-- Ch. 7 Window Functions -- 
+--------------------------------
+-- Window functions allow you to compare one row to another without doing any joins 
+-- Use to create running totals
+-- Use to determine whether one row was greater than a previous row, then classify it based on your finding
+
+-- Window function performs a calculation across a set of table rows, comparable to an aggregate function
+	-- Aggregate function - cause rows to become grouped into a single output rows
+	-- Window function -  window functions allow the rows to retain their separate identities 
+
+-- OVER and PARTITION BY are key to window functions.
+-- Not every window functions uses PARTITION BY and ORDER BY
+
+-- the window is the ordered subset of data over which all of these calculations are made
+-- ORDER and PARTITION are what define the window 
+	-- Adding OVER designates it as a window function.
+	-- PARTITION BY function is narrows the window from the entire data set to individual groups in a dataset 
+
+-- Note: You CAN'T use window functions and standard aggregations in the same query. 
+-- More specifically, you can’t include window functions in a GROUP BY clause.
+
+-- Syntax for calculating a Running total:
+-- Aggregation-of (column) OVER (PARTITION BY column) ORDER BY column) AS running total
 
 
-/* 7.2 Window Functions 
+-- 7.2: Running Total --
+-------------------------
+-- You can create an aggregation - Running total - without using GROUP BY.
 
-A window function performs a calculation across a set of table rows that are 
-somehow related to the current row. 
-
-Unlike regular aggregate functions, use of a window function does not cause 
-rows to become grouped into a single output row — the rows retain their separate 
-identities. 
-
-Behind the scenes, the window function is able to access more than just the 
-current row of the query result.
-
-Adding OVER designates it as a window function.
-
-The PARTITION BY function is used to narrow the window from the entire data set to individual groups in a dataset. 
-
-ORDER and PARTITION are what define the window - the ordered subset of data over which all of these calculations are made.
-
-
-
-Running totals
----------------
-The most practical example of a window function is a running total.
-ex. Calculate a running total of how much standard paper we've sold to date. */
+-- 1a) Calculate a running total of how much standard paper sold to date.
 
 SELECT standard_qty,
 	SUM(standard_qty) OVER (ORDER BY occurred_at) AS running_total
 FROM orders; 
+-- You could read this as:
+-- Take the sum of standard_qty across all rows leading up to a given row, in order by occurred_at.
 
-/* Takes the sum of standard_qty across all rows leading up to a given row, in order by occurred_at.
-This query creates an aggregation without using GROUP BY. */
-
-
--- Partitioned by month -- 
+-- 1b) Calculate a running total of how much standard paper we've sold to date, starting over at the beginning of each month.
 
 SELECT standard_qty,
 	DATE_TRUNC ('month', occurred_at) AS month,
 	SUM(standard_qty) OVER (PARTITION BY DATE_TRUNC ('month', occurred_at) ORDER BY occurred_at) AS running_total
 FROM orders; 
+-- to narrow the window from the entire dataset to individual groups within the dataset, use PARTITION BY.
+-- This query groups and orders the query by the month in which the transaction occurred; within each month it's ordered by occurred_at
+-- ORDER BY treats each partition as separate and defines the running total 
+	-- without ORDER BY each value will simply be a sum of all the standard quantity values in its respective month
 
-/* Takes the sum of standard_qty across all rows leading up to a given row, partitioned by the month in which 
-the transaction occurred and ordered by occurrence timestamp. 
-This query groups and orders the query by the month in which the transaction occurred. 
-The running total will start over at the beginning of each month.
-
-ORDER BY treats every partition as separate and is what creates the running total. */
-
-
--- No ORDER BY --
-
-SELECT standard_qty,
-	DATE_TRUNC ('month', occurred_at) AS month,
-	SUM(standard_qty) OVER (PARTITION BY DATE_TRUNC ('month', occurred_at)) AS running_total
-FROM orders; 
-
--- Without ORDER BY each value would simply be the sum of all the standard quantity values in its respective month: 
-
--- 2. Calculate a running total of standard_amt_usd over order time (with no date truncation). --
-
--- Across all time -- 
+-- 2a) Calculate a running total of standard_amt_usd over order time (with no date truncation). 
 
 SELECT standard_amt_usd,
   SUM(standard_amt_usd) OVER (ORDER BY occurred_at) AS running_total
 FROM orders;
--- Takes the sum of standard_amt_usd across all rows leading up to a given row, in order by occurred_at. 
+-- Take the sum of standard_amt_usd across all rows leading up to a given row, in order by occurred_at. 
+-- Running total continues across all orders in the dataset.
 
-
--- Partitioned by year --
-
+-- 2b) Calculate a partitioned running total of standard_amt_usd over order time by year. 
 SELECT standard_amt_usd,
 DATE_TRUNC('year', occurred_at) AS year,
 SUM(standard_amt_usd) OVER (PARTITION BY DATE_TRUNC('year', occurred_at) ORDER BY occurred_at) AS running_total
 FROM orders;
-
-/* Takes the sum of standard_amt_usd across all rows leading up to a given row, in order by occurred_at.
-Grouped and ordered by the year in which the transaction occurred. */ 
-
-
+-- Take the sum of standard_amt_usd across all rows leading up to a given row, in order by occurred_at. 
+-- Running total continues across all orders within a year, then starts over at the start of the next year.
+-- Can also think of as grouping and ordering by the year in which the transaction occurred. 
 
 
+-- 7.7: ROW_NUMBER & RANK -- 
+----------------------------
+-- The easiest place to start using Window Functions is with functions that just count - they don't aggregate.
 
--- ROW_NUMBER and RANK just count - they don't actually aggregate.
+-- ROW NUMBER () displays the number of a given row in the window you define.
+-- Row number orders the rows according to the ORDER BY part of the window statement.
+-- Row Number does not require you to specifiy a variable within the parentheses.
 
-
-/* ROW_NUMBER 
-
-ROW_NUMBER displays the number of a given row within the window you define. It starts 
-at 1 and orders the rows according the ORDER BY part of the window statement. ROW_NUMBER 
-does not require you to specify a variable within the parentheses. */
-
-SELECT id,
-	account_id,
-	occurred_at,
-	ROW_NUMBER() OVER (ORDER BY id) AS row_num
-FROM orders;
--- Here we're ordering by id, which increments by 1 every row. So the ID and row_num fields always have the same value. 
-
+-- 1.b) Ranks rows in order from earliest to most recent order date.
 
 SELECT id,
 	account_id,
 	occurred_at,
 	ROW_NUMBER() OVER (ORDER BY occurred_at) AS row_num
 FROM orders;
--- When we ORDER BY occurred_at the rows are occurrence date, the row number no longer matches up with ids.
--- I guess we don't assign ids to instances based on chronology?
+-- sorts rows from earliest to most recent order date, regardless of account_id
 
+-- 1c) Group rows by account_id, then ranks order within from earliest order to most recent order for each account_id.
+	-- gives each order date a unique, sequential rank in the group, regardless of whether 2 dates are exactly the same (ex. 5,6) 
 SELECT id,
 	account_id,
 	occurred_at,
-	ROW_NUMBER() OVER (PARTITION BY account_id ORDER BY id) AS row_num
+	ROW_NUMBER() OVER (PARTITION BY account_id ORDER BY occurred_at) AS row_num
 FROM orders;
--- When we PARTITION BY account_id, it starts the count over at 1 again in each partition.
--- Now this shows us the row number within each account_id where row 1 is the first order that occurred.
--- Shows orders for each account, ordered from 1st to last order, with numbering starting over again at 1 for each account.
+-- groups rows by account_id, sorting by order date within each group
+-- within each partition, row_num 1 stands for the first order that occurred within that account_id
 
+--  RANK is similar to ROW_NUMBER, but has a subtle difference. --
+	-- ROW_NUMBER() gives all rows different numbers.
+	-- RANK will give two rows with the same value the same rank number. 
+	-- Wherever there is more than one row assigned the same number, RANK will skip some values to make up for the repeated rank.
+	-- DENSE_RANK will also give two rows with the same value the same rank number, but won't skip numbers to make up for it.
 
-
-
-
-
-/* RANK and DENSE_RANK 
-
-RANK does something similar to ROW_NUMBER, but has a subtle difference.
-
-If 2 lines in a row have the same value for occurred_at, they're given the same rank
-whereas ROW_NUMBER will give them different numbers. */ 
-
-SELECT id,
+ -- 1e) Group rows by account_id, then ranks order within from earliest order to most recent order for each account_id.
+	-- gives each order date a sequential rank in the group, giving 2 dates that are exactly the same the same rank - and then skipping values after to make up for i. (ex. 5,5,7) 
+ SELECT id,
 	account_id,
 	DATE_TRUNC('month', occurred_at) AS month,
 	occurred_at,
 	RANK() OVER (PARTITION BY account_id ORDER BY DATE_TRUNC('month', occurred_at)) AS row_num
 FROM orders;
-
 -- Shows orders for each account, also by occurrence date - but orders with the same occurrence date are given the same rank. 
 -- To make up for rows where the same rank number is repeated, rank will skip some values following it.
 
--- Entries within the same month are given the same rank
--- the RANK column will skip some values to make up for the repeated rank.
-
-
-
+-- 1f) Group rows by account_id, then ranks order within from earliest order to most recent order for each account_id.
+	-- gives each order date a sequential rank in the group, giving 2 dates that are exactly the same the same rank - doesn't skipping values after. (ex. 5,5,6) 
 SELECT id,
 	account_id,
 	DATE_TRUNC('month', occurred_at) AS month,
@@ -151,18 +117,15 @@ SELECT id,
 	DENSE_RANK() OVER (PARTITION BY account_id ORDER BY DATE_TRUNC('month', occurred_at)) AS row_num
 FROM orders;
 
--- DENSE_RANK is similar to RANK, but it doesn't skip values after assigning several rows with the same rank 
-
-
+-- 2a) Rank total quantities of paper ordered from highest to lowest for each account.
 
 SELECT id, account_id, total,
 RANK() OVER (PARTITION BY account_id ORDER BY total DESC) AS total_rank
 FROM orders;
+-- Groups orders within each account_id, ranking them from order with the highest paper quantity sold to the lowest.
 
--- Ranks total paper ordered by account.
 
-
--- 7.11 Aggregates in Window Functions 
+-- 7.11 Aggregates in Window Functions ---
 
 SELECT id,
        account_id,
